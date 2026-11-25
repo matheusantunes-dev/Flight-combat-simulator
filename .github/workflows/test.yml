@@ -35,6 +35,8 @@ jobs:
         run: node tests/eject.mjs
       - name: Teste do hangar 3D
         run: node tests/hangar.mjs
+      - name: Teste das armas reais
+        run: node tests/armas.mjs
       - name: Teste da tela remota (PC transmite, celular mostra)
         run: node tests/remote.mjs
       - name: Teste dos alvos de solo e das missões de ataque

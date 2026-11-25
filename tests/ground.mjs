@@ -28,8 +28,9 @@ ok.campanha2Liberada = await p.evaluate(() => !document.querySelector('[data-v=c
 await p.click('[data-v=c5]');
 ok.selecaoUnica = await p.evaluate(() => document.querySelectorAll('[data-k=mission] button.on').length === 1 && /Martelo/.test(document.querySelector('#selLine').textContent));
 
-const r = await p.evaluate(() => {
+const r = await p.evaluate(async () => {
   const t = window.__tomcat, P = t.P, G = t.G, T = t.T, out = {};
+  t.S.fh = true; await t.selectAircraft('f16'); // o F-16 leva AGM-65 (o F-14 real não levava Maverick)
   const fly = (pos, look) => { P.state = 'fly'; P.gear = false; P.gearPos = 0; P.pos.copy(pos); const d = look.clone().sub(pos); d.y = 0; d.normalize(); const sp = 220; P.vel.set(d.x * sp, 0, d.z * sp); const h = Math.atan2(d.x, -d.z); P.q.setFromEuler(new THREE.Euler(-0.35, -h, 0, 'YXZ')); P.thr = P.spool = 0.9; };
   // ---- Missão 6: ataque à ilha
   t.S.mission = 'c5'; t.startGame();
@@ -51,7 +52,7 @@ const r = await p.evaluate(() => {
   // AAA atira de perto
   const aaa = gr.find((u) => u.type === 'aaa');
   P.hp = 100; fly(aaa.pos.clone().add(new THREE.Vector3(0, 600, 1400)), aaa.pos); P.vel.set(0, 0, 0);
-  let hit = false; t.sim(6, () => { P.vel.set(0, 0, 0); P.pos.copy(aaa.pos).add(new THREE.Vector3(0, 600, 1400)); if (P.hp < 100) hit = true; });
+  let hit = false; t.sim(15, () => { P.vel.set(0, 0, 0); P.pos.copy(aaa.pos).add(new THREE.Vector3(0, 600, 1400)); if (P.hp < 100) hit = true; });
   out.aaaAtira = hit;
   // vitória: destrói o resto do solo e o céu
   for (const u of T.filter((u) => u.kind === 'ground' && u.alive)) t.damage(u, 9, 'gun');

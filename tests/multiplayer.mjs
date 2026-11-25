@@ -43,6 +43,7 @@ ok.times = await A.evaluate(([b, c]) => { const t = __tomcat.NET.teams; return t
 ok.trocaPeloBotao = await C.evaluate(() => /Vermelho|Azul/.test(document.getElementById('mpTeam').textContent));
 await A.click('#mpStart'); await A.waitForTimeout(3500);
 ok.pvpStart = (await B.evaluate(() => __tomcat.NET.match && __tomcat.G.mission === 'pvp'));
+await A.waitForFunction(() => __tomcat.T.some((t) => t.kind === 'remote'), null, { timeout: 15000 }).catch(() => {}); // o 1º estado do adversário pode demorar no Chrome sem GPU
 ok.colegaNaoEhAlvo = await A.evaluate((c) => !__tomcat.T.some((t) => t.kind === 'remote' && t.id === c) && __tomcat.T.some((t) => t.kind === 'remote'), idC);
 ok.ladosOpostos = (await A.evaluate(() => __tomcat.P.pos.z)) > (await B.evaluate(() => __tomcat.P.pos.z));
 // fogo amigo não vale: C manda acerto em A

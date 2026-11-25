@@ -39,6 +39,23 @@ npx gltfpack -i modelo.gltf -o models/modelo.glb -c -noq -kn -km -ke
 ```
 `-noq` mantém as coordenadas em float (o código separa trem de pouso, asas e cockpit pelos nomes e precisa delas assim); `-kn -km -ke` mantêm nomes, materiais e extras.
 
+## Armas e desempenho reais
+
+- **Velocidade máxima calibrada:** o arrasto de cada caça foi ajustado para bater a velocidade real em altitude (F-14 Mach 2,34, F-16 2,05, MiG-29 2,25, Mirage 2,2...). Ao nível do mar vale o limite estrutural de cada um (~750-810 nós). A ferramenta `node tools/velocidade.mjs` mostra a tabela.
+- **Cargas reais por avião**, em 6 estações: 1 canhão · 2 IR · 3 radar · 4 longo alcance · 5 míssil ar-solo · 6 bombas.
+  - **F-14B:** AIM-9M, AIM-7M, AIM-54C e GBU-12 com o pod LANTIRN. O F-14 não levava Maverick.
+  - **F-16C:** AIM-9X, AIM-120C, AGM-65D e GBU-12.
+  - **MiG-29A:** R-73, R-27R e FAB-500 burra.
+  - **Mirage 2000C:** Magic II, Super 530D e Mk 82.
+- **Bombas:**
+  - **Burras** (Mk 82, FAB-500): mira CCIP no HUD. Solte quando o círculo cair no alvo.
+  - **A laser** (GBU-12/27, KAB): só guiam enquanto você mantém a trava, e o pod enxerga para baixo e para trás.
+  - **GPS** (GBU-39, JDAM, AASM): gravam a coordenada na soltura, você pode ir embora, e planam de longe. Alvo que se move escapa.
+  - **Explosão em área:** pega o que estiver perto. Soltar baixo demais acerta o próprio avião com estilhaços.
+- **Mísseis especiais:** Exocet (só em navio, voa rente ao mar), Kh-59M (TV, longo alcance), Meteor (ramjet), R-37M.
+- **Furtividade:** F-22, F-117 e Su-57 são vistos bem mais perto pelo radar inimigo e pelos SAMs.
+- **Caças novos com ficha pronta** (F-15E, Rafale M, Su-57, Gripen, Su-35, Su-34, F-117, A-10C, Su-30MKK, F-22, Su-25): velocidade, armas, canhão e assento reais já estão no jogo. Eles aparecem no hangar quando o modelo 3D (`models/<id>.glb`) entrar.
+
 ## Hangar 3D
 
 No menu, na aba **Jogar**, o caça aparece num hangar fechado, numa plataforma giratória com refletores, como na escolha de avião do Ace Combat.
