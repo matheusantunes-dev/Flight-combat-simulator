@@ -30,7 +30,7 @@ await ctx.route(LIBS?/three\.min|GLTFLoader|meshopt|fonts\.g|esm\.run|elevation-
  return r.fulfill({body:''})});
 const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(String(e)));p.on('console',m=>{if(m.type()==='warning'||m.type()==='error')errs.push(m.text())});
 await p.goto(URL0);await p.waitForFunction(()=>window.__tomcat&&!document.querySelector('#go').disabled,null,{timeout:120000});
-await p.click('[data-k=world] [data-v=rio]');await p.click('[data-k=wq] [data-v=alta]');await p.waitForTimeout(6000);
+await p.click('.tabs button[data-tab=world]');await p.click('[data-k=world] [data-v=rio]');await p.click('[data-k=wq] [data-v=alta]');await p.waitForTimeout(6000);
 
 console.log('menu: carrierH',await p.evaluate(()=>__tomcat.terrainH?0:0),'hits',JSON.stringify(hits));
 await p.evaluate(()=>{const t=__tomcat;t.S.mission='free';t.startGame();t.P.pos.set(0,900,-7500);t.sim(.1)});await p.waitForTimeout(8000);

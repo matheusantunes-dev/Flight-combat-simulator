@@ -25,7 +25,7 @@ await p.goto(URL0);
 await p.waitForFunction(() => window.__tomcat && !document.querySelector('#go').disabled, null, { timeout: 120000 });
 const ok = {};
 
-await p.click('#ctlOpen'); await p.waitForTimeout(300);
+await p.click('.tabs button[data-tab=opts]'); await p.click('#ctlOpen'); await p.waitForTimeout(300);
 const bind = async (act, fn) => {
   await p.evaluate((a) => { const rows = [...document.querySelectorAll('#joyList .jrow')]; const r = rows.find((x) => x.querySelector('span').textContent.startsWith(a)); r.querySelector('button').click(); }, act);
   await p.waitForTimeout(150); await p.evaluate(fn); await p.waitForTimeout(250);
