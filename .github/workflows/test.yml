@@ -15,7 +15,7 @@ jobs:
           node-version: 20
       - name: Instalar Playwright
         run: |
-          npm i --no-save playwright@1
+          npm i --no-save playwright@1 pngjs geojson-vt@3 vt-pbf
           npx playwright install --with-deps chromium
       - name: Servir o jogo
         run: python3 -m http.server 8080 &
@@ -23,3 +23,5 @@ jobs:
         run: node tests/smoke.mjs
       - name: Teste do multiplayer (2 abas, rede local)
         run: node tests/multiplayer.mjs
+      - name: Teste do Mundo Real (dados sintéticos)
+        run: node tests/world.mjs
