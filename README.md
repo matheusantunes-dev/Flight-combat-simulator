@@ -39,6 +39,8 @@ npx gltfpack -i modelo.gltf -o models/modelo.glb -c -noq -kn -km -ke
 ```
 `-noq` mantém as coordenadas em float (o código separa trem de pouso, asas e cockpit pelos nomes e precisa delas assim); `-kn -km -ke` mantêm nomes, materiais e extras.
 
+Modelos de outros autores (nós `Object_*`, eixos trocados) passam antes por `tools/normalizar-modelo.mjs`: ele gira o nariz para +X, deixa Y para cima e renomeia as peças para o padrão do jogo (`-airframe`, `-canopy`, `-landingOn`). Depois, `tools/encolher-modelo.mjs` recomprime as texturas. No `index.html`, cada caça tem `scale`, `eye` (olho do piloto em metros), `gearH` e, se o modelo veio com o trem recolhido, `pgear` (trem desenhado pelo jogo: pernas e rodas).
+
 ## Armas e desempenho reais
 
 - **Velocidade máxima calibrada:** o arrasto de cada caça foi ajustado para bater a velocidade real em altitude (F-14 Mach 2,34, F-16 2,05, MiG-29 2,25, Mirage 2,2...). Ao nível do mar vale o limite estrutural de cada um (~750-810 nós). A ferramenta `node tools/velocidade.mjs` mostra a tabela.
@@ -155,5 +157,10 @@ Observações honestas:
 - WebLLM / MLC AI (Apache-2.0) e modelos Qwen2.5 (Alibaba, licença Apache-2.0).
 - Modelos 3D dos caças F-14, F-16, MiG-29 e Mirage 2000: bohmerang, **CC BY-NC-SA** (uso não comercial, com atribuição e mesma licença).
 - MiG-29 e Su-27 simples: Zuujis, CC0.
+- F-15E, Rafale M, Su-57, Gripen, Su-35 e Su-34: bohmerang, **CC BY-NC-SA 4.0**.
+- F-117A, F-22A e F-16E/F Block 60: andertan, **CC BY 4.0**.
+- A-10C e Su-30MKK: Jeyhun1985, **CC BY 4.0**. Su-25: Alexios_Apokaukos, **CC BY 4.0**.
+- J-11B (usado como Flanker inimigo): Rhine_Lab_Muelsyse, **CC BY 4.0**.
+- Alterações nos modelos CC BY: reorientados (nariz em +X), simplificados, texturas recomprimidas; F-117, F-16E, F-22, A-10 e Su-30 ganham trem de pouso procedural no jogo (os modelos vieram com o trem recolhido).
 
 Por causa da licença NC dos caças, este projeto **não pode ser vendido nem monetizado** sem trocar esses modelos.

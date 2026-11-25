@@ -22,7 +22,7 @@ const ok = await p.evaluate(async () => {
   const t = __tomcat, P = t.P, G = t.G, T = t.T, o = {}, V = THREE.Vector3;
   const AC = t.ACFT;
   o.cargasReais = AC.f14.wpn.bomb.m === 'gbu12' && !AC.f14.wpn.agm && AC.mig29.wpn.bomb.m === 'fab500' && !AC.m2000.wpn.agm && AC.f16.wpn.agm && AC.f16.wpn.bomb && AC.a10.gun.n === 1174 && AC.f117.gun.n === 0 && AC.rafale.wpn.agm.m === 'exocet';
-  o.novosEsperandoModelo = Object.keys(t.NEWAC).every((id) => AC[id].soon) && /Chegando/.test(document.getElementById('soonLine').textContent);
+  o.novosTodosNoHangar = Object.keys(t.NEWAC).every((id) => !AC[id].soon && document.querySelector('[data-k=ac] button[data-v=' + id + ']')) && !document.getElementById('soonLine').textContent;
   const fly = (pos, vel) => { P.state = 'fly'; P.gear = false; P.gearPos = 0; P.pos.copy(pos); P.vel.copy(vel); P.q.setFromUnitVectors(new V(0, 0, -1), vel.clone().normalize()); P.thr = P.spool = .9; P.hp = 100; };
   const hold = (pos, vel) => () => { P.pos.copy(pos); P.vel.copy(vel); P.hp = 100; };
   // ---- bomba burra (MiG-29, FAB-500) com CCIP, em cima do depósito

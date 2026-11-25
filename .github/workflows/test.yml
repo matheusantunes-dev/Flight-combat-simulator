@@ -41,3 +41,5 @@ jobs:
         run: node tests/remote.mjs
       - name: Teste dos alvos de solo e das missões de ataque
         run: node tests/ground.mjs
+      - name: Todos os caças (modelos, trem, voo)
+        run: node tests/cacas.mjs
