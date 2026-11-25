@@ -25,3 +25,5 @@ jobs:
         run: node tests/multiplayer.mjs
       - name: Teste do Mundo Real (dados sintéticos)
         run: node tests/world.mjs
+      - name: Teste do joystick e do VR
+        run: node tests/controls.mjs

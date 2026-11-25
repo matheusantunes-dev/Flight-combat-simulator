@@ -22,7 +22,7 @@ Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fc
 
 ## Testes automáticos
 
-Todo Pull Request roda `.github/workflows/test.yml`: abre o jogo num Chrome headless e confere decolagem por catapulta, pouso com cabo e combate com os alas (`tests/smoke.mjs`), o multiplayer com 2 abas: lobby, PvP e coop (`tests/multiplayer.mjs`), e o Mundo Real com mapa sintético (`tests/world.mjs`).
+Todo Pull Request roda `.github/workflows/test.yml`: abre o jogo num Chrome headless e confere decolagem por catapulta, pouso com cabo e combate com os alas (`tests/smoke.mjs`), o multiplayer com 2 abas: lobby, PvP e coop (`tests/multiplayer.mjs`), o Mundo Real com mapa sintético (`tests/world.mjs`), e o joystick com um manche falso + o VR (`tests/controls.mjs`).
 
 Rodar no seu PC:
 ```bash
@@ -61,9 +61,11 @@ Como funciona: [Trystero](https://github.com/dmotz/trystero) encontra os jogador
 
 Testar sem internet, em duas abas: `http://localhost:8080/?rede=local`.
 
-## Mundo Real: Rio de Janeiro (protótipo)
+## Mundo Real (qualquer lugar do planeta)
 
-No menu: **Mundo → Rio de Janeiro (real)** e escolha a **Qualidade do mapa**.
+No menu: **Mundo → Mundo real**, escolha a **Qualidade do mapa** e **onde voar**: um dos lugares prontos ou a busca (OpenStreetMap/Nominatim, só ao apertar Buscar). O jogo procura mar a até 60 km para o porta-aviões; sem mar, a decolagem é no ar e o pouso fica desligado.
+
+- **Voo sem fim:** no Voo livre, a cada 60 km o mundo se recentraliza no avião e o mapa continua (o porta-aviões fica para trás). Nos modos de combate e no multiplayer o teatro é fixo; no multiplayer, todos usam o lugar do anfitrião.
 
 - **Relevo real:** AWS Terrain Tiles (Terrarium), grátis e sem chave.
 - **Chão:** imagem de satélite Sentinel-2 cloudless 2016 (EOX, CC BY 4.0, ~10 m por pixel: bonita do alto, borrada voando baixo).
@@ -77,6 +79,14 @@ No menu: **Mundo → Rio de Janeiro (real)** e escolha a **Qualidade do mapa**.
 | Alta | até zoom 14 | raio de 3,2 km |
 
 Limitações: o teatro é plano (~200 km em volta do porta-aviões); fora disso o mapa acaba. Os créditos dos dados aparecem no rodapé, como as licenças exigem.
+
+## Joystick programável e VR
+
+Menu (ou Pausa) → **CONTROLES · JOYSTICK · VR**.
+
+- **Joystick:** qualquer manche, manete, volante ou controle USB/Bluetooth que o navegador enxergar. Aperte um botão do aparelho para ele aparecer, toque em **Definir** em cada ação e mexa o eixo ou aperte o botão. O sentido do eixo é gravado sozinho (por isso a tela pede "puxe para trás", "incline para a direita"). Dá para misturar aparelhos (manche + manete separados). Zona morta e curva ajustáveis; tudo fica salvo no navegador.
+- **VR de celular:** tela dividida em dois olhos e o giroscópio mexe a cabeça dentro do cockpit. Funciona com óculos tipo Cardboard ou qualquer suporte de celular. Com o celular no óculos, pilote com joystick Bluetooth ou USB (OTG). Toque 2× na tela para sair; o botão "Recentralizar" (ou a ação gravada no joystick) zera a direção da cabeça.
+- **Olhar com o giroscópio sem óculos:** opção no mesmo painel.
 
 ## Rádio com IA (grátis, sem chave)
 
