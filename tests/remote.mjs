@@ -18,7 +18,7 @@ const errs = [];
 const pc = await ctx.newPage(); pc.on('pageerror', (e) => errs.push('pc: ' + e));
 await pc.goto(URL0 + '?rede=local');
 await pc.waitForFunction(() => window.__tomcat && !document.querySelector('#go').disabled, null, { timeout: 120000 });
-await pc.click('#ctlOpen'); await pc.waitForTimeout(200);
+await pc.click('.tabs button[data-tab=opts]'); await pc.click('#ctlOpen'); await pc.waitForTimeout(200);
 await pc.click('#rsStart');
 await pc.waitForFunction(() => document.querySelector('#rsCode').textContent.length >= 4, null, { timeout: 20000 });
 const code = await pc.textContent('#rsCode');

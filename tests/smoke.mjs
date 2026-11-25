@@ -34,7 +34,9 @@ const results = await page.evaluate(() => {
   t.sim(10);
   out.pouso = G.traps === 1;
   // 3) combate: os alas derrubam a primeira onda
-  t.S.mission = 'free'; t.startGame(); t.sim(5); G.waveT = 0.1; t.sim(100);
+  t.S.mission = 'free'; t.startGame(); t.sim(5); t.wingCmd('disperse'); G.waveT = 0.1;
+  // os alas caçam sozinhos; espera até alguém abater (no máximo 180 s de jogo)
+  for (let i = 0; i < 18 && G.kills + G.allyKills === 0; i++) t.sim(10);
   out.alas = t.AL.length === 6;
   out.abates = G.kills + G.allyKills > 0;
   // 4) rádio responde no roteiro
