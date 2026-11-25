@@ -90,6 +90,9 @@ body.touch #radio{bottom:auto;top:40px;width:min(470px,60vw)}body.touch #rlog{ma
 .jbar{display:block;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--hud) calc(var(--v,0)*100%),rgba(255,255,255,.12) 0)}.jsl label{flex:1;font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
 .ctlbtn{margin-top:10px;font-size:14px!important;padding:9px!important}.wpres{display:flex;flex-wrap:wrap;gap:6px}.wpres button,.wres button{all:unset;cursor:pointer;padding:5px 10px;border-radius:999px;border:1px solid var(--line);font-size:13px;background:rgba(255,255,255,.04)}.wpres button:hover,.wres button:hover{border-color:var(--hud)}.wres{display:flex;flex-direction:column;gap:4px;margin-top:6px}.wres button{border-radius:8px}.wplace .mprow .btn{flex:0 0 auto;margin-top:8px}.wplace input{margin-top:8px}
 body.vr #top,body.vr #msgs,body.vr #tc,body.vr #hint,body.vr #attr,body.vr #radio,body.vr #liveChip{display:none!important}
+#rsv{position:fixed;inset:0;background:#000;z-index:100}#rsvCv{position:fixed;left:0;top:0;width:100vw;height:100vh}#rsvVid{position:fixed;width:2px;height:2px;opacity:0;pointer-events:none}
+#rsvUI{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;text-align:center;padding:20px}#rsvStart{pointer-events:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;max-width:420px}#rsvStart .btn{width:100%;margin-top:10px}#rsvMsg{color:#ffd58a;text-shadow:0 1px 3px #000;font-size:15px}
+body.rsview>*:not(#rsv):not(script){display:none!important}.rsbox{display:flex;gap:14px;align-items:flex-start;margin-top:10px;background:#fff1;border-radius:12px;padding:10px}.rsbox canvas{border-radius:8px;background:#fff}.rscode{font:700 28px 'Share Tech Mono',monospace;color:var(--hud);letter-spacing:.15em}.rslink{font:11px 'Share Tech Mono',monospace;word-break:break-all;color:var(--ink)}
 #hint{position:fixed;left:50%;top:12px;transform:translateX(-50%);background:rgba(0,0,0,.55);padding:6px 14px;border-radius:8px;font-size:17px;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 20px);overflow:hidden;text-overflow:ellipsis}
 #gv{position:fixed;inset:0;pointer-events:none;opacity:0}
 #flash{position:fixed;inset:0;pointer-events:none;background:#ff3020;opacity:0;transition:opacity .5s}
@@ -276,7 +279,16 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
   <p class="sub">Tela dividida em dois olhos e o giroscópio do celular mexe a cabeça dentro do cockpit. Com o celular no óculos, use um joystick Bluetooth/USB (OTG) para pilotar. Toque 2× na tela para sair.</p>
   <div class="mprow"><button class="btn" id="vrBtn" type="button">Entrar no VR</button><button class="btn alt" id="vrRe" type="button">Recentralizar</button></div>
   <label class="chk"><input type="checkbox" id="gyroLook"> Olhar com o giroscópio, sem óculos (mexa o celular para olhar em volta)</label>
+  <h3>Tela remota: o PC desenha, o celular mostra</h3>
+  <p class="sub">Joystick no PC, imagem e som no celular (com ou sem óculos). Melhor com o PC no cabo de rede e o celular no Wi-Fi 5 GHz. A cabeça responde na hora; o resto do mundo chega com um pequeno atraso da rede.</p>
+  <button class="btn" id="rsStart" type="button">Transmitir para o celular</button>
+  <div id="rsBox" class="hide rsbox"><canvas id="rsQR" class="hide" width="220" height="220"></canvas><div><div class="lbl">Código</div><b id="rsCode" class="rscode"></b><p class="sub">Ou abra no celular:<br><span id="rsLink" class="rslink"></span></p><p class="sub" id="rsSt"></p></div></div>
+  <h3>Óculos de VR de verdade (Quest, SteamVR…)</h3>
+  <p class="sub">No PC: Chrome com o óculos ligado (Quest Link/Air Link ou SteamVR). No Quest: abra o site no navegador do próprio óculos. O joystick continua valendo.</p>
+  <button class="btn alt" id="xrBtn" type="button" disabled>Procurando óculos de VR…</button>
 </div></div>
+<div id="rsv" class="hide"><canvas id="rsvCv"></canvas><video id="rsvVid" playsinline autoplay></video>
+ <div id="rsvUI"><div id="rsvStart"><h2>FCS · Tela remota</h2><p>Sala <b id="rsvCode"></b>. O jogo roda no PC; aqui só aparece a imagem.</p><button class="btn" id="rsvVR" type="button">Começar no VR (óculos)</button><button class="btn alt" id="rsvTela" type="button">Começar como tela</button><p class="sub">No VR: encaixe o celular deitado. Segure o dedo 1 s se a imagem ficar de cabeça para baixo.</p></div><p id="rsvMsg"></p></div></div>
 <div id="mpBoard" class="hide"><h3>Placar</h3><ol></ol><p class="note"></p></div>
 
 <div id="pause" class="ov hide">
@@ -326,7 +338,7 @@ renderer.toneMapping=THREE.ACESFilmicToneMapping;
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(65,1,1.2,100000);
 const cockScene=new THREE.Scene(),cockCam=new THREE.PerspectiveCamera(65,1,0.02,45);
 let W=1,H=1,DPR=1;
-function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio,2);let rot=0;try{rot=VR.on&&H>W?VR.side:0;VR.rot=rot}catch(e){}/* VR ainda não existe no 1º resize */if(rot){W=innerHeight;H=innerWidth}
+function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio,2);let rot=0;try{rot=VR.on&&H>W?VR.side:0;VR.rot=rot}catch(e){}try{if(RS.active){W=RS.view.w;H=RS.view.h;DPR=1;rot=0;VR.rot=0}}catch(e){}/* VR ainda não existe no 1º resize */if(rot){W=innerHeight;H=innerWidth}
  for(const c of[$('#gl'),$('#hud')])Object.assign(c.style,rot?{width:W+'px',height:H+'px',maxWidth:'none',maxHeight:'none',inset:'auto',left:'50%',top:'50%',transform:'translate(-50%,-50%) rotate('+rot+'deg)'}:{width:'',height:'',maxWidth:'',maxHeight:'',inset:'',left:'',top:'',transform:''});
  renderer.setSize(W,H,false);camera.aspect=cockCam.aspect=W/H;camera.updateProjectionMatrix();cockCam.updateProjectionMatrix();hc.width=W*DPR;hc.height=H*DPR}
 addEventListener('resize',resize);resize();
@@ -1191,8 +1203,9 @@ function drawPanel(){const x=px;att();
 
 /* ================= HUD ================= */
 const HUDC='rgba(140,255,170,.96)',tH=new V3(),tH2=new V3(),L1=new V3(),L2=new V3(),hz=new V3(),rH=new V3();
-function sp(p){tH2.copy(p).applyMatrix4(camera.matrixWorldInverse);if(tH2.z>-1)return null;tH.copy(p).project(camera);return[(tH.x*.5+.5)*W,(-tH.y*.5+.5)*H]}
-const dp=d=>sp(tH.copy(camera.position).addScaledVector(d,1000).clone());
+let HCAM=camera;
+function sp(p){tH2.copy(p).applyMatrix4(HCAM.matrixWorldInverse);if(tH2.z>-1)return null;tH.copy(p).project(HCAM);return[(tH.x*.5+.5)*W,(-tH.y*.5+.5)*H]}
+const dp=d=>sp(tH.copy(HCAM.position).addScaledVector(d,1000).clone());
 function line(c,a,b){c.beginPath();c.moveTo(a[0],a[1]);c.lineTo(b[0],b[1]);c.stroke()}
 function inRange(){const t=P.wpn===2?P.seek:P.lock;if(!t)return false;const d=t.pos.distanceTo(P.pos);if(P.wpn===1)return d<1400;const w=A.wpn[SLOT[P.wpn]];if(!w)return false;const def=MDEF[w.m];return d>def.min&&d<def.max*(P.mach>1?1.25:1)&&P.stores[SLOT[P.wpn]].some(s=>s.loaded)}
 function warnings(){const w=[];if(P.state!=='fly')return w;const agl=P.pos.y-Math.max(terrainH(P.pos.x,P.pos.z),0);
@@ -1205,7 +1218,7 @@ function drawHUD(warn){const c=hx;c.setTransform(DPR,0,0,DPR,0,0);c.clearRect(0,
  if(S.diff==='easy')for(const t of T){if(!t.alive||t.dying)continue;const s=sp(t.pos);if(!s)continue;const d=t.pos.distanceTo(P.pos);c.strokeStyle=t.kind==='vamp'?'rgba(255,107,224,.9)':'rgba(255,181,71,.9)';c.lineWidth=1.5;const r=7;
   c.beginPath();for(const [sx,sy] of[[-1,-1],[1,-1],[1,1],[-1,1]]){c.moveTo(s[0]+sx*r,s[1]+sy*(r-4));c.lineTo(s[0]+sx*r,s[1]+sy*r);c.lineTo(s[0]+sx*(r-4),s[1]+sy*r)}c.stroke();c.fillStyle=c.strokeStyle;c.textAlign='center';c.font='12px "Share Tech Mono",monospace';c.fillText((t.kind==='vamp'?'VAMP ':t.ace?'ÁS '+t.ace.toUpperCase()+' ':t.tname.toUpperCase()+' ')+(d/NM).toFixed(1),s[0],s[1]+18)}
  if(view==='ext'){c.font='16px "Share Tech Mono",monospace';c.fillStyle='#d9ffe3';c.textAlign='left';c.fillText(Math.round(P.kias)+' KT  M'+P.mach.toFixed(2)+'  '+Math.round(P.pos.y*FT)+' FT  G '+P.g.toFixed(1)+'  THR '+Math.round(Math.min(P.thr,1)*100)+'%'+(P.ab>.05?' AB':'')+(A.sweep?'  ASAS '+Math.round(P.sweep)+'°':''),16,H-22);bigWarn(c,warn);return}
- const bs=dp(P.fwd);if(!bs){bigWarn(c,warn);return}const [bx,by]=bs,ppr=(H/2)/Math.tan(camera.fov*D2R/2);let hw=ppr*Math.tan(15*D2R),ht=ppr*Math.tan(11*D2R);const hb0=ppr*Math.tan((HD.ok?A.hudB:12.5)*D2R),land=P.gearPos>.5;let hb=hb0;if(TOUCH.ui&&H<560){hw=Math.max(hw,Math.min(W*.19,230));ht=Math.max(ht,H*.31);hb=Math.max(hb,H*.27)}
+ const bs=dp(P.fwd);if(!bs){bigWarn(c,warn);return}const [bx,by]=bs,ppr=(H/2)/Math.tan(HCAM.fov*D2R/2);let hw=ppr*Math.tan(15*D2R),ht=ppr*Math.tan(11*D2R);const hb0=ppr*Math.tan((HD.ok?A.hudB:12.5)*D2R),land=P.gearPos>.5;let hb=hb0;if(TOUCH.ui&&H<560){hw=Math.max(hw,Math.min(W*.19,230));ht=Math.max(ht,H*.31);hb=Math.max(hb,H*.27)}
  c.save();c.beginPath();c.rect(bx-hw,by-ht,hw*2,ht+hb);c.clip();c.strokeStyle=c.fillStyle=HUDC;c.lineWidth=1.6;c.shadowColor='rgba(0,35,12,.9)';c.shadowBlur=3;
  // escada de arfagem conforme
  hz.set(P.fwd.x,0,P.fwd.z);if(hz.lengthSq()<.003)hz.set(-P.up.x*Math.sign(P.fwd.y),0,-P.up.z*Math.sign(P.fwd.y));hz.normalize();rH.set(-hz.z,0,hz.x);const pd=P.pitch*R2D;
@@ -1304,7 +1317,10 @@ document.getElementById('joyAuto').onclick=joyAuto;document.getElementById('joyC
 addEventListener('gamepadconnected',()=>{if(!document.getElementById('ctl').classList.contains('hide'))joyUI();say('Controle conectado. Programe em CONTROLES · JOYSTICK · VR.','a')});
 document.getElementById('vrBtn').onclick=async()=>{document.getElementById('ctl').classList.add('hide');if(G.paused)setPause(false);await vrSet(true)};
 {const gl=document.getElementById('gyroLook');gl.checked=!!S.gyroLook;gl.onchange=async e=>{S.gyroLook=e.target.checked;saveCfg();if(S.gyroLook){const ok=await vrGyro(true);if(!ok){S.gyroLook=false;e.target.checked=false}}else if(!VR.on)vrGyro(false)}}
-document.getElementById('vrRe').onclick=vrRecenter;},0);
+document.getElementById('vrRe').onclick=vrRecenter;
+document.getElementById('rsStart').onclick=()=>{initAudio();if(RS.role==='host')rsStop();else rsHostStart()};document.getElementById('xrBtn').onclick=xrStart;
+document.getElementById('rsvVR').onclick=()=>rsViewerStart(true);document.getElementById('rsvTela').onclick=()=>rsViewerStart(false);
+{const q=new URLSearchParams(location.search).get('tela');if(q)rsViewerInit(q)}},0);
 $('#fh').checked=!!S.freeHangar;$('#fh').onchange=e=>{S.freeHangar=e.target.checked;saveCfg();hangarUI()};$('#kc').checked=S.kcam!==false;$('#kc').onchange=e=>{S.kcam=e.target.checked;saveCfg()};
 $('#pname').value=S.name||'';$('#pname').onchange=e=>{S.name=cleanName(e.target.value);e.target.value=S.name;saveCfg()};
 $('#inv').checked=S.invert;$('#voi').checked=S.voice;$('#inf').checked=!!S.inf;$('#inf').onchange=e=>{S.inf=e.target.checked;saveCfg()};$('#inv').onchange=e=>{S.invert=e.target.checked;saveCfg()};$('#voi').onchange=e=>{S.voice=e.target.checked;saveCfg()};
@@ -1372,16 +1388,18 @@ function update(dt){
   if(P.state==='cat'&&Math.random()<.15)emit(SMK,tA.set(rnd(-.5,.5),DECK+.3,rnd(-150,CAT_Z)),0,rnd(1,3),0,2.5,2,8,.85,.87,.9,.25,.6)}
  mpTick(dt);worldTick(dt);worldShift();if(JOY.cap)joyCapPoll();if(!document.getElementById('ctl').classList.contains('hide'))joyBars();if(run&&WORLD.real&&P.state==='fly'&&hitBuilding(P.pos))crash('Você bateu num prédio do Rio!');
  return run}
-function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.05);last=now;const run=update(dt);
+function frame(now){if(RS.role==='view')return;if(!XR.s)requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.05);last=now;const run=update(dt);
  updCamera(dt);syncModel(dt);touchFrame();
  sky.position.copy(camera.position);sea.position.set(Math.round(camera.position.x/125)*125,0,Math.round(camera.position.z/125)*125);
  sun.position.copy(camera.position).addScaledVector(sunDir,5000);sun.target.position.copy(camera.position);
  tA.copy(sunDir).applyQuaternion(tQ.copy(P.q).invert());cSun.position.copy(tA).multiplyScalar(5);cSun.target.position.set(0,0,0);
  const scl=renderer.getPixelRatio()*H/(2*Math.tan(camera.fov*D2R/2));SMK.m.uniforms.scale.value=FIR.m.uniforms.scale.value=SPK.m.uniforms.scale.value=scl;
  const gv=$('#gv');if(G.mode==='play'){const b=clamp(P.gload,0,1.15),r=clamp(-P.gload,0,1);gv.style.opacity=Math.max(b,r);gv.style.background=r>b?'radial-gradient(ellipse at center,rgba(150,0,0,.2) 0%,rgba(150,0,0,.95) 75%)':'radial-gradient(ellipse at center,rgba(0,0,0,'+clamp(b-.7,0,1)+') 0%,rgba(0,0,0,1) '+(90-b*45)+'%)'}else gv.style.opacity=0;
- const vrOn=VR.on;if(!vrOn){renderer.clear();renderer.render(scene,camera)}
- const showC=view==='cock'&&G.mode==='play'&&P.state!=='dead'&&!G.kcam;if(showC){if(!vrOn){renderer.clearDepth();renderer.render(cockScene,cockCam)}if(now-panelT>66){panelT=now;drawPanel()}}
- const warn=run?warnings():[];if(vrOn)vrRender(showC,warn);else drawHUD(warn);updAudio(warn.length&&warn.some(w=>w!=='MISSILE'));
+ const vrOn=VR.on&&!XR.s,showC=view==='cock'&&G.mode==='play'&&P.state!=='dead'&&!G.kcam,warn=run?warnings():[];
+ if(XR.s){xrPre();xrHUD(warn);XR.hud.visible=G.mode==='play'&&P.state!=='dead';renderer.clear();renderer.render(scene,camera);renderer.clearDepth();if(showC)renderer.render(cockScene,cockCam);xrPost();if(showC&&now-panelT>66){panelT=now;drawPanel()}}
+ else{if(!vrOn){renderer.clear();renderer.render(scene,camera)}
+ if(showC){if(!vrOn){renderer.clearDepth();renderer.render(cockScene,cockCam)}if(now-panelT>66){panelT=now;drawPanel()}}
+ if(vrOn)vrRender(showC,warn);else drawHUD(warn);rsHostFrame()}updAudio(warn.length&&warn.some(w=>w!=='MISSILE'));
  if(now-uiT>200){uiT=now;updUI()}}
 
 /* ================= modelos 3D reais (GLB) ================= */
@@ -1788,7 +1806,7 @@ async function vrSet(on){if(on){const ok=await vrGyro(true);if(!ok)return;VR.on=
   try{await screen.orientation.lock('landscape')}catch(e){}setTimeout(resize,250);resize();VR.needRef=true;renderer.setPixelRatio(Math.min(devicePixelRatio,IS_TOUCH?1.1:1.5));say('VR ligado. Encaixe o celular deitado no óculos. Toque 2x para sair; segure 1 s se a imagem ficar de cabeça para baixo.','')}
  else{VR.on=false;VR.rot=0;document.body.classList.remove('vr');try{screen.orientation.unlock()}catch(e){}if(!S.gyroLook)vrGyro(false);renderer.setPixelRatio(Math.min(devicePixelRatio,IS_TOUCH?1.3:1.75));resize()}}
 // desenha os dois olhos: cenário + cockpit + HUD em cada metade
-function vrRender(showC,warn){const w=W,h=H,hw=w/2;camera.aspect=cockCam.aspect=hw/h;camera.updateProjectionMatrix();cockCam.updateProjectionMatrix();
+function vrRender(showC,warn){const w=W,h=H,hw=w/2,f0=camera.fov,cf0=cockCam.fov;if(RS.active){camera.fov=cockCam.fov=2*Math.atan(Math.tan(f0*DEG/2)*(1+2*RS.margin))/DEG;RS.fr=camera.fov}camera.aspect=cockCam.aspect=hw/h;camera.updateProjectionMatrix();cockCam.updateProjectionMatrix();
  renderer.setScissorTest(false);renderer.clear();renderer.setScissorTest(true);const cp=camera.position.clone(),kp=cockCam.position.clone(),rt=new V3();
  for(const e of [-1,1]){const x=e<0?0:hw;renderer.setViewport(x,0,hw,h);renderer.setScissor(x,0,hw,h);
   rt.set(1,0,0).applyQuaternion(camera.quaternion);camera.position.copy(cp).addScaledVector(rt,e*VR.ipd/2);camera.updateMatrixWorld();renderer.render(scene,camera);
@@ -1796,10 +1814,112 @@ function vrRender(showC,warn){const w=W,h=H,hw=w/2;camera.aspect=cockCam.aspect=
  camera.position.copy(cp);cockCam.position.copy(kp);renderer.setScissorTest(false);renderer.setViewport(0,0,w,h);
  // HUD: desenha na metade esquerda e copia para a direita
  hx.setTransform(1,0,0,1,0,0);hx.clearRect(0,0,hc.width,hc.height);W=hw;try{drawHUD(warn)}finally{W=w}hx.setTransform(1,0,0,1,0,0);hx.clearRect(Math.floor(hw*DPR),0,hc.width,hc.height);hx.drawImage(hc,0,0,Math.floor(hw*DPR),Math.floor(h*DPR),Math.floor(hw*DPR),0,Math.floor(hw*DPR),Math.floor(h*DPR));
- hx.fillStyle='#000';hx.fillRect(Math.floor(hw*DPR)-1,0,2,Math.floor(h*DPR))}
+ hx.fillStyle='#000';hx.fillRect(Math.floor(hw*DPR)-1,0,2,Math.floor(h*DPR));if(RS.active){camera.fov=f0;cockCam.fov=cf0;camera.updateProjectionMatrix();cockCam.updateProjectionMatrix()}}
 // toque duplo sai do VR (o celular está dentro do óculos)
 addEventListener('touchstart',()=>{if(VR.on)VR.t0=performance.now()},{passive:true});
-addEventListener('touchend',()=>{if(!VR.on)return;const t=performance.now();if(t-(VR.t0||t)>800){VR.autoSide=false;VR.side=-VR.side;resize();VR.needRef=true;return}if(t-VR.tap<350)vrSet(false);VR.tap=t},{passive:true});
+addEventListener('touchend',()=>{if(!VR.on)return;const t=performance.now();if(t-(VR.t0||t)>800){VR.autoSide=false;VR.side=-VR.side;resize();VR.needRef=true;return}if(t-VR.tap<350&&RS.role!=='view')vrSet(false);VR.tap=t},{passive:true});
+
+/* ================= TELA REMOTA: o PC desenha, o celular mostra =================
+   Mesmo esquema do ALVR / Steam Link, só que no navegador: o PC captura a imagem do jogo (canvas.captureStream),
+   manda por WebRTC direto para o celular (na rede de casa, sem passar por servidor) e recebe o giroscópio de volta.
+   No VR, o PC desenha cada olho com uma "sobra" em volta da imagem e o celular faz o Timewarp: move o recorte na
+   hora com o giroscópio, então a cabeça responde sem esperar o vídeo. O mundo (mísseis, aviões) chega com o atraso da rede. */
+const RS={role:null,code:'',sig:null,pc:null,dc:null,comp:null,cx:null,stream:null,vr:true,margin:.22,active:false,view:{w:1280,h:720},
+ poses:[],rtt:60,fr:70,lastT:0,vidT:-1,vidChange:0,wake:null,audioDest:null,helloI:0,poseI:0,pingI:0,started:false};
+const ICE={iceServers:[{urls:'stun:stun.l.google.com:19302'}]};
+const rsUrl=()=>location.origin+location.pathname+'?tela='+RS.code+(/rede=local/.test(location.search)?'&rede=local':'');
+const rsq=id=>document.getElementById(id);
+// sinalização: só troca as "cartas" do WebRTC (oferta, resposta, candidatos). Vídeo e comandos vão direto PC↔celular.
+async function rsSignal(code){
+ if(/rede=local/.test(location.search)){const bc=new BroadcastChannel('fcs-tela-'+code),me=Math.random().toString(36).slice(2),H=[];bc.onmessage=e=>{const o=e.data;if(o&&o.from!==me)for(const f of H)f(o.d)};return{send:d=>bc.postMessage({from:me,d}),on:f=>H.push(f),close:()=>bc.close()}}
+ const ty=await import(TRYSTERO_URL);const room=ty.joinRoom({appId:'fcs-tela-remota',maxUsers:2,identity:'none'},'fcs-tela-'+code);const a=room.makeAction('s'),H=[];a.onMessage(d=>{for(const f of H)f(d)});
+ return{send:d=>a.send(d).catch(()=>{}),on:f=>H.push(f),close:()=>room.leave().catch(()=>{})}}
+const sdpJ=d=>({type:d.type,sdp:d.sdp});
+/* ---------- lado do PC ---------- */
+async function rsHostStart(){await rsStop();RS.role='host';RS.code=mpCode();rsHostUI('Conectando…');
+ try{RS.sig=await rsSignal(RS.code)}catch(e){RS.role=null;rsHostUI('Sem internet para parear (o pareamento usa a internet; a imagem vai direto pela rede de casa).');return}
+ RS.sig.on(rsHostMsg);rsHostUI('Escaneie o QR code com o celular.');rsQR();rsWake(true)}
+async function rsHostMsg(m){if(!m||!m.t)return;
+ if(m.t==='hello'){if(RS.pc&&RS.pc.connectionState==='connected')return;RS.view={w:clamp(m.w|0,320,1920)&~1,h:clamp(m.h|0,240,1080)&~1};RS.vr=!!m.vr;await rsHostOffer()}
+ else if(m.t==='answer'&&RS.pc&&RS.pc.signalingState==='have-local-offer'){await RS.pc.setRemoteDescription(m.sdp)}
+ else if(m.t==='ice'&&RS.pc&&m.c){try{await RS.pc.addIceCandidate(m.c)}catch(e){}}}
+async function rsHostOffer(){if(RS.pc)try{RS.pc.close()}catch(e){}const pc=new RTCPeerConnection(ICE);RS.pc=pc;
+ pc.onicecandidate=e=>{if(e.candidate)RS.sig.send({t:'ice',c:e.candidate.toJSON()})};
+ if(!RS.comp){RS.comp=document.createElement('canvas');RS.cx=RS.comp.getContext('2d',{alpha:false})}RS.comp.width=RS.view.w;RS.comp.height=RS.view.h;RS.cx.fillRect(0,0,RS.view.w,RS.view.h);
+ RS.stream=RS.comp.captureStream(60);initAudio();if(AC&&SND.master&&!RS.audioDest){try{RS.audioDest=AC.createMediaStreamDestination();SND.master.connect(RS.audioDest)}catch(e){}}
+ const ms=new MediaStream([...RS.stream.getVideoTracks(),...(RS.audioDest?RS.audioDest.stream.getAudioTracks():[])]);
+ for(const t of ms.getTracks()){const snd=pc.addTrack(t,ms);if(t.kind==='video'){try{t.contentHint='motion'}catch(e){}try{const p=snd.getParameters();if(!p.encodings||!p.encodings.length)p.encodings=[{}];p.encodings[0].maxBitrate=12e6;p.encodings[0].maxFramerate=60;p.degradationPreference='maintain-framerate';snd.setParameters(p).catch(()=>{})}catch(e){}}}
+ const dc=pc.createDataChannel('in',{ordered:false,maxRetransmits:0});RS.dc=dc;dc.onmessage=e=>{try{rsHostIn(JSON.parse(e.data))}catch(_){}};dc.onopen=()=>dc.send(JSON.stringify({t:'fov',fr:RS.fr,m:RS.margin}));
+ pc.onconnectionstatechange=()=>{const st=pc.connectionState;if(st==='connected'){rsApply(true);rsHostUI('Transmitindo para o celular'+(RS.vr?' (VR)':'')+'. Pode desligar o monitor, só não minimize esta janela.')}else if(st==='failed'||st==='closed'||st==='disconnected'){rsApply(false);rsHostUI('O celular desconectou. Esperando ele voltar…')}};
+ const off=await pc.createOffer();await pc.setLocalDescription(off);RS.sig.send({t:'offer',sdp:sdpJ(pc.localDescription)})}
+function rsHostIn(m){if(m.t==='q'){VR.rel.set(m.q[0],m.q[1],m.q[2],m.q[3])}else if(m.t==='ping'){if(RS.dc&&RS.dc.readyState==='open')RS.dc.send(JSON.stringify({t:'pong',id:m.id}))}else if(m.t==='key')onKey(m.k)}
+function rsApply(on){RS.active=on;if(on){VR.on=RS.vr;VR.gyro=RS.vr;VR.rel.identity();renderer.setPixelRatio(1)}else{VR.on=false;if(!S.gyroLook)VR.gyro=false;renderer.setPixelRatio(Math.min(devicePixelRatio,IS_TOUCH?1.3:1.75))}resize()}
+// todo frame: junta cenário + HUD numa imagem só e manda (o captureStream pega quando a imagem muda)
+function rsHostFrame(){if(!RS.active||!RS.cx)return;const w=RS.comp.width,h=RS.comp.height;RS.cx.drawImage(renderer.domElement,0,0,w,h);RS.cx.drawImage(hc,0,0,w,h);
+ if(RS.dc&&RS.dc.readyState==='open'&&performance.now()-RS.lastT>1000){RS.lastT=performance.now();RS.dc.send(JSON.stringify({t:'fov',fr:RS.fr,m:RS.margin}))}}
+async function rsWake(on){try{if(on&&navigator.wakeLock&&!RS.wake){RS.wake=await navigator.wakeLock.request('screen');RS.wake.addEventListener('release',()=>{RS.wake=null})}else if(!on&&RS.wake){await RS.wake.release();RS.wake=null}}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(RS.role==='host'&&document.visibilityState==='visible')rsWake(true)});
+async function rsQR(){const cv=rsq('rsQR'),u=rsUrl();rsq('rsLink').textContent=u;rsq('rsCode').textContent=RS.code;try{const Q=await import('https://esm.run/qrcode@1');await (Q.default||Q).toCanvas(cv,u,{width:220,margin:1});cv.classList.remove('hide')}catch(e){cv.classList.add('hide')}}
+function rsHostUI(msg){const b=rsq('rsBox');if(!b)return;b.classList.toggle('hide',RS.role!=='host');if(msg)rsq('rsSt').textContent=msg;rsq('rsStart').textContent=RS.role==='host'?'Parar transmissão':'Transmitir para o celular'}
+async function rsStop(){clearInterval(RS.helloI);clearInterval(RS.poseI);clearInterval(RS.pingI);if(RS.pc)try{RS.pc.close()}catch(e){}RS.pc=null;RS.dc=null;if(RS.sig)RS.sig.close();RS.sig=null;if(RS.active)rsApply(false);if(RS.role==='host'){RS.role=null;rsWake(false);rsHostUI('')}}
+/* ---------- lado do celular (só mostra) ---------- */
+function rsViewSize(){const dpr=Math.min(devicePixelRatio||1,2),sw=Math.max(innerWidth,innerHeight),sh=Math.min(innerWidth,innerHeight),k=Math.min(1,1600/(sw*dpr));return{w:Math.round(sw*dpr*k)&~1,h:Math.round(sh*dpr*k)&~1}}
+function rsViewerInit(code){RS.role='view';RS.code=code.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);document.body.classList.add('rsview');rsq('rsv').classList.remove('hide');rsq('rsvCode').textContent=RS.code}
+async function rsViewerStart(vr){RS.vr=vr;rsq('rsvStart').classList.add('hide');rsq('rsvMsg').textContent='Conectando ao PC…';
+ if(vr){await vrGyro(true);VR.on=true;VR.autoSide=true}// VR.on aqui só liga a detecção de lado; este aparelho não desenha o jogo
+ try{const d=document.documentElement,rq=d.requestFullscreen||d.webkitRequestFullscreen;if(rq&&!document.fullscreenElement)await rq.call(d,{navigationUI:'hide'})}catch(e){}try{await screen.orientation.lock('landscape')}catch(e){}
+ try{RS.sig=await rsSignal(RS.code)}catch(e){rsq('rsvMsg').textContent='Sem internet para parear com o PC.';return}
+ RS.sig.on(rsViewMsg);const hello=()=>{if(RS.pc&&RS.pc.connectionState==='connected')return;const s=rsViewSize();RS.sig.send({t:'hello',w:s.w,h:s.h,vr:RS.vr})};hello();RS.helloI=setInterval(hello,1500);
+ RS.poseI=setInterval(()=>{const q=VR.rel;RS.poses.push({t:performance.now(),q:q.clone()});if(RS.poses.length>90)RS.poses.shift();if(RS.dc&&RS.dc.readyState==='open'&&RS.vr)RS.dc.send(JSON.stringify({t:'q',q:[+q.x.toFixed(4),+q.y.toFixed(4),+q.z.toFixed(4),+q.w.toFixed(4)]}))},16);
+ RS.pingI=setInterval(()=>{if(RS.dc&&RS.dc.readyState==='open'){RS.pingT=performance.now();RS.dc.send(JSON.stringify({t:'ping',id:RS.pingT}))}},1000);
+ requestAnimationFrame(rsViewLoop)}
+async function rsViewMsg(m){if(!m||!m.t)return;
+ if(m.t==='offer'){if(RS.pc)try{RS.pc.close()}catch(e){}const pc=new RTCPeerConnection(ICE);RS.pc=pc;
+  pc.onicecandidate=e=>{if(e.candidate)RS.sig.send({t:'ice',c:e.candidate.toJSON()})};
+  pc.ontrack=e=>{const v=rsq('rsvVid');if(v.srcObject!==e.streams[0]){v.srcObject=e.streams[0];v.play().catch(()=>{})}for(const r of pc.getReceivers()){try{r.jitterBufferTarget=0}catch(_){}try{r.playoutDelayHint=0}catch(_){}}};
+  pc.ondatachannel=e=>{RS.dc=e.channel;RS.dc.onmessage=ev=>{try{const d=JSON.parse(ev.data);if(d.t==='pong')RS.rtt=RS.rtt*.7+(performance.now()-d.id)*.3;else if(d.t==='fov'){RS.fr=d.fr;RS.margin=d.m}}catch(_){}}};
+  pc.onconnectionstatechange=()=>{const st=pc.connectionState;rsq('rsvMsg').textContent=st==='connected'?'':st==='failed'||st==='disconnected'?'Conexão com o PC caiu. Tentando de novo…':'Conectando ao PC…'};
+  await pc.setRemoteDescription(m.sdp);const ans=await pc.createAnswer();await pc.setLocalDescription(ans);RS.sig.send({t:'answer',sdp:sdpJ(pc.localDescription)})}
+ else if(m.t==='ice'&&RS.pc&&m.c){try{await RS.pc.addIceCandidate(m.c)}catch(e){}}}
+// pose usada pelo PC para o quadro que está na tela ≈ pose de (meia volta de rede + codificação) atrás
+function rsPoseAt(t){let best=RS.poses[0];for(const p of RS.poses){if(p.t<=t)best=p;else break}return best?best.q:VR.rel}
+const _dq=new Q4(),_eu=new THREE.Euler();
+function rsViewLoop(){requestAnimationFrame(rsViewLoop);const cv=rsq('rsvCv'),v=rsq('rsvVid'),cx=cv.getContext('2d',{alpha:false});
+ const port=innerHeight>innerWidth&&RS.vr,lw=port?innerHeight:innerWidth,lh=port?innerWidth:innerHeight,dpr=Math.min(devicePixelRatio||1,2);
+ if(cv.width!==Math.round(lw*dpr)||cv.height!==Math.round(lh*dpr)){cv.width=Math.round(lw*dpr);cv.height=Math.round(lh*dpr)}
+ Object.assign(cv.style,port?{width:lw+'px',height:lh+'px',left:'50%',top:'50%',transform:'translate(-50%,-50%) rotate('+(VR.side||90)+'deg)'}:{width:'100vw',height:'100vh',left:'0',top:'0',transform:''});
+ cx.fillStyle='#000';cx.fillRect(0,0,cv.width,cv.height);if(!v.videoWidth)return;
+ if(v.currentTime!==RS.vidT){RS.vidT=v.currentTime;RS.vidChange=performance.now()}
+ const stale=performance.now()-RS.vidChange>2000;rsq('rsvMsg').textContent=stale?'O PC parou de mandar imagem. A janela do jogo foi minimizada?':rsq('rsvMsg').textContent==='O PC parou de mandar imagem. A janela do jogo foi minimizada?'?'':rsq('rsvMsg').textContent;
+ const vw=v.videoWidth,vh=v.videoHeight,W2=cv.width,H2=cv.height;
+ if(!RS.vr){const k=Math.min(W2/vw,H2/vh);cx.drawImage(v,(W2-vw*k)/2,(H2-vh*k)/2,vw*k,vh*k);return}
+ // Timewarp: diferença entre a cabeça agora e a cabeça usada pelo PC naquele quadro
+ const qf=rsPoseAt(performance.now()-(RS.rtt/2+45));_dq.copy(qf).invert().multiply(VR.rel);_eu.setFromQuaternion(_dq,'YXZ');
+ const ew=vw/2,fy=(vh/2)/Math.tan(RS.fr*DEG/2),cw=ew/(1+2*RS.margin),ch=vh/(1+2*RS.margin);
+ const dx=clamp(-Math.tan(_eu.y)*fy,-(ew-cw)/2,(ew-cw)/2),dy=clamp(-Math.tan(_eu.x)*fy,-(vh-ch)/2,(vh-ch)/2);
+ for(const e of[0,1]){const dw=W2/2,dh=H2;cx.save();cx.beginPath();cx.rect(e*dw,0,dw,dh);cx.clip();cx.translate(e*dw+dw/2,dh/2);cx.rotate(_eu.z);
+  cx.drawImage(v,e*ew+(ew-cw)/2+dx,(vh-ch)/2+dy,cw,ch,-dw/2,-dh/2,dw,dh);cx.restore()}
+ cx.fillRect(W2/2-1,0,2,H2)}
+
+/* ================= ÓCULOS DE VR DE VERDADE (WebXR: Meta Quest, SteamVR, Windows MR…) =================
+   No PC: Chrome + óculos ligado (Quest Link/Air Link, SteamVR). No próprio Quest: abrir o site no navegador dele.
+   A cabeça é do óculos; o HUD vira um painel na frente do piloto; o joystick continua funcionando. */
+const XR={s:null,sup:false,rig:new THREE.Group(),crig:new THREE.Group(),hud:null,tex:null,hcam:new THREE.PerspectiveCamera(65,1,1,100000)};
+scene.add(XR.rig);cockScene.add(XR.crig);
+try{if(navigator.xr&&navigator.xr.isSessionSupported)navigator.xr.isSessionSupported('immersive-vr').then(s=>{XR.sup=s;const b=document.getElementById('xrBtn');if(b){b.disabled=!s;b.textContent=s?'Entrar com óculos de VR (WebXR)':'Óculos de VR não encontrado'}}).catch(()=>{})}catch(e){}
+async function xrStart(){if(XR.s)return;let s;try{s=await navigator.xr.requestSession('immersive-vr',{optionalFeatures:['local-floor']})}catch(e){say('O navegador não abriu o VR: '+(e.message||e),'w');return}
+ renderer.xr.enabled=true;renderer.xr.setReferenceSpaceType('local');await renderer.xr.setSession(s);XR.s=s;XR.rig.add(camera);XR.crig.add(cockCam);
+ if(!XR.hud){XR.tex=new THREE.CanvasTexture(hc);const sz=2*Math.tan(32.5*DEG);XR.hud=new THREE.Mesh(new THREE.PlaneGeometry(sz,sz),new THREE.MeshBasicMaterial({map:XR.tex,transparent:true,depthTest:false,depthWrite:false,toneMapped:false}));XR.hud.position.set(0,0,-1);XR.hud.renderOrder=999}
+ cockScene.add(XR.hud);s.addEventListener('end',xrEnd);document.getElementById('ctl').classList.add('hide');if(G.paused)setPause(false);renderer.setAnimationLoop(frame);say('VR ligado no óculos. O joystick continua valendo.','')}
+function xrEnd(){renderer.setAnimationLoop(null);renderer.xr.enabled=false;XR.s=null;XR.rig.remove(camera);XR.crig.remove(cockCam);if(XR.hud)cockScene.remove(XR.hud);camera.position.copy(XR.rig.position);camera.quaternion.copy(XR.rig.quaternion);resize();requestAnimationFrame(frame)}
+// antes de desenhar: o "rig" vai para onde a câmera do jogo estaria; a cabeça (óculos) soma por cima
+function xrPre(){XR.rig.position.copy(camera.position);XR.rig.quaternion.copy(camera.quaternion);camera.position.set(0,0,0);camera.quaternion.identity();
+ XR.crig.position.copy(cockCam.position);XR.crig.quaternion.copy(cockCam.quaternion);cockCam.position.set(0,0,0);cockCam.quaternion.identity()}
+function xrPost(){camera.position.copy(XR.rig.position);camera.quaternion.copy(XR.rig.quaternion)}
+// HUD no óculos: desenha olhando para a frente do avião, num quadrado, e vira textura do painel
+function xrHUD(warn){const w=W,h=H,d=DPR;W=1024;H=1024;DPR=1;if(hc.width!==1024){hc.width=1024;hc.height=1024}
+ XR.hcam.position.copy(XR.rig.position);XR.hcam.quaternion.copy(P.q);XR.hcam.fov=65;XR.hcam.aspect=1;XR.hcam.updateProjectionMatrix();XR.hcam.updateMatrixWorld();HCAM=XR.hcam;
+ try{drawHUD(warn)}finally{HCAM=camera;W=w;H=h;DPR=d}XR.tex.needsUpdate=true}
 
 /* ================= controles de toque ================= */
 const TOUCH={ui:false,joy:null,x:0,y:0,fire:false,thrId:null,ox:0,oy:0,pausedRot:false};
@@ -1848,7 +1968,7 @@ function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.
 resetP();placeCat();applyTOD();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
 // PWA: instala como app e funciona offline (só em HTTPS ou localhost)
 if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
-window.__tomcat={RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>
