@@ -21,3 +21,5 @@ jobs:
         run: python3 -m http.server 8080 &
       - name: Teste de fumaça
         run: node tests/smoke.mjs
+      - name: Teste do multiplayer (2 abas, rede local)
+        run: node tests/multiplayer.mjs
