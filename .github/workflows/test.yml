@@ -33,6 +33,8 @@ jobs:
         run: node tests/gforce.mjs
       - name: Teste da ejeção e do modo a pé
         run: node tests/eject.mjs
+      - name: Teste do hangar 3D
+        run: node tests/hangar.mjs
       - name: Teste da tela remota (PC transmite, celular mostra)
         run: node tests/remote.mjs
       - name: Teste dos alvos de solo e das missões de ataque

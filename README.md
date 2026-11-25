@@ -39,6 +39,12 @@ npx gltfpack -i modelo.gltf -o models/modelo.glb -c -noq -kn -km -ke
 ```
 `-noq` mantém as coordenadas em float (o código separa trem de pouso, asas e cockpit pelos nomes e precisa delas assim); `-kn -km -ke` mantêm nomes, materiais e extras.
 
+## Hangar 3D
+
+No menu, na aba **Jogar**, o caça aparece num hangar fechado, numa plataforma giratória com refletores, como na escolha de avião do Ace Combat.
+- Tocar num avião do hangar mostra o modelo e a ficha, mesmo bloqueado. A ficha tem barras de velocidade, manobra, estabilidade, ar-ar, ar-solo e alcance, calculadas dos dados do próprio jogo e comparadas com o resto da frota, além das armas e do assento.
+- **VER NO HANGAR** esconde o menu. Aí dá para arrastar para girar, usar a roda do mouse ou a pinça para aproximar, e trocar de avião com ◀ ▶ antes de tocar em PILOTAR ESTE.
+
 ## Progressão, missões e ranking
 
 - **Hangar com PM (pontos de mérito):** o F-14 começa liberado; F-16 (1.500 PM), Mirage (3.000 PM) e MiG-29 (5.000 PM) são comprados com os pontos das partidas. Missão cumprida rende 1,5× os pontos. A opção "Hangar liberado" no menu desliga a progressão.
