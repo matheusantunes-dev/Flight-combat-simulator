@@ -56,7 +56,8 @@ npx gltfpack -i modelo.gltf -o models/modelo.glb -c -noq -kn -km -ke
 No menu: **MULTIPLAYER** → **Criar sala** → **Copiar convite** ou **Compartilhar** (WhatsApp, Discord…). Quem abre o link cai direto na sala. O anfitrião escolhe o modo e decola com todo mundo.
 
 - **Cooperativo vs IA:** a sala inteira defende a frota contra as ondas. Os inimigos rodam no aparelho do anfitrião; se ele sair, a partida acaba.
-- **PvP todos contra todos:** primeiro a 10 abates vence, ou o melhor em 8 minutos. Quem cai volta em 5 s.
+- **PvP por times (Azul × Vermelho, até 3 por time):** quem entra vai para o time menor e dá para trocar no lobby. Sem fogo amigo; colegas aparecem como losango azul no HUD e não entram no radar de alvos. Cada time nasce de um lado do mapa. Primeiro time a 12 abates vence, ou o melhor em 8 minutos. Quem cai volta em 5 s.
+- **Só dois jeitos de jogar junto:** todos contra a IA (cooperativo) ou time contra time. Não existe todos contra todos.
 - **Placar:** Tab (PC) ou botão PLACAR (celular).
 - **Chat:** o rádio (Enter) vira chat da sala; comece com "ia," para falar com o copiloto.
 - **Voz da sala:** botão no lobby, por WebRTC (só online).

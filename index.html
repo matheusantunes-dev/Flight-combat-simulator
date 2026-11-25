@@ -82,6 +82,7 @@ body.touch #radio{bottom:auto;top:40px;width:min(470px,60vw)}body.touch #rlog{ma
 .mprow{display:flex;gap:8px;align-items:center}.mprow .btn{flex:1;margin-top:10px}.mpcode{text-transform:uppercase;letter-spacing:.2em;font-family:'Share Tech Mono',monospace;margin-top:10px}.mpcodebox{margin-top:12px;font-size:15px;color:var(--muted)}.mpcodebox b{font:700 30px 'Share Tech Mono',monospace;color:var(--hud);letter-spacing:.15em;flex:1}
 .mplist{margin:4px 0 0;padding:0;list-style:none}.mplist li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.mplist li span{color:var(--muted);font-size:13px}
 .mpgo{background:rgba(140,255,170,.12);color:var(--hud);border:1px solid rgba(140,255,170,.5);font-size:16px;margin-top:8px!important;padding:10px!important}#mpVoice.on{background:#c0392b;color:#fff}
+#mpBoard .tm{margin:8px 0 2px;font:700 14px 'Share Tech Mono',monospace}#mpBoard .tm.az,.tchip.az{color:#7fd0ff}#mpBoard .tm.vm,.tchip.vm{color:#ff8a7a}.mpteams{gap:12px;margin-top:8px;font:600 14px 'Share Tech Mono',monospace}.tchip{padding:4px 10px;border-radius:8px;background:rgba(255,255,255,.06)}.mplist li i{font-style:normal;font:700 11px 'Share Tech Mono',monospace;margin-right:6px}.mplist li i.az{color:#7fd0ff}.mplist li i.vm{color:#ff8a7a}
 #mpBoard{position:fixed;left:50%;top:60px;transform:translateX(-50%);min-width:320px;background:rgba(6,12,10,.9);border:1px solid rgba(140,255,170,.4);border-radius:14px;padding:12px 18px;z-index:35;font-size:15px}#mpBoard h3{margin:0 0 6px}#mpBoard ol{margin:0;padding:0;list-style:none}#mpBoard li{display:flex;justify-content:space-between;gap:20px;padding:4px 0;border-bottom:1px solid var(--line)}#mpBoard li span{color:var(--muted);font-family:'Share Tech Mono',monospace}#mpBoard .note{color:var(--muted);font-size:12px;margin:6px 0 0}
 #attr{position:fixed;left:8px;bottom:4px;z-index:20;font:11px Inter,system-ui,sans-serif;color:rgba(255,255,255,.75);text-shadow:0 1px 2px #000;max-width:calc(100vw - 16px);pointer-events:auto}#attr a{color:inherit}body.touch #attr{font-size:9px;left:50%;transform:translateX(-50%);bottom:2px;text-align:center;width:60vw}
 #ctl{background:rgba(5,8,10,.72);justify-content:center}.ctlcard{width:min(620px,100%)}.ctlcard h3{margin:16px 0 4px;font-size:17px}#joyPads{white-space:pre-wrap;font:12px 'Share Tech Mono',monospace;margin:4px 0}
@@ -292,7 +293,8 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
       <div class="mprow mpcodebox"><span>Sala</span><b id="mpCode"></b><span id="mpCount"></span></div>
       <div class="mprow"><button class="btn alt" id="mpCopy" type="button">Copiar convite</button><button class="btn alt" id="mpShare" type="button">Compartilhar</button></div>
       <div class="lbl">Pilotos</div><ol id="mpList" class="mplist"></ol>
-      <div class="lbl">Modo (o anfitrião escolhe)</div><div class="opts seg" id="mpMode"><button data-v="coop" type="button">Cooperativo vs IA</button><button data-v="pvp" type="button">PvP todos contra todos</button></div>
+      <div class="lbl">Modo (o anfitrião escolhe)</div><div class="opts seg" id="mpMode"><button data-v="coop" type="button">Cooperativo vs IA</button><button data-v="pvp" type="button">PvP: time contra time</button></div>
+      <div id="mpTeamBox" class="hide"><div class="mprow mpteams"><span class="tchip az">AZUL <b id="mpAz">0</b></span><span class="tchip vm">VERMELHO <b id="mpVm">0</b></span></div><button class="btn alt" id="mpTeam" type="button">Trocar de time</button></div>
       <button class="btn alt" id="mpVoice" type="button">🎙 Voz da sala</button>
       <button class="btn" id="mpStart" type="button">DECOLAR COM A SALA</button><p class="sub hide" id="mpWait">Aguardando o anfitrião decolar…</p>
       <button class="btn alt" id="mpLeave" type="button">Sair da sala</button>
@@ -746,11 +748,12 @@ const ACFT={
   fl:[[-.7,-.8,13.9],[.7,-.8,13.9]],wpn:{aim9:{m:'r73',n:2,kg:105,name:'R-73 Archer',sh:'R73'},aim7:{m:'r27',n:2,kg:253,name:'R-27R Alamo',sh:'R27'},aim54:null},gun:{n:150,rate:25,v:870,dmg:.22}},
  m2000:{name:'Mirage 2000C',file:'models/m2000.glb',scale:1,eye:[6.45,2.76],gearH:2.76,sweep:false,naval:false,hudB:12,wave:.55,S:41,empty:7500,fuel:3160,mil:64000,ab:31000,CLa:3.3,aSt:.5,cd0:.019,k:.12,gLim:9,fbw:true,roll:4.0,
   fl:[[0,-.16,12.1]],wpn:{aim9:{m:'magic',n:2,kg:89,name:'Magic II',sh:'MAG'},aim7:{m:'s530',n:2,kg:270,name:'Super 530D',sh:'530'},aim54:null},gun:{n:250,rate:60,v:850,dmg:.2}}};
+ACFT.f16.gSeat=.6;// assento reclinado a 30°
 ACFT.f14.wpn.agm={m:'agm',n:2,kg:210,name:'AGM-65 Maverick',sh:'AGM'};ACFT.f16.wpn.agm={m:'agm',n:4,kg:210,name:'AGM-65 Maverick',sh:'AGM'};ACFT.mig29.wpn.agm={m:'agm',n:2,kg:300,name:'Kh-25ML',sh:'KH25'};ACFT.m2000.wpn.agm={m:'agm',n:2,kg:520,name:'AS-30L',sh:'AS30'};
 let A=ACFT.f14;const SLOT=['','','aim9','aim7','aim54','agm'];
 function nextWpn(){let n=P.wpn;for(let i=0;i<5;i++){n=n%5+1;if(n===1||A.wpn[SLOT[n]])break}P.wpn=n}
 function resetP(){Object.assign(P,{thr:0,spool:0,ab:0,abLit:0,detent:false,gear:1,gearPos:1,flaps:1,flapsPos:1,sb:0,sbPos:0,hook:0,hookPos:0,sweep:20,sweepAuto:true,sweepMan:20,
- fuel:A.fuel,hp:100,g:1,gmax:1,aoa:0,beta:0,mach:0,kias:0,spd:0,qd:0,state:'cat',prevWh:0,gun:A.gun.n,flr:30,chf:30,wpn:2,lock:null,seek:null,seekLock:false,gload:0,trapT:0,launchV:0,alive:true,rwr:0,aSt:.42,bingo:false,flameout:false,mass:28000,thrust:0,rho:1.225,shake:0,smokeT:0});
+ fuel:A.fuel,hp:100,g:1,gmax:1,aoa:0,beta:0,mach:0,kias:0,spd:0,qd:0,state:'cat',prevWh:0,gun:A.gun.n,flr:30,chf:30,wpn:2,lock:null,seek:null,seekLock:false,gload:0,gph:{rfx:0,dv:0,res:1,loc:0,neg:0,warnT:0},trapT:0,launchV:0,alive:true,rwr:0,aSt:.42,bingo:false,flameout:false,mass:28000,thrust:0,rho:1.225,shake:0,smokeT:0});
  P.w.set(0,0,0);P.vel.set(0,0,0);P.stores={};for(const k of['aim9','aim7','aim54','agm']){const w=A.wpn[k];P.stores[k]=w?[...Array(w.n)].map((_,i)=>{const mesh=A===ACFT.f14?(me.stores[k]||[])[i]:null;if(mesh)mesh.visible=true;return{loaded:true,mesh,i}}):[]}}
 function axes(){P.fwd.set(0,0,-1).applyQuaternion(P.q);P.up.set(0,1,0).applyQuaternion(P.q);P.right.set(1,0,0).applyQuaternion(P.q)}
 const tE=new THREE.Euler();
@@ -804,6 +807,21 @@ function onKey(c){
   case 'KeyR':if(P.thr>=1)P.detent=false;break;
  }
 }
+/* ===== fisiologia do G (como na centrífuga, não um contador) =====
+ Números de estudos de centrífuga da USAF/USN: sem proteção, o limiar é ~4,7 G; com traje anti-G (+1 G) e a manobra de esforço
+ (AGSM, +2,5 G) o piloto treinado aguenta 9 G. O cérebro tem uma reserva de oxigênio de ~5 s: um puxão curto não apaga ninguém,
+ G-LOC nunca vem antes de ~5 s e, a 7 G ou mais, leva em média ~9-10 s. A visão (túnel e escurecimento) aparece ~1 G antes da perda
+ de consciência e com atraso. O reflexo do coração ajuda depois de alguns segundos de G sustentado. Assento reclinado (F-16) ajuda. */
+const GPH={relax:4.7,suit:1,agsm:2.5};
+function gTol(){return GPH.relax+GPH.suit+GPH.agsm+(A.gSeat||0)+P.gph.rfx*.8+(S.diff==='easy'?.5:0)}
+function gPhys(dt){const h=P.gph;if(G.mode!=='play'||P.state==='dead'){h.dv=h.va=0;h.res=1;h.loc=0;h.neg=0;return}const g=P.g;
+ h.rfx+=((g>3?1:0)-h.rfx)*(1-Math.exp(-dt/(g>3?8:15)));const gt=gTol();
+ const vx=Math.max(0,g-(gt-.8));h.va=(h.va||0)+(vx-(h.va||0))*(1-Math.exp(-dt/(vx>(h.va||0)?2:.8)));h.dv+=(h.va-h.dv)*(1-Math.exp(-dt/(h.va>h.dv?2:.8)));// duas etapas: a reserva de O2 da retina segura os primeiros segundos
+ const ex=g-gt;if(ex>0)h.res-=dt*Math.min(.2,.038+.036*ex);else if(g<gt-1)h.res=Math.min(1,h.res+dt*.22);
+ h.neg+=((g<-2.5?1:0)-h.neg)*(1-Math.exp(-dt/(g<-2.5?1.6:.8)));
+ h.warnT-=dt;if(h.dv>.6&&h.warnT<=0&&!h.loc){h.warnT=20;say('RIO: Tô vendo cinza nas bordas! Alivia um pouco o manche.','a')}
+ if(h.loc>0){h.loc-=dt;if(h.loc<=0){h.res=.35;say('...voltando. RIO: Você apagou por uns segundos! Cuidado com o G sustentado.','a')}}
+ else if(h.res<=0){h.loc=6+Math.random()*3;h.res=0;say('G-LOC! Você perdeu a consciência. O avião está sem ninguém no manche...','w')}}
 function readInput(dt){
  let tp=((K.KeyS||K.ArrowDown)?1:0)-((K.KeyW||K.ArrowUp)?1:0);if(S.invert)tp=-tp;
  let tr=((K.KeyD||K.ArrowRight)?1:0)-((K.KeyA||K.ArrowLeft)?1:0),ty=(K.KeyE?1:0)-(K.KeyQ?1:0);
@@ -1350,6 +1368,7 @@ function warnings(){const w=[];if(P.state!=='fly')return w;const agl=P.pos.y-Mat
 function drawHUD(warn){const c=hx;c.setTransform(DPR,0,0,DPR,0,0);c.clearRect(0,0,W,H);if(G.mode!=='play'||P.state==='dead')return;if(G.kcam){c.font='600 15px Inter,system-ui,sans-serif';c.fillStyle='rgba(255,255,255,.85)';c.textAlign='center';c.fillText('ABATE  ·  toque ou tecle para pular',W/2,H-40);return}
  const HF=TOUCH.ui&&H<560?12:15;c.font=HF+'px "Share Tech Mono",monospace';c.textBaseline='middle';
  if(G.vip&&G.vip.alive&&!G.vip.dying){const s=sp(G.vip.pos);if(s){c.strokeStyle=c.fillStyle='rgba(255,210,90,.95)';c.lineWidth=1.6;c.beginPath();c.arc(s[0],s[1],9,0,7);c.stroke();c.textAlign='center';c.font='12px "Share Tech Mono",monospace';c.fillText('AWACS '+(G.vip.pos.distanceTo(P.pos)/NM).toFixed(1),s[0],s[1]-14)}}
+ if(NET.match)for(const r of NET.R.values()){if(!r.alive||r.enemy)continue;const s=sp(r.pos);if(!s)continue;const d=r.pos.distanceTo(P.pos);c.strokeStyle=c.fillStyle='rgba(88,200,255,.95)';c.lineWidth=1.6;c.beginPath();c.moveTo(s[0],s[1]-8);c.lineTo(s[0]+8,s[1]);c.lineTo(s[0],s[1]+8);c.lineTo(s[0]-8,s[1]);c.closePath();c.stroke();c.textAlign='center';c.font='11px "Share Tech Mono",monospace';c.fillText(r.name+' '+(d/NM).toFixed(1),s[0],s[1]-12)}
  for(const a of AL){if(!a.alive||a.dying||a.state==='hold')continue;const s=sp(a.pos);if(!s)continue;const d=a.pos.distanceTo(P.pos);c.strokeStyle=c.fillStyle='rgba(88,200,255,.9)';c.lineWidth=1.4;c.beginPath();c.moveTo(s[0],s[1]-7);c.lineTo(s[0]+7,s[1]);c.lineTo(s[0],s[1]+7);c.lineTo(s[0]-7,s[1]);c.closePath();c.stroke();if(d>400){c.textAlign='center';c.font='11px "Share Tech Mono",monospace';c.fillText(a.cs.split(' ')[1]+' '+(d/NM).toFixed(1),s[0],s[1]-11)}}
  for(const t of T){if(!t.alive||t.kind!=='ground')continue;const d=t.pos.distanceTo(P.pos);if(d>28000)continue;const s=sp(t.pos);if(!s)continue;const lk=P.lock===t,col=t.primary?'rgba(255,120,80,.95)':'rgba(255,190,120,.75)';c.strokeStyle=c.fillStyle=col;c.lineWidth=lk?2.2:1.4;const r=lk?9:6;c.beginPath();c.moveTo(s[0],s[1]-r);c.lineTo(s[0]+r,s[1]);c.lineTo(s[0],s[1]+r);c.lineTo(s[0]-r,s[1]);c.closePath();c.stroke();if(t.primary||lk||d<6000){c.textAlign='center';c.font='11px "Share Tech Mono",monospace';c.fillText((t.primary?'ALVO ':'')+t.def.name.split(' ')[0].toUpperCase()+' '+(d/NM).toFixed(1),s[0],s[1]-r-6)}}
  if(S.diff==='easy')for(const t of T){if(!t.alive||t.dying||t.kind==='ground')continue;const s=sp(t.pos);if(!s)continue;const d=t.pos.distanceTo(P.pos);c.strokeStyle=t.kind==='vamp'?'rgba(255,107,224,.9)':'rgba(255,181,71,.9)';c.lineWidth=1.5;const r=7;
@@ -1470,7 +1489,7 @@ function syncMenu(){setTimeout(selLine,0);document.querySelectorAll('[data-k=ac]
 const topEl=$('#top'),hintEl=$('#hint');let uiT=0;
 function updUI(){if(G.mode!=='play'){return}updTouch();
  topEl.innerHTML='<span class="ac">'+A.name+'</span>'+(G.mission==='fly'?'<span>VOO LIVRE</span><span>ALVOS ABATIDOS '+G.kills+'</span><span>J: alvo de treino</span>'+(S.inf?'<span>ARMAS ∞</span>':''):(G.camp>=0?'<span class="mis">M'+(G.camp+1)+' · '+CAMPAIGN[G.camp].name+'</span>':'')+(G.mission==='trap'?'<span>TREINO DE POUSO</span><span>POUSOS '+G.traps+'</span>':'<span>ONDA '+G.wave+(G.camp>=0?'/'+CAMPAIGN[G.camp].waves.length:'')+(G.waveActive?'':'<i class="lo"> · próxima '+(P.state==='cat'?'após decolar':Math.ceil(Math.max(G.waveT,0))+'s')+'</i>')+'</span>'+(G.timer>0&&G.waveActive?'<span'+(G.timer<30?' class="bad"':'')+'>TEMPO '+Math.ceil(G.timer)+'s</span>':'')+(G.vip?'<span'+(G.vip.hp<50?' class="bad"':'')+'>AWACS '+Math.max(0,Math.round(G.vip.hp))+'%</span>':'')+(G.gtot?'<span class="k">SOLO '+(G.gtot-groundLeft())+'/'+G.gtot+'</span>':'')+(G.convoyEnd?(()=>{const d=convoyLeft();return d<1e8?'<span class="k'+(d<1500?' bad':'')+'">COMBOIO '+(d/1000).toFixed(1)+' km do porto</span>':''})():'')+'<span>ABATES '+G.kills+'</span><span'+(G.carrierHp<50?' class="bad"':'')+'>NAVE '+G.carrierHp+'%</span>')+'<span class="pt">PONTOS '+G.score+'</span>');
- if(NET.match){const mb=NET.board.get(NET.me)||{k:0,d:0};if(NET.mode==='pvp'){const tl=Math.max(0,PVP_TIME-(Date.now()-NET.cfg.t0)/1000);topEl.innerHTML='<span class="ac">'+A.name+'</span><span class="mis">PvP · SALA '+NET.code+'</span><span>'+mb.k+' ABATES · '+mb.d+' QUEDAS</span><span>META '+PVP_KILLS+'</span><span>'+Math.floor(tl/60)+':'+String(Math.floor(tl%60)).padStart(2,'0')+'</span><span>'+(TOUCH.ui?'PLACAR':'TAB = placar')+'</span>'}else topEl.insertAdjacentHTML('afterbegin','<span class="mis">COOP · SALA '+NET.code+' · '+(NET.peers.size+1)+' pilotos</span>')}
+ if(NET.match){const mb=NET.board.get(NET.me)||{k:0,d:0};if(NET.mode==='pvp'){const tl=Math.max(0,PVP_TIME-(Date.now()-NET.cfg.t0)/1000);topEl.innerHTML='<span class="ac">'+A.name+'</span><span class="mis">PvP · SALA '+NET.code+'</span><span class="k" style="color:'+TEAMS[myTeam()].c+'">TIME '+TEAMS[myTeam()].n.toUpperCase()+'</span><span class="k">AZUL '+teamScore('az')+' × '+teamScore('vm')+' VERM.</span><span>VOCÊ '+mb.k+'/'+mb.d+'</span><span class="lo">META '+PVP_TEAM_KILLS+'</span><span>'+Math.floor(tl/60)+':'+String(Math.floor(tl%60)).padStart(2,'0')+'</span><span>'+(TOUCH.ui?'PLACAR':'TAB = placar')+'</span>'}else topEl.insertAdjacentHTML('afterbegin','<span class="mis">COOP · SALA '+NET.code+' · '+(NET.peers.size+1)+' pilotos</span>')}
  let h='';if(P.state==='cat')h=TOUCH.ui?(P.thr<.98?'Suba a manete até MIL e toque LANÇAR':'Toque LANÇAR CATAPULTA'):P.thr<.98?'Segure R até MIL (100%)  ·  K flaps já abaixo':'L = catapulta!  ·  segure R de novo para pós-combustor';else if(P.state==='trap')h='Enganchado! Aguarde...';else if(TOUCH.ui&&P.state==='fly'&&P.gearPos>.5&&P.pos.y>DECK+80&&G.mission!=='trap')h='SISTEMAS → TREM e FLAPS para recolher';else if(P.state==='fly'&&P.gearPos>.5&&P.pos.y>DECK+80&&G.mission!=='trap'&&Math.hypot(P.pos.x,P.pos.z)>1500)h='G recolhe o trem  ·  K recolhe os flaps';
  hintEl.textContent=h;hintEl.classList.toggle('hide',!h)}
 
@@ -1520,7 +1539,7 @@ function syncModel(dt){me.g.position.copy(P.pos);me.g.quaternion.copy(P.q);me.sw
 function update(dt){
  if(G.kcam){G.kcam.t+=dt;if(G.kcam.t>2.2||G.mode!=='play'||G.paused)G.kcam=null;else dt*=.3}// câmera lenta do abate
  const run=G.mode==='play'&&!G.paused,live=G.mode!=='play'||!G.paused;
- if(run){G.t+=dt;readInput(dt);const n=Math.ceil(dt/.008);for(let i=0;i<n&&P.state!=='dead';i++)stepPlayer(dt/n);axes();att();updGun(dt);radar();if(G.mode==='play'&&P.state!=='dead'&&P.g>6.5)P.gload+=(P.g-6.5)*dt*.22;else P.gload=Math.max(0,P.gload-dt*.35);if(P.g<-2.2)P.gload-=dt*.2;}
+ if(run){G.t+=dt;readInput(dt);if(P.gph.loc>0&&P.state!=='dead'){IN.pitch=IN.roll=IN.yaw=0;fireHeld=false}const n=Math.ceil(dt/.008);for(let i=0;i<n&&P.state!=='dead';i++)stepPlayer(dt/n);axes();att();updGun(dt);radar();gPhys(dt);}
  else if(G.mode==='menu'){P.spool=.12}
  if(live&&G.mode!=='menu'){FR.length=0;if(P.state==='fly'||P.state==='deck')FR.push(P);for(const a of AL)if(a.alive&&!a.dying&&a.state!=='hold')FR.push(a);if(G.vip&&G.vip.alive&&!G.vip.dying)FR.push(G.vip);if(NET.match&&NET.mode==='coop')for(const r of NET.R.values())if(r.alive)FR.push(r);if(G.vip&&G.vip.alive)updVIP(G.vip,dt);for(const t of[...T]){if(!t.alive)continue;t.ghost?updGhost(t,dt):t.kind==='remote'?0:t.kind==='bandit'?updBandit(t,dt):t.kind==='ground'?updGround(t,dt):updVamp(t,dt)}updWrecks(dt);for(const a of[...AL])if(a.alive)updAlly(a,dt);updMissiles(dt);updBullets(dt);updFlares(dt);if(G.mode==='play')waves(dt)}
  if(live){updPS(SMK,dt);updPS(FIR,dt);updPS(SPK,dt);updFX(dt);flashL.intensity*=Math.exp(-dt*6);sea.material.normalMap.offset.x+=dt*.0012;sea.material.normalMap.offset.y+=dt*.0007;
@@ -1534,7 +1553,7 @@ function frame(now){if(RS.role==='view')return;if(!XR.s)requestAnimationFrame(fr
  sun.position.copy(camera.position).addScaledVector(sunDir,5000);sun.target.position.copy(camera.position);
  tA.copy(sunDir).applyQuaternion(tQ.copy(P.q).invert());cSun.position.copy(tA).multiplyScalar(5);cSun.target.position.set(0,0,0);
  const scl=renderer.getPixelRatio()*H/(2*Math.tan(camera.fov*D2R/2));SMK.m.uniforms.scale.value=FIR.m.uniforms.scale.value=SPK.m.uniforms.scale.value=scl;
- const gv=$('#gv');if(G.mode==='play'){const b=clamp(P.gload,0,1.15),r=clamp(-P.gload,0,1);gv.style.opacity=Math.max(b,r);gv.style.background=r>b?'radial-gradient(ellipse at center,rgba(150,0,0,.2) 0%,rgba(150,0,0,.95) 75%)':'radial-gradient(ellipse at center,rgba(0,0,0,'+clamp(b-.7,0,1)+') 0%,rgba(0,0,0,1) '+(90-b*45)+'%)'}else gv.style.opacity=0;
+ const gv=$('#gv');if(G.mode==='play'&&P.state!=='dead'){const h=P.gph,tun=clamp(h.dv/1.6,0,1),blk=h.loc>0?1:clamp((.4-h.res)/.4,0,1),red=clamp(h.neg,0,1);gv.style.opacity=Math.max(tun,blk,red*.9);gv.style.background=red>Math.max(tun,blk)?'radial-gradient(ellipse at center,rgba(150,0,0,.25) 0%,rgba(150,0,0,.95) 75%)':'radial-gradient(ellipse at center,rgba(8,8,8,'+blk.toFixed(3)+') 0%,rgba(8,8,8,'+blk.toFixed(3)+') '+(68-tun*48)+'%,rgba(0,0,0,1) '+(100-tun*40)+'%)'}else gv.style.opacity=0;
  const vrOn=VR.on&&!XR.s,showC=view==='cock'&&G.mode==='play'&&P.state!=='dead'&&!G.kcam,warn=run?warnings():[];
  if(XR.s){xrPre();xrHUD(warn);XR.hud.visible=G.mode==='play'&&P.state!=='dead';renderer.clear();renderer.render(scene,camera);renderer.clearDepth();if(showC)renderer.render(cockScene,cockCam);xrPost();if(showC&&now-panelT>66){panelT=now;drawPanel()}}
  else{if(!vrOn){renderer.clear();renderer.render(scene,camera)}
@@ -1728,7 +1747,15 @@ if(window.claude&&claude.use){
    Teste local sem internet: abra duas abas com ?rede=local (usa BroadcastChannel). */
 const TRYSTERO_URL='https://esm.run/trystero@0.27.0';
 const NET={on:false,match:false,host:false,me:'',hostId:'',code:'',mode:'coop',tr:null,peers:new Map(),R:new Map(),GM:new Map(),board:new Map(),stT:0,snT:0,helloT:0,voice:null,audio:new Map(),nid:0,seen:new Set(),endT:0,cfg:{}};
-const MP_MAX=6,PVP_KILLS=10,PVP_TIME=480;
+const MP_MAX=6,PVP_KILLS=10,PVP_TEAM_KILLS=12,PVP_TIME=480;
+/* PvP é sempre time contra time (Azul x Vermelho), até 3 por time. Coop: todos contra a IA.
+   O anfitrião distribui os times (quem entra vai pro time menor) e é a palavra final; ninguém atira no próprio time. */
+const TEAMS={az:{n:'Azul',c:'#58c8ff'},vm:{n:'Vermelho',c:'#ff6a5a'}};NET.teams=new Map();
+const teamOf=id=>NET.teams.get(id)||'az',myTeam=()=>teamOf(NET.me),isEnemy=id=>NET.mode==='pvp'&&teamOf(id)!==myTeam();
+function teamCount(t){let n=0;for(const id of [NET.me,...NET.peers.keys()])if(NET.teams.get(id)===t)n++;return n}
+function teamAssign(id){if(!NET.host||NET.teams.has(id))return;NET.teams.set(id,teamCount('az')<=teamCount('vm')?'az':'vm')}
+function teamScore(t){let k=0;for(const [id,b] of NET.board)if(teamOf(id)===t)k+=b.k;return k}
+function teamSwitch(id){if(!NET.host)return;const to=teamOf(id)==='az'?'vm':'az';if(teamCount(to)>=Math.ceil(MP_MAX/2)){if(id===NET.me)mpStatus('O time '+TEAMS[to].n+' já está cheio (3).');return}NET.teams.set(id,to);mpHello();mpLobbyUI()}
 const mpq=id=>document.getElementById(id);
 const r1=x=>Math.round(x*10)/10,r3=x=>Math.round(x*1000)/1000;
 function mpCode(){const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=A[Math.floor(Math.random()*A.length)];return s}
@@ -1748,7 +1775,7 @@ function mpSend(t,d,to){if(NET.tr)NET.tr.send(Object.assign({t},d||{},to?{to}:{}
 async function mpJoin(code,asHost){code=(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);if(code.length<4){mpStatus('Código inválido: são 5 letras/números.');return}
  if(NET.on)await mpLeave(true);mpStatus('Conectando à sala '+code+'…');
  try{NET.tr=/rede=local/.test(location.search)?trLocal(code):await trTrystero(code)}catch(e){console.error(e);mpStatus('Não deu para conectar (sem internet ou bloqueio de rede). Tente de novo.');return}
- Object.assign(NET,{on:true,match:false,host:!!asHost,me:NET.tr.me,hostId:asHost?NET.tr.me:'',code,mode:NET.mode||'coop'});NET.peers.clear();NET.board.clear();
+ Object.assign(NET,{on:true,match:false,host:!!asHost,me:NET.tr.me,hostId:asHost?NET.tr.me:'',code,mode:NET.mode||'coop'});NET.peers.clear();NET.board.clear();NET.teams.clear();if(asHost)NET.teams.set(NET.me,'az');
  NET.tr.on('msg',mpOnMsg);NET.tr.on('join',id=>{mpHello(id);if(NET.voice&&NET.tr.room)NET.tr.room.addStream(NET.voice,{target:id}).catch(()=>{})});NET.tr.on('leave',mpOnLeave);NET.tr.on('stream',mpOnStream);
  NET.tr.on('error',e=>{if(e&&e.code==='room-full'){mpStatus('Sala cheia (6 pilotos). Peça outro código.');mpLeave(true)}});
  try{history.replaceState(null,'','?sala='+code+(/rede=local/.test(location.search)?'&rede=local':''))}catch(e){}
@@ -1756,22 +1783,24 @@ async function mpJoin(code,asHost){code=(code||'').toUpperCase().replace(/[^A-Z0
 async function mpLeave(silent){if(!NET.on)return;mpSend('bye');clearInterval(NET.helloI);try{await NET.tr.leave()}catch(e){}NET.tr=null;NET.on=false;NET.match=false;
  for(const r of NET.R.values())mpRemoveRemote(r);NET.R.clear();NET.peers.clear();for(const a of NET.audio.values())a.remove();NET.audio.clear();if(NET.voice){for(const t of NET.voice.getTracks())t.stop();NET.voice=null}
  try{history.replaceState(null,'',location.pathname)}catch(e){}if(!silent)mpStatus('Você saiu da sala.');mpLobbyUI()}
-function mpHello(to){if(!NET.on)return;mpSend('hello',{name:mpName(),ac:S.ac,host:NET.host,mode:NET.mode,match:NET.match,cfg:NET.host?NET.cfg:undefined},to)}
+function mpHello(to){if(!NET.on)return;mpSend('hello',{name:mpName(),ac:S.ac,host:NET.host,mode:NET.mode,match:NET.match,cfg:NET.host?NET.cfg:undefined,teams:NET.host?Object.fromEntries(NET.teams):undefined},to)}
 function mpStatus(t){const e=mpq('mpst');if(e)e.textContent=t}
 function mpLobbyUI(){const inRoom=NET.on;mpq('mpJoinBox').classList.toggle('hide',inRoom);mpq('mpRoom').classList.toggle('hide',!inRoom);if(!inRoom)return;
  mpq('mpCode').textContent=NET.code;const L=mpq('mpList');L.textContent='';const list=[{id:NET.me,name:mpName(),ac:S.ac,host:NET.host,me:true},...[...NET.peers.entries()].map(([id,p])=>Object.assign({id},p))];
- for(const p of list.slice(0,MP_MAX)){const li=document.createElement('li'),b=document.createElement('b'),s2=document.createElement('span');b.textContent=p.name+(p.me?' (você)':'');s2.textContent=(ACFT[p.ac]?ACFT[p.ac].name.split(' ')[0]:'?')+(p.host?' · anfitrião':'');li.append(b,s2);L.appendChild(li)}
+ const pv=NET.mode==='pvp';if(pv)list.sort((a,b)=>teamOf(a.id).localeCompare(teamOf(b.id)));
+ for(const p of list.slice(0,MP_MAX)){const li=document.createElement('li'),b=document.createElement('b'),s2=document.createElement('span');if(pv){const ti=document.createElement('i');ti.className=teamOf(p.id);ti.textContent=TEAMS[teamOf(p.id)].n.toUpperCase();b.appendChild(ti)}b.append(p.name+(p.me?' (você)':''));s2.textContent=(ACFT[p.ac]?ACFT[p.ac].name.split(' ')[0]:'?')+(p.host?' · anfitrião':'');li.append(b,s2);L.appendChild(li)}
  mpq('mpCount').textContent=list.length+'/'+MP_MAX;document.querySelectorAll('#mpMode button').forEach(b=>{b.classList.toggle('on',b.dataset.v===NET.mode);b.disabled=!NET.host});
- mpq('mpStart').classList.toggle('hide',!NET.host);mpq('mpWait').classList.toggle('hide',NET.host)}
+ mpq('mpStart').classList.toggle('hide',!NET.host);mpq('mpWait').classList.toggle('hide',NET.host);mpq('mpTeamBox').classList.toggle('hide',!pv);if(pv){mpq('mpAz').textContent=teamCount('az');mpq('mpVm').textContent=teamCount('vm');mpq('mpTeam').textContent='Trocar para o time '+(myTeam()==='az'?'Vermelho':'Azul')}}
 function mpInviteURL(){return location.origin+location.pathname+'?sala='+NET.code}
 /* ---- mensagens ---- */
 function mpOnMsg(d,from){if(!d||!d.t||(d.to&&d.to!==NET.me))return;const p=NET.peers.get(from);
  switch(d.t){
- case 'hello':{const isNew=!NET.peers.has(from);NET.peers.set(from,{name:String(d.name||'Piloto').slice(0,16),ac:ACFT[d.ac]?d.ac:'f14',host:!!d.host});if(d.host){NET.hostId=from;if(!NET.host){NET.mode=d.mode||NET.mode;if(d.cfg)NET.cfg=d.cfg}}
+ case 'hello':{const isNew=!NET.peers.has(from);NET.peers.set(from,{name:String(d.name||'Piloto').slice(0,16),ac:ACFT[d.ac]?d.ac:'f14',host:!!d.host});if(d.host){NET.hostId=from;if(!NET.host){NET.mode=d.mode||NET.mode;if(d.cfg)NET.cfg=d.cfg;if(d.teams)NET.teams=new Map(Object.entries(d.teams))}}if(NET.host&&!NET.teams.has(from)){teamAssign(from);if(NET.match){NET.cfg.teams=Object.fromEntries(NET.teams)}mpHello()}
   if(NET.peers.size+1>MP_MAX&&!NET.host&&isNew&&!NET.match){}// a trava de 6 é do Trystero (maxUsers)
   if(isNew){if(NET.match)say(NET.peers.get(from).name+' entrou na sala.','a');mpHello(from);if(NET.host&&NET.match)mpSend('start',{cfg:NET.cfg},from)}
   if(!NET.host&&d.host&&d.match&&!NET.match)mpStartMatch(d.cfg||NET.cfg);mpLobbyUI();break}
  case 'bye':mpOnLeave(from);break;
+ case 'teamReq':if(NET.host&&!NET.match)teamSwitch(from);break;
  case 'start':if(!NET.host){NET.cfg=d.cfg;mpStartMatch(d.cfg)}break;
  case 'st':if(NET.match)mpRemoteState(from,d);break;
  case 'snap':if(NET.match&&!NET.host&&from===NET.hostId)mpApplySnap(d);break;
@@ -1782,17 +1811,17 @@ function mpOnMsg(d,from){if(!d||!d.t||(d.to&&d.to!==NET.me))return;const p=NET.p
  case 'kill':{const kb=NET.board.get(d.by);if(kb&&NET.match)kb.k++}if(NET.match&&d.by===NET.me){G.kills++;const pts=d.ace?500:100;G.score+=pts;say('Splash! '+d.name+' abatido. +'+pts,'','Splash one');const g=[...T].find(t=>t.nid===d.nid);if(g&&S.kcam!==false&&P.state==='fly')G.kcam={t:0,tg:g,side:1}}else if(NET.match){const n=(NET.peers.get(d.by)||{}).name;if(n)say(n+' derrubou '+d.name+'!','')}break;
  case 'chat':say((p?p.name:'?')+': '+String(d.text||'').slice(0,200),'a');radioLine('c',String(d.text||'').slice(0,200),p?p.name:'?');break;
  case 'end':if(!NET.host)mpEnd(d.reason,d.board);break}}
-function mpOnLeave(id){const p=NET.peers.get(id);NET.peers.delete(id);const r=NET.R.get(id);if(r)mpRemoveRemote(r);NET.R.delete(id);const a=NET.audio.get(id);if(a){a.remove();NET.audio.delete(id)}
+function mpOnLeave(id){const p=NET.peers.get(id);NET.peers.delete(id);if(NET.host&&!NET.match){NET.teams.delete(id);mpHello()}const r=NET.R.get(id);if(r)mpRemoveRemote(r);NET.R.delete(id);const a=NET.audio.get(id);if(a){a.remove();NET.audio.delete(id)}
  if(p&&NET.match)say(p.name+' saiu da sala.','a');if(id===NET.hostId&&!NET.host){if(NET.match)mpEnd('O anfitrião saiu da sala.');NET.hostId='';mpStatus('O anfitrião saiu.')}mpLobbyUI()}
 /* ---- início da partida ---- */
-function mpHostStart(){if(!NET.host)return;NET.cfg={world:{real:S.world==='rio',lat0:WORLD.lat0,lon0:WORLD.lon0,nc:WORLD.noCarrier,name:WORLD.placeName},mode:NET.mode,tod:S.tod,diff:S.diff,seed:Math.floor(Math.random()*1e9),t0:Date.now()};mpSend('start',{cfg:NET.cfg});mpStartMatch(NET.cfg)}
-function mpStartMatch(cfg){NET.match=true;NET.mode=cfg.mode;NET.endT=0;mpq('mp').classList.add('hide');S.tod=cfg.tod||S.tod;
+function mpHostStart(){if(!NET.host)return;NET.cfg={world:{real:S.world==='rio',lat0:WORLD.lat0,lon0:WORLD.lon0,nc:WORLD.noCarrier,name:WORLD.placeName},mode:NET.mode,tod:S.tod,diff:S.diff,seed:Math.floor(Math.random()*1e9),t0:Date.now(),teams:Object.fromEntries(NET.teams)};mpSend('start',{cfg:NET.cfg});mpStartMatch(NET.cfg)}
+function mpStartMatch(cfg){NET.match=true;NET.mode=cfg.mode;if(cfg.teams)NET.teams=new Map(Object.entries(cfg.teams));NET.endT=0;mpq('mp').classList.add('hide');S.tod=cfg.tod||S.tod;
  for(const id of [NET.me,...NET.peers.keys()])if(!NET.board.has(id))NET.board.set(id,{k:0,d:0});
  if(cfg.world&&!NET.host){S.world=cfg.world.real?'rio':'ilhas';if(cfg.world.real&&(Math.abs(cfg.world.lat0-WORLD.lat0)>1e-6||Math.abs(cfg.world.lon0-WORLD.lon0)>1e-6))worldReorigin(cfg.world.lat0,cfg.world.lon0);WORLD.noCarrier=!!cfg.world.nc;WORLD.placeName=cfg.world.name||WORLD.placeName;worldSet(cfg.world.real);if(cfg.world.real)say('Mapa da sala: '+WORLD.placeName+'.','a')}
  S.mission=cfg.mode==='pvp'?'pvp':NET.host?'free':'coopc';goFull();startGame();
- if(cfg.mode==='pvp'){mpSpawnPvP();say('PvP · '+(NET.peers.size+1)+' pilotos. Primeiro a '+PVP_KILLS+' abates vence, ou o melhor em '+(PVP_TIME/60)+' minutos. Boa caçada kkk','a')}
+ if(cfg.mode==='pvp'){mpSpawnPvP();say('PvP por times · Você é do time '+TEAMS[myTeam()].n.toUpperCase()+' ('+teamCount(myTeam())+' contra '+teamCount(myTeam()==='az'?'vm':'az')+'). Primeiro time a '+PVP_TEAM_KILLS+' abates vence, ou o melhor em '+(PVP_TIME/60)+' minutos. Losango azul no HUD = seu time.','a')}
  else say('Cooperativo · sala '+NET.code+': '+(NET.peers.size+1)+(NET.peers.size?' pilotos':' piloto')+' defendendo a frota. '+(NET.host?'Você é o anfitrião: os inimigos rodam no seu aparelho.':''),'a')}
-function mpSpawnPvP(){const a=Math.random()*6.283,r=rnd(6000,9000);P.state='fly';P.pos.set(Math.sin(a)*r,rnd(4500,6500),-12000+Math.cos(a)*r);const yaw=Math.atan2(-Math.sin(a),-Math.cos(a));setQ(yaw+Math.PI,0,0);
+function mpSpawnPvP(){const az=myTeam()==='az';P.state='fly';P.pos.set(rnd(-2500,2500),rnd(4500,6500),-12000+(az?1:-1)*rnd(11000,13000));setQ(az?0:Math.PI,0,0);
  const f=new V3(0,0,-1).applyQuaternion(P.q);P.vel.copy(f).multiplyScalar(240);P.gear=P.gearPos=0;P.flaps=P.flapsPos=0;P.hook=P.hookPos=0;P.thr=P.spool=.9;P.prevWh=P.pos.y}
 /* ---- morte e renascimento (no multiplayer ninguém volta pro menu) ---- */
 function mpPlayerDown(why,by){if(P.state==='dead'&&P.mpDown)return;P.mpDown=true;P.state='dead';P.alive=false;me.g.visible=false;explosion(P.pos,1.8,P.pos.y<5);
@@ -1801,22 +1830,22 @@ function mpPlayerDown(why,by){if(P.state==='dead'&&P.mpDown)return;P.mpDown=true
 function mpRespawn(){const keep={k:G.kills,s:G.score};resetP();Object.assign(P,{hp:100,alive:true,mpDown:false});if(NET.mode==='pvp')mpSpawnPvP();else placeAir();G.kills=keep.k;G.score=keep.s;me.g.visible=view==='ext';say('De volta ao ar. Vingança kkk','a')}
 function mpOnDied(from,d){const b=NET.board.get(from)||{k:0,d:0};b.d++;NET.board.set(from,b);if(d.by){if(d.by===NET.me){G.kills++;G.score+=100;say('Splash! '+((NET.peers.get(from)||{}).name||'Piloto')+' abatido. +100','','Splash one')}const k=NET.board.get(d.by)||{k:0,d:0};k.k++;NET.board.set(d.by,k)}
  const r=NET.R.get(from);if(r){explosion(r.pos,1.4,false,r.vel);r.alive=false;r.mesh.visible=false;r.downT=5}mpCheckPvPEnd()}
-function mpCheckPvPEnd(){if(!NET.host||NET.mode!=='pvp'||!NET.match)return;let win=null;for(const [id,b] of NET.board)if(b.k>=PVP_KILLS)win=id;
- const tl=PVP_TIME-(Date.now()-NET.cfg.t0)/1000;if(win||tl<=0){if(!win){let best=-1;for(const [id,b] of NET.board)if(b.k>best){best=b.k;win=id}}const nm=win===NET.me?mpName():(NET.peers.get(win)||{}).name||'?';mpHostEnd(nm+' venceu o PvP!')}}
+function mpCheckPvPEnd(){if(!NET.host||NET.mode!=='pvp'||!NET.match)return;const a=teamScore('az'),v=teamScore('vm'),tl=PVP_TIME-(Date.now()-NET.cfg.t0)/1000;
+ if(a>=PVP_TEAM_KILLS||v>=PVP_TEAM_KILLS||tl<=0){mpHostEnd(a===v?'Empate! Azul '+a+' × '+v+' Vermelho.':'Time '+(a>v?'Azul':'Vermelho')+' venceu o PvP! Azul '+a+' × '+v+' Vermelho.')}}
 function mpHostEnd(reason){if(!NET.host)return;const board=mpBoardList();mpSend('end',{reason,board});mpEnd(reason,board)}
-function mpBoardList(){return [[NET.me,mpName()],...[...NET.peers.entries()].map(([id,p])=>[id,p.name])].map(([id,n])=>{const b=NET.board.get(id)||{k:0,d:0};return {name:n,k:b.k,d:b.d}}).sort((a,b)=>b.k-a.k||a.d-b.d)}
-function mpEnd(reason,board){if(!NET.match)return;NET.match=false;G.mode='play';NET.ending=true;endGame(reason);NET.ending=false;setTimeout(()=>{const el=mpq('ovs');if(board&&el){el.innerHTML='';for(const [i,b] of board.entries()){const dv=document.createElement('div'),bb=document.createElement('b'),sp2=document.createElement('span');bb.textContent=b.k+' / '+b.d;sp2.textContent=(i+1)+'º '+b.name;dv.append(bb,sp2);el.appendChild(dv)}}const ag=mpq('again');ag.textContent='Voltar à sala';ag.onclick=mpBackToRoom},2700);
+function mpBoardList(){return [[NET.me,mpName()],...[...NET.peers.entries()].map(([id,p])=>[id,p.name])].map(([id,n])=>{const b=NET.board.get(id)||{k:0,d:0};return {name:n,k:b.k,d:b.d,team:teamOf(id)}}).sort((a,b)=>(NET.mode==='pvp'?a.team.localeCompare(b.team):0)||b.k-a.k||a.d-b.d)}
+function mpEnd(reason,board){if(!NET.match)return;NET.match=false;G.mode='play';NET.ending=true;endGame(reason);NET.ending=false;setTimeout(()=>{const el=mpq('ovs');if(board&&el){el.innerHTML='';for(const [i,b] of board.entries()){const dv=document.createElement('div'),bb=document.createElement('b'),sp2=document.createElement('span');bb.textContent=b.k+' / '+b.d;sp2.textContent=(b.team&&NET.mode==='pvp'?TEAMS[b.team].n+' · ':(i+1)+'º ')+b.name;if(b.team&&NET.mode==='pvp')bb.style.color=TEAMS[b.team].c;dv.append(bb,sp2);el.appendChild(dv)}}const ag=mpq('again');ag.textContent='Voltar à sala';ag.onclick=mpBackToRoom},2700);
  for(const r of NET.R.values())mpRemoveRemote(r);NET.R.clear()}
 function mpBackToRoom(){const ag=mpq('again');ag.textContent='Voar de novo';ag.onclick=startGame;mpq('over').classList.add('hide');toMenu();mpq('mp').classList.remove('hide');mpLobbyUI();mpStatus(NET.on?'De volta à sala. '+(NET.host?'Decole quando quiser.':'Aguardando o anfitrião.'):'')}
 /* ---- outros pilotos ---- */
 function mpRemote(id){let r=NET.R.get(id);if(r)return r;const p=NET.peers.get(id)||{name:'Piloto',ac:'f14'};
- r={id,kind:'remote',name:p.name,tname:p.name,ac:p.ac,pos:new V3(),vel:new V3(),q:new Q4(),np:new V3(),nq:new Q4(),t:0,alive:true,dying:false,hp:1,mesh:new THREE.Group(),dot:new THREE.Sprite(NET.mode==='pvp'?dotMat:allyDot),gm:[],upS:new V3(0,1,0),loaded:false};
+ r={id,kind:'remote',name:p.name,tname:p.name,ac:p.ac,pos:new V3(),vel:new V3(),q:new Q4(),np:new V3(),nq:new Q4(),t:0,alive:true,dying:false,hp:1,mesh:new THREE.Group(),dot:new THREE.Sprite(isEnemy(id)?dotMat:allyDot),enemy:isEnemy(id),team:teamOf(id),gm:[],upS:new V3(0,1,0),loaded:false};
  r.dot.scale.set(.006,.006,1);scene.add(r.mesh,r.dot);NET.R.set(id,r);
  loadAircraft(p.ac).then(R=>{if(!NET.R.has(id))return;let m;if(R){const h=makeHD(R,false);h.gear(false);m=h.g;r.hd=h}else m=buildF14().g;r.mesh.add(m);r.loaded=true});
- if(NET.mode==='pvp')T.push(r);return r}
+ if(r.enemy)T.push(r);return r}
 function mpRemoveRemote(r){scene.remove(r.mesh,r.dot);for(const g of r.gm)scene.remove(g);const i=T.indexOf(r);if(i>=0)T.splice(i,1);r.alive=false}
-function mpRemoteState(id,d){const r=mpRemote(id);r.np.fromArray(d.p);r.nq.fromArray(d.q);r.vel.fromArray(d.v);r.t=performance.now();r.ab=d.ab;r.hp=d.hp;
- if(d.dead){r.alive=false;r.mesh.visible=false;return}if(!r.alive){r.alive=true;r.pos.copy(r.np);r.q.copy(r.nq)}r.mesh.visible=true;if(NET.mode==='pvp'&&!T.includes(r))T.push(r);if(r.pos.lengthSq()===0){r.pos.copy(r.np);r.q.copy(r.nq)}
+function mpRemoteState(id,d){const r=mpRemote(id);const en=isEnemy(id);if(en!==r.enemy){r.enemy=en;r.dot.material=en?dotMat:allyDot;if(!en){const i=T.indexOf(r);if(i>=0)T.splice(i,1);if(P.lock===r)P.lock=null}}r.np.fromArray(d.p);r.nq.fromArray(d.q);r.vel.fromArray(d.v);r.t=performance.now();r.ab=d.ab;r.hp=d.hp;
+ if(d.dead){r.alive=false;r.mesh.visible=false;return}if(!r.alive){r.alive=true;r.pos.copy(r.np);r.q.copy(r.nq)}r.mesh.visible=true;if(r.enemy&&!T.includes(r))T.push(r);if(r.pos.lengthSq()===0){r.pos.copy(r.np);r.q.copy(r.nq)}
  // mísseis desse piloto: só imagem (quem simula é ele)
  const ms=d.m||[];while(r.gm.length<ms.length){const g=missileModel(ms[r.gm.length][3]||'aim9');scene.add(g);r.gm.push(g)}while(r.gm.length>ms.length)scene.remove(r.gm.pop());
  ms.forEach((m,i)=>{const g=r.gm[i];const np=XV.set(m[0],m[1],m[2]);if(g.userData.lp){const dir=tB.subVectors(np,g.userData.lp);if(dir.lengthSq()>1){g.quaternion.setFromUnitVectors(ZN,dir.normalize());emit(SMK,g.userData.lp,0,1,0,6,1.6,16,.8,.8,.82,.45,.3,.25)}}else g.userData.lp=new V3();g.position.copy(np);g.userData.lp.copy(np);
@@ -1831,7 +1860,7 @@ function mpDamage(t,dmg,src){// chamado pelo damage() quando o alvo é de rede
  if(t.kind==='remote'){mpSend('hit',{to:t.id,k:src==='gun'?'gun':'msl'});emit(FIR,t.pos,0,0,0,.25,3,9,1,.7,.3,1,1);return}
  if(t.ghost){mpSend('hit',{to:NET.hostId,nid:t.nid,dmg,src})}}
 function mpOnHit(d,from){if(d.nid!==undefined){if(!NET.host)return;const b=T.find(t=>t.nid===d.nid);if(b)damage(b,Math.min(+d.dmg||0,2),'net:'+from);return}
- if(NET.mode!=='pvp'||P.state!=='fly')return;P.lastBy=from;if(d.k==='gun'){P.hp-=NET.cfg.diff==='easy'?1.6:2.6;P.shake=Math.max(P.shake,.6);if(P.hp<=0)mpPlayerDown('Abatido no canhão!',from)}else{P.hp-=NET.cfg.diff==='easy'?45:55;P.shake=1.2;explosion(tA.copy(P.pos).addScaledVector(P.fwd,-14),.6,false,P.vel,'missile');if(P.hp<=0)mpPlayerDown('Míssil no alvo!',from);else say('Fomos atingidos por '+((NET.peers.get(from)||{}).name||'alguém')+'! Integridade '+Math.round(P.hp)+'%.','w')}}
+ if(NET.mode!=='pvp'||P.state!=='fly'||!isEnemy(from))return;P.lastBy=from;if(d.k==='gun'){P.hp-=NET.cfg.diff==='easy'?1.6:2.6;P.shake=Math.max(P.shake,.6);if(P.hp<=0)mpPlayerDown('Abatido no canhão!',from)}else{P.hp-=NET.cfg.diff==='easy'?45:55;P.shake=1.2;explosion(tA.copy(P.pos).addScaledVector(P.fwd,-14),.6,false,P.vel,'missile');if(P.hp<=0)mpPlayerDown('Míssil no alvo!',from);else say('Fomos atingidos por '+((NET.peers.get(from)||{}).name||'alguém')+'! Integridade '+Math.round(P.hp)+'%.','w')}}
 function mpOnCM(from,d){// alguém soltou flare/chaff: meus mísseis (ou os inimigos que eu simulo) contra ele podem se perder
  const r=NET.R.get(from);if(!r)return;const f=makeCM(d.k==='flare'?'flare':'chaff',r.pos,r.vel,tB.set(0,1,0));for(const m of MS)if(m.alive&&m.target===r&&(f.kind==='flare')===!!m.d.ir&&m.pos.distanceTo(r.pos)<5500&&Math.random()<.42)m.target=f}
 /* ---- anfitrião do coop: retrato dos inimigos ---- */
@@ -1865,8 +1894,8 @@ async function mpVoice(on){if(!NET.on||!NET.tr||!NET.tr.room){mpStatus('Voz da s
 function mpOnStream(stream,id){let a=NET.audio.get(id);if(!a){a=document.createElement('audio');a.autoplay=true;a.playsInline=true;document.body.appendChild(a);NET.audio.set(id,a)}a.srcObject=stream;a.play().catch(()=>{})}
 /* ---- placar (Tab ou botão PLACAR) ---- */
 function mpBoardShow(on){const el=mpq('mpBoard');if(!NET.match){el.classList.add('hide');return}el.classList.toggle('hide',!on);if(!on)return;const ol=el.querySelector('ol');ol.textContent='';
- for(const b of mpBoardList()){const li=document.createElement('li'),n=document.createElement('b'),s2=document.createElement('span');n.textContent=b.name;s2.textContent=b.k+' abates · '+b.d+' quedas';li.append(n,s2);ol.appendChild(li)}
- const tl=NET.mode==='pvp'?Math.max(0,PVP_TIME-(Date.now()-NET.cfg.t0)/1000):0;el.querySelector('.note').textContent=NET.mode==='pvp'?'PvP · '+PVP_KILLS+' abates vence · '+Math.floor(tl/60)+':'+String(Math.floor(tl%60)).padStart(2,'0'):'Cooperativo · sala '+NET.code}
+ let lt='';for(const b of mpBoardList()){if(NET.mode==='pvp'&&b.team!==lt){lt=b.team;const h=document.createElement('li');h.className='tm '+lt;h.textContent='TIME '+TEAMS[lt].n.toUpperCase()+' · '+teamScore(lt)+' abates';ol.appendChild(h)}const li=document.createElement('li'),n=document.createElement('b'),s2=document.createElement('span');n.textContent=b.name;s2.textContent=b.k+' abates · '+b.d+' quedas';li.append(n,s2);ol.appendChild(li)}
+ const tl=NET.mode==='pvp'?Math.max(0,PVP_TIME-(Date.now()-NET.cfg.t0)/1000):0;el.querySelector('.note').textContent=NET.mode==='pvp'?'PvP por times · '+PVP_TEAM_KILLS+' abates vence · '+Math.floor(tl/60)+':'+String(Math.floor(tl%60)).padStart(2,'0'):'Cooperativo · sala '+NET.code}
 /* ---- UI do lobby ---- */
 mpq('mpOpen').addEventListener('click',()=>{mpq('mp').classList.remove('hide');mpLobbyUI();if(!S.name)setTimeout(()=>mpq('mpName').focus(),50)});
 mpq('mpClose').addEventListener('click',()=>{mpq('mp').classList.add('hide')});
@@ -1876,6 +1905,7 @@ mpq('mpEnter').addEventListener('click',()=>{initAudio();mpJoin(mpq('mpIn').valu
 mpq('mpIn').addEventListener('keydown',e=>{if(e.key==='Enter')mpq('mpEnter').click()});
 mpq('mpLeave').addEventListener('click',()=>mpLeave());
 mpq('mpStart').addEventListener('click',()=>mpHostStart());
+mpq('mpTeam').addEventListener('click',()=>{if(NET.host)teamSwitch(NET.me);else mpSend('teamReq',{},NET.hostId)});
 document.querySelectorAll('#mpMode button').forEach(b=>b.addEventListener('click',()=>{if(!NET.host)return;NET.mode=b.dataset.v;mpHello();mpLobbyUI()}));
 mpq('mpCopy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(mpInviteURL());mpStatus('Convite copiado! Cole no WhatsApp ou Discord.')}catch(e){mpStatus('Copie este link: '+mpInviteURL())}});
 mpq('mpShare').addEventListener('click',async()=>{const u=mpInviteURL();if(navigator.share){try{await navigator.share({title:'FCS · bora voar?',text:'Entra na minha sala do FCS: código '+NET.code,url:u})}catch(e){}}else mpq('mpCopy').click()});
@@ -2108,7 +2138,7 @@ function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.
 resetP();placeCat();applyTOD();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
 // PWA: instala como app e funciona offline (só em HTTPS ou localhost)
 if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
-window.__tomcat={lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>
