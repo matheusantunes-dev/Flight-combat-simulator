@@ -96,6 +96,20 @@ Menu (ou Pausa) → **CONTROLES · JOYSTICK · VR**.
 - **Tela remota (PC desenha, celular mostra):** no PC, toque em **Transmitir para o celular** e escaneie o QR code com o celular (ou abra o link `?tela=CÓDIGO`). Escolha **VR** (óculos de celular) ou **tela**. O joystick fica no PC, a imagem e o som vão para o celular por WebRTC, direto pela rede de casa (a internet só é usada para parear). No VR, o PC desenha cada olho com uma sobra em volta e o celular move o recorte com o giroscópio na hora (Timewarp, como no ALVR/Oculus): a cabeça responde sem atraso, o resto do mundo chega com o atraso da rede (uns 50–150 ms no Wi-Fi 5 GHz). O PC pede para a tela não dormir; pode desligar o monitor, mas **não minimize a janela do jogo** (o navegador para de desenhar abas escondidas; o celular avisa se isso acontecer). Melhor resultado: PC no cabo de rede, celular no Wi-Fi 5 GHz.
 - **Óculos de VR de verdade (WebXR, experimental):** Meta Quest, SteamVR, Windows MR. No PC: Chrome com o óculos ligado (Quest Link/Air Link ou SteamVR). No Quest: abra o site no navegador do próprio óculos. O botão só aparece ativo quando o navegador encontra um óculos. A cabeça é do óculos, o HUD vira um painel na frente do piloto e o joystick continua valendo.
 
+## Ejeção, paraquedas e modo a pé
+
+- **Ejetar:** Ctrl+E três vezes, como no DCS. No celular é SISTEMAS → EJETAR, segurando 1 s. No joystick dá para gravar o botão.
+- **Sequência do assento** (padrão ACES II; F-14 com Martin-Baker GRU-7A, MiG-29 com K-36D, Mirage com Mk 10):
+  - Modo 1, abaixo de 250 nós e 15.000 pés: o paraquedas abre logo.
+  - Modo 2, acima de 250 nós: o drogue freia antes de o paraquedas abrir.
+  - Modo 3, acima de 15.000 pés: queda estabilizada no drogue até 15.000 pés.
+- **Física:** catapulta e foguete empurram para o "teto" do avião, então ejetar invertido e baixo mata. O paraquedas desce a ~7 m/s e, depois de soltar os 4 tirantes, dá para dirigir com A/D.
+- **Ferimentos:** acima de 600 nós o vento machuca, e pousar acima de 8,5 m/s torce o tornozelo.
+- **F-14:** a ejeção é comandada, então o RIO sai 0,4 s antes de você.
+- **No mar:** o colete infla e o bote sai sozinho 4 s depois da separação. E chama o resgate (SH-60). O tempo foi encurtado para 12 s; na vida real seriam de 20 minutos a horas.
+- **A pé:** com o avião parado no convés, Shift+E sai e E entra de novo. W/A/S/D anda, Shift corre, Espaço pula e C troca 1ª/3ª pessoa. Dá para andar entre os F-14 estacionados e até cair do convés no mar. No celular, o manche virtual anda e aparecem os botões CORRER, PULAR e ENTRAR.
+- **Depois do resgate:** no Voo livre você volta ao convés com um avião novo na catapulta. Nas missões, ejetar encerra a missão quando você é resgatado. No multiplayer, você volta para a partida depois de pousar.
+
 ## Rádio com IA (grátis, sem chave)
 
 Abra com **Enter** (ou o botão **RÁDIO** no celular).
