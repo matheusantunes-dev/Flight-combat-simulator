@@ -27,5 +27,7 @@ jobs:
         run: node tests/world.mjs
       - name: Teste do joystick e do VR
         run: node tests/controls.mjs
+      - name: Teste da fisiologia do G
+        run: node tests/gforce.mjs
       - name: Teste da tela remota (PC transmite, celular mostra)
         run: node tests/remote.mjs

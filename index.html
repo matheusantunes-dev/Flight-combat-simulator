@@ -710,9 +710,10 @@ const ACFT={
   fl:[[-.7,-.8,13.9],[.7,-.8,13.9]],wpn:{aim9:{m:'r73',n:2,kg:105,name:'R-73 Archer',sh:'R73'},aim7:{m:'r27',n:2,kg:253,name:'R-27R Alamo',sh:'R27'},aim54:null},gun:{n:150,rate:25,v:870,dmg:.22}},
  m2000:{name:'Mirage 2000C',file:'models/m2000.glb',scale:1,eye:[6.45,2.76],gearH:2.76,sweep:false,naval:false,hudB:12,wave:.55,S:41,empty:7500,fuel:3160,mil:64000,ab:31000,CLa:3.3,aSt:.5,cd0:.019,k:.12,gLim:9,fbw:true,roll:4.0,
   fl:[[0,-.16,12.1]],wpn:{aim9:{m:'magic',n:2,kg:89,name:'Magic II',sh:'MAG'},aim7:{m:'s530',n:2,kg:270,name:'Super 530D',sh:'530'},aim54:null},gun:{n:250,rate:60,v:850,dmg:.2}}};
+ACFT.f16.gSeat=.6;// assento reclinado a 30°
 let A=ACFT.f14;const SLOT=['','','aim9','aim7','aim54'];
 function resetP(){Object.assign(P,{thr:0,spool:0,ab:0,abLit:0,detent:false,gear:1,gearPos:1,flaps:1,flapsPos:1,sb:0,sbPos:0,hook:0,hookPos:0,sweep:20,sweepAuto:true,sweepMan:20,
- fuel:A.fuel,hp:100,g:1,gmax:1,aoa:0,beta:0,mach:0,kias:0,spd:0,qd:0,state:'cat',prevWh:0,gun:A.gun.n,flr:30,chf:30,wpn:2,lock:null,seek:null,seekLock:false,gload:0,trapT:0,launchV:0,alive:true,rwr:0,aSt:.42,bingo:false,flameout:false,mass:28000,thrust:0,rho:1.225,shake:0,smokeT:0});
+ fuel:A.fuel,hp:100,g:1,gmax:1,aoa:0,beta:0,mach:0,kias:0,spd:0,qd:0,state:'cat',prevWh:0,gun:A.gun.n,flr:30,chf:30,wpn:2,lock:null,seek:null,seekLock:false,gload:0,gph:{rfx:0,dv:0,res:1,loc:0,neg:0,warnT:0},trapT:0,launchV:0,alive:true,rwr:0,aSt:.42,bingo:false,flameout:false,mass:28000,thrust:0,rho:1.225,shake:0,smokeT:0});
  P.w.set(0,0,0);P.vel.set(0,0,0);P.stores={};for(const k of['aim9','aim7','aim54']){const w=A.wpn[k];P.stores[k]=w?[...Array(w.n)].map((_,i)=>{const mesh=A===ACFT.f14?me.stores[k][i]:null;if(mesh)mesh.visible=true;return{loaded:true,mesh,i}}):[]}}
 function axes(){P.fwd.set(0,0,-1).applyQuaternion(P.q);P.up.set(0,1,0).applyQuaternion(P.q);P.right.set(1,0,0).applyQuaternion(P.q)}
 const tE=new THREE.Euler();
@@ -766,6 +767,21 @@ function onKey(c){
   case 'KeyR':if(P.thr>=1)P.detent=false;break;
  }
 }
+/* ===== fisiologia do G (como na centrífuga, não um contador) =====
+ Números de estudos de centrífuga da USAF/USN: sem proteção, o limiar é ~4,7 G; com traje anti-G (+1 G) e a manobra de esforço
+ (AGSM, +2,5 G) o piloto treinado aguenta 9 G. O cérebro tem uma reserva de oxigênio de ~5 s: um puxão curto não apaga ninguém,
+ G-LOC nunca vem antes de ~5 s e, a 7 G ou mais, leva em média ~9-10 s. A visão (túnel e escurecimento) aparece ~1 G antes da perda
+ de consciência e com atraso. O reflexo do coração ajuda depois de alguns segundos de G sustentado. Assento reclinado (F-16) ajuda. */
+const GPH={relax:4.7,suit:1,agsm:2.5};
+function gTol(){return GPH.relax+GPH.suit+GPH.agsm+(A.gSeat||0)+P.gph.rfx*.8+(S.diff==='easy'?.5:0)}
+function gPhys(dt){const h=P.gph;if(G.mode!=='play'||P.state==='dead'){h.dv=h.va=0;h.res=1;h.loc=0;h.neg=0;return}const g=P.g;
+ h.rfx+=((g>3?1:0)-h.rfx)*(1-Math.exp(-dt/(g>3?8:15)));const gt=gTol();
+ const vx=Math.max(0,g-(gt-.8));h.va=(h.va||0)+(vx-(h.va||0))*(1-Math.exp(-dt/(vx>(h.va||0)?2:.8)));h.dv+=(h.va-h.dv)*(1-Math.exp(-dt/(h.va>h.dv?2:.8)));// duas etapas: a reserva de O2 da retina segura os primeiros segundos
+ const ex=g-gt;if(ex>0)h.res-=dt*Math.min(.2,.038+.036*ex);else if(g<gt-1)h.res=Math.min(1,h.res+dt*.22);
+ h.neg+=((g<-2.5?1:0)-h.neg)*(1-Math.exp(-dt/(g<-2.5?1.6:.8)));
+ h.warnT-=dt;if(h.dv>.6&&h.warnT<=0&&!h.loc){h.warnT=20;say('RIO: Tô vendo cinza nas bordas! Alivia um pouco o manche.','a')}
+ if(h.loc>0){h.loc-=dt;if(h.loc<=0){h.res=.35;say('...voltando. RIO: Você apagou por uns segundos! Cuidado com o G sustentado.','a')}}
+ else if(h.res<=0){h.loc=6+Math.random()*3;h.res=0;say('G-LOC! Você perdeu a consciência. O avião está sem ninguém no manche...','w')}}
 function readInput(dt){
  let tp=((K.KeyS||K.ArrowDown)?1:0)-((K.KeyW||K.ArrowUp)?1:0);if(S.invert)tp=-tp;
  let tr=((K.KeyD||K.ArrowRight)?1:0)-((K.KeyA||K.ArrowLeft)?1:0),ty=(K.KeyE?1:0)-(K.KeyQ?1:0);
@@ -1380,7 +1396,7 @@ function syncModel(dt){me.g.position.copy(P.pos);me.g.quaternion.copy(P.q);me.sw
 function update(dt){
  if(G.kcam){G.kcam.t+=dt;if(G.kcam.t>2.2||G.mode!=='play'||G.paused)G.kcam=null;else dt*=.3}// câmera lenta do abate
  const run=G.mode==='play'&&!G.paused,live=G.mode!=='play'||!G.paused;
- if(run){G.t+=dt;readInput(dt);const n=Math.ceil(dt/.008);for(let i=0;i<n&&P.state!=='dead';i++)stepPlayer(dt/n);axes();att();updGun(dt);radar();if(G.mode==='play'&&P.state!=='dead'&&P.g>6.5)P.gload+=(P.g-6.5)*dt*.22;else P.gload=Math.max(0,P.gload-dt*.35);if(P.g<-2.2)P.gload-=dt*.2;}
+ if(run){G.t+=dt;readInput(dt);if(P.gph.loc>0&&P.state!=='dead'){IN.pitch=IN.roll=IN.yaw=0;fireHeld=false}const n=Math.ceil(dt/.008);for(let i=0;i<n&&P.state!=='dead';i++)stepPlayer(dt/n);axes();att();updGun(dt);radar();gPhys(dt);}
  else if(G.mode==='menu'){P.spool=.12}
  if(live&&G.mode!=='menu'){FR.length=0;if(P.state==='fly'||P.state==='deck')FR.push(P);for(const a of AL)if(a.alive&&!a.dying&&a.state!=='hold')FR.push(a);if(G.vip&&G.vip.alive&&!G.vip.dying)FR.push(G.vip);if(NET.match&&NET.mode==='coop')for(const r of NET.R.values())if(r.alive)FR.push(r);if(G.vip&&G.vip.alive)updVIP(G.vip,dt);for(const t of[...T]){if(!t.alive)continue;t.ghost?updGhost(t,dt):t.kind==='remote'?0:t.kind==='bandit'?updBandit(t,dt):updVamp(t,dt)}for(const a of[...AL])if(a.alive)updAlly(a,dt);updMissiles(dt);updBullets(dt);updFlares(dt);if(G.mode==='play')waves(dt)}
  if(live){updPS(SMK,dt);updPS(FIR,dt);updPS(SPK,dt);updFX(dt);flashL.intensity*=Math.exp(-dt*6);sea.material.normalMap.offset.x+=dt*.0012;sea.material.normalMap.offset.y+=dt*.0007;
@@ -1394,7 +1410,7 @@ function frame(now){if(RS.role==='view')return;if(!XR.s)requestAnimationFrame(fr
  sun.position.copy(camera.position).addScaledVector(sunDir,5000);sun.target.position.copy(camera.position);
  tA.copy(sunDir).applyQuaternion(tQ.copy(P.q).invert());cSun.position.copy(tA).multiplyScalar(5);cSun.target.position.set(0,0,0);
  const scl=renderer.getPixelRatio()*H/(2*Math.tan(camera.fov*D2R/2));SMK.m.uniforms.scale.value=FIR.m.uniforms.scale.value=SPK.m.uniforms.scale.value=scl;
- const gv=$('#gv');if(G.mode==='play'){const b=clamp(P.gload,0,1.15),r=clamp(-P.gload,0,1);gv.style.opacity=Math.max(b,r);gv.style.background=r>b?'radial-gradient(ellipse at center,rgba(150,0,0,.2) 0%,rgba(150,0,0,.95) 75%)':'radial-gradient(ellipse at center,rgba(0,0,0,'+clamp(b-.7,0,1)+') 0%,rgba(0,0,0,1) '+(90-b*45)+'%)'}else gv.style.opacity=0;
+ const gv=$('#gv');if(G.mode==='play'&&P.state!=='dead'){const h=P.gph,tun=clamp(h.dv/1.6,0,1),blk=h.loc>0?1:clamp((.4-h.res)/.4,0,1),red=clamp(h.neg,0,1);gv.style.opacity=Math.max(tun,blk,red*.9);gv.style.background=red>Math.max(tun,blk)?'radial-gradient(ellipse at center,rgba(150,0,0,.25) 0%,rgba(150,0,0,.95) 75%)':'radial-gradient(ellipse at center,rgba(8,8,8,'+blk.toFixed(3)+') 0%,rgba(8,8,8,'+blk.toFixed(3)+') '+(68-tun*48)+'%,rgba(0,0,0,1) '+(100-tun*40)+'%)'}else gv.style.opacity=0;
  const vrOn=VR.on&&!XR.s,showC=view==='cock'&&G.mode==='play'&&P.state!=='dead'&&!G.kcam,warn=run?warnings():[];
  if(XR.s){xrPre();xrHUD(warn);XR.hud.visible=G.mode==='play'&&P.state!=='dead';renderer.clear();renderer.render(scene,camera);renderer.clearDepth();if(showC)renderer.render(cockScene,cockCam);xrPost();if(showC&&now-panelT>66){panelT=now;drawPanel()}}
  else{if(!vrOn){renderer.clear();renderer.render(scene,camera)}
@@ -1968,7 +1984,7 @@ function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.
 resetP();placeCat();applyTOD();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
 // PWA: instala como app e funciona offline (só em HTTPS ou localhost)
 if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
-window.__tomcat={RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={gPhys,gTol,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>
