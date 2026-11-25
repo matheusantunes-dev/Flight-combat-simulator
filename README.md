@@ -22,7 +22,7 @@ Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fc
 
 ## Testes automáticos
 
-Todo Pull Request roda `.github/workflows/test.yml`: abre o jogo num Chrome headless e confere decolagem por catapulta, pouso com cabo e combate com os alas.
+Todo Pull Request roda `.github/workflows/test.yml`: abre o jogo num Chrome headless e confere decolagem por catapulta, pouso com cabo e combate com os alas (`tests/smoke.mjs`), e o multiplayer com 2 abas: lobby, PvP e coop (`tests/multiplayer.mjs`).
 
 Rodar no seu PC:
 ```bash
@@ -46,6 +46,20 @@ npx gltfpack -i modelo.gltf -o models/modelo.glb -c -noq -kn -km -ke
 - **Nuvens:** dentro delas, mísseis perdem o alvo com mais facilidade, dos dois lados.
 - **Câmera do abate:** 2 s em câmera lenta seguindo o inimigo abatido por míssil. Qualquer tecla ou toque pula; dá para desligar no menu.
 - **Ranking global:** função `api/score.js` na Vercel + Upstash Redis (plano grátis: 256 MB e 500 mil comandos por mês, sem cartão). Para ligar: Vercel → projeto → **Storage → Create Database → Upstash (Redis)** → conectar ao projeto → **Redeploy**. Sem isso, o ranking fica salvo só no aparelho.
+
+## Multiplayer (até 6 pilotos por sala)
+
+No menu: **MULTIPLAYER** → **Criar sala** → **Copiar convite** ou **Compartilhar** (WhatsApp, Discord…). Quem abre o link cai direto na sala. O anfitrião escolhe o modo e decola com todo mundo.
+
+- **Cooperativo vs IA:** a sala inteira defende a frota contra as ondas. Os inimigos rodam no aparelho do anfitrião; se ele sair, a partida acaba.
+- **PvP todos contra todos:** primeiro a 10 abates vence, ou o melhor em 8 minutos. Quem cai volta em 5 s.
+- **Placar:** Tab (PC) ou botão PLACAR (celular).
+- **Chat:** o rádio (Enter) vira chat da sala; comece com "ia," para falar com o copiloto.
+- **Voz da sala:** botão no lobby, por WebRTC (só online).
+
+Como funciona: [Trystero](https://github.com/dmotz/trystero) encontra os jogadores por relays públicos do Nostr e liga os navegadores direto por WebRTC. Não tem servidor nosso nem custo. Em algumas redes (4G de certas operadoras, Wi-Fi corporativo) a conexão direta pode falhar, porque não usamos servidor TURN.
+
+Testar sem internet, em duas abas: `http://localhost:8080/?rede=local`.
 
 ## Rádio com IA (grátis, sem chave)
 
