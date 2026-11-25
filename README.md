@@ -2,18 +2,6 @@
 
 Jogo de combate aéreo 3D em HTML/CSS/JS (Three.js), com cockpit do F-14, esquadrilha de 6 alas e rádio com IA que roda no navegador.
 
-## Publicar na Vercel
-
-1. Em [vercel.com](https://vercel.com), entre com o GitHub e clique em **Add New → Project**.
-2. Importe o repositório `Flight-combat-simulator`.
-3. Configure assim:
-   - **Framework Preset:** Other
-   - **Build Command:** vazio
-   - **Output Directory:** vazio (a raiz do repo)
-4. Clique em **Deploy**. Cada push na `main` publica de novo, e cada Pull Request ganha um link de prévia.
-
-Testar local antes: `python3 -m http.server 8080` e abra `http://localhost:8080` (abrir o arquivo direto com duplo clique não funciona, porque os modelos 3D são carregados por HTTP).
-
 ## Instalar como app (PWA)
 
 No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inicial"). No PC: ícone de instalar na barra de endereço. Depois da primeira visita, o jogo abre até sem internet (a IA local e o multiplayer continuam precisando de rede).
