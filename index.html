@@ -326,7 +326,9 @@ renderer.toneMapping=THREE.ACESFilmicToneMapping;
 const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(65,1,1.2,100000);
 const cockScene=new THREE.Scene(),cockCam=new THREE.PerspectiveCamera(65,1,0.02,45);
 let W=1,H=1,DPR=1;
-function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio,2);renderer.setSize(W,H,false);camera.aspect=cockCam.aspect=W/H;camera.updateProjectionMatrix();cockCam.updateProjectionMatrix();hc.width=W*DPR;hc.height=H*DPR}
+function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio,2);let rot=0;try{rot=VR.on&&H>W?VR.side:0;VR.rot=rot}catch(e){}/* VR ainda não existe no 1º resize */if(rot){W=innerHeight;H=innerWidth}
+ for(const c of[$('#gl'),$('#hud')])Object.assign(c.style,rot?{width:W+'px',height:H+'px',maxWidth:'none',maxHeight:'none',inset:'auto',left:'50%',top:'50%',transform:'translate(-50%,-50%) rotate('+rot+'deg)'}:{width:'',height:'',maxWidth:'',maxHeight:'',inset:'',left:'',top:'',transform:''});
+ renderer.setSize(W,H,false);camera.aspect=cockCam.aspect=W/H;camera.updateProjectionMatrix();cockCam.updateProjectionMatrix();hc.width=W*DPR;hc.height=H*DPR}
 addEventListener('resize',resize);resize();
 
 function canvasTex(w,h,draw,srgb=true){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);if(srgb)t.encoding=THREE.sRGBEncoding;t.anisotropy=8;return t}
@@ -1773,16 +1775,18 @@ function joyAuto(){const pads=joyPads();const g=pads.find(p=>p.mapping!=='standa
  JOY.b.roll={id:g.id,t:'a',i:0,inv:false};JOY.b.pitch={id:g.id,t:'a',i:1,inv:false};if(g.axes.length>2)JOY.b.thr={id:g.id,t:'a',i:2,inv:true};if(g.axes.length>5)JOY.b.yaw={id:g.id,t:'a',i:5,inv:false};else if(g.axes.length>3)JOY.b.yaw={id:g.id,t:'a',i:3,inv:false};
  const bs=['fire','weapon','lock','flare','chaff','cam','gear','flaps','hook','brake','wing','pause'];bs.forEach((a,i)=>{if(i<g.buttons.length)JOY.b[a]={id:g.id,t:'b',i}});joySave();joyUI('Palpite aplicado. Teste cada comando e regrave o que estiver trocado.')}
 /* ================= VR (tela dividida tipo Cardboard) + olhar pelo giroscópio ================= */
-const VR={on:false,gyro:false,ok:false,dq:new Q4(),ref:new Q4(),rel:new Q4(),ipd:.064,needRef:true,tap:0};
+const VR={on:false,gyro:false,ok:false,side:90,rot:0,autoSide:true,dq:new Q4(),ref:new Q4(),rel:new Q4(),ipd:.064,needRef:true,tap:0};
 {const zee=new V3(0,0,1),eu=new THREE.Euler(),q0=new Q4(),q1=new Q4(-Math.sqrt(.5),0,0,Math.sqrt(.5));
- VR.onOri=e=>{if(e.alpha===null)return;VR.ok=true;const o=((screen.orientation&&screen.orientation.angle)||window.orientation||0)*DEG;eu.set(e.beta*DEG,e.alpha*DEG,-e.gamma*DEG,'YXZ');VR.dq.setFromEuler(eu).multiply(q1).multiply(q0.setFromAxisAngle(zee,-o));
+ VR.onOri=e=>{if(e.alpha===null)return;VR.ok=true;if(VR.on&&innerHeight>innerWidth&&VR.autoSide&&Math.abs(e.gamma)>45){const sd=e.gamma<0?90:-90;if(sd!==VR.side){VR.side=sd;resize()}}const o=(VR.rot?VR.rot:((screen.orientation&&screen.orientation.angle)||window.orientation||0))*DEG;eu.set(e.beta*DEG,e.alpha*DEG,-e.gamma*DEG,'YXZ');VR.dq.setFromEuler(eu).multiply(q1).multiply(q0.setFromAxisAngle(zee,-o));
   if(VR.needRef){VR.ref.copy(VR.dq);VR.needRef=false}VR.rel.copy(VR.ref).invert().multiply(VR.dq)}}
 async function vrGyro(on){if(on){try{if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const r=await DeviceOrientationEvent.requestPermission();if(r!=='granted'){say('Sem permissão para o giroscópio.','w');return false}}}catch(e){say('O giroscópio precisa de HTTPS e de um toque na tela.','w');return false}
   addEventListener('deviceorientation',VR.onOri);VR.gyro=true;VR.needRef=true;setTimeout(()=>{if(!VR.ok)say('Este aparelho não mandou dados do giroscópio.','w')},1500);return true}
  removeEventListener('deviceorientation',VR.onOri);VR.gyro=false;VR.rel.identity();return false}
 function vrRecenter(){VR.needRef=true;say('Visão recentralizada.','')}
-async function vrSet(on){if(on){const ok=await vrGyro(true);if(!ok)return;VR.on=true;document.body.classList.add('vr');goFull();try{await screen.orientation.lock('landscape')}catch(e){}renderer.setPixelRatio(Math.min(devicePixelRatio,IS_TOUCH?1.1:1.5));say('VR ligado. Encaixe o celular no óculos; toque 2x na tela para sair.','')}
- else{VR.on=false;document.body.classList.remove('vr');if(!S.gyroLook)vrGyro(false);renderer.setPixelRatio(Math.min(devicePixelRatio,IS_TOUCH?1.3:1.75));resize()}}
+async function vrSet(on){if(on){const ok=await vrGyro(true);if(!ok)return;VR.on=true;VR.autoSide=true;document.body.classList.add('vr');
+  try{const d=document.documentElement,rq=d.requestFullscreen||d.webkitRequestFullscreen;if(rq&&!document.fullscreenElement)await rq.call(d,{navigationUI:'hide'})}catch(e){}
+  try{await screen.orientation.lock('landscape')}catch(e){}setTimeout(resize,250);resize();VR.needRef=true;renderer.setPixelRatio(Math.min(devicePixelRatio,IS_TOUCH?1.1:1.5));say('VR ligado. Encaixe o celular deitado no óculos. Toque 2x para sair; segure 1 s se a imagem ficar de cabeça para baixo.','')}
+ else{VR.on=false;VR.rot=0;document.body.classList.remove('vr');try{screen.orientation.unlock()}catch(e){}if(!S.gyroLook)vrGyro(false);renderer.setPixelRatio(Math.min(devicePixelRatio,IS_TOUCH?1.3:1.75));resize()}}
 // desenha os dois olhos: cenário + cockpit + HUD em cada metade
 function vrRender(showC,warn){const w=W,h=H,hw=w/2;camera.aspect=cockCam.aspect=hw/h;camera.updateProjectionMatrix();cockCam.updateProjectionMatrix();
  renderer.setScissorTest(false);renderer.clear();renderer.setScissorTest(true);const cp=camera.position.clone(),kp=cockCam.position.clone(),rt=new V3();
@@ -1794,7 +1798,8 @@ function vrRender(showC,warn){const w=W,h=H,hw=w/2;camera.aspect=cockCam.aspect=
  hx.setTransform(1,0,0,1,0,0);hx.clearRect(0,0,hc.width,hc.height);W=hw;try{drawHUD(warn)}finally{W=w}hx.setTransform(1,0,0,1,0,0);hx.clearRect(Math.floor(hw*DPR),0,hc.width,hc.height);hx.drawImage(hc,0,0,Math.floor(hw*DPR),Math.floor(h*DPR),Math.floor(hw*DPR),0,Math.floor(hw*DPR),Math.floor(h*DPR));
  hx.fillStyle='#000';hx.fillRect(Math.floor(hw*DPR)-1,0,2,Math.floor(h*DPR))}
 // toque duplo sai do VR (o celular está dentro do óculos)
-addEventListener('touchend',()=>{if(!VR.on)return;const t=performance.now();if(t-VR.tap<350)vrSet(false);VR.tap=t},{passive:true});
+addEventListener('touchstart',()=>{if(VR.on)VR.t0=performance.now()},{passive:true});
+addEventListener('touchend',()=>{if(!VR.on)return;const t=performance.now();if(t-(VR.t0||t)>800){VR.autoSide=false;VR.side=-VR.side;resize();VR.needRef=true;return}if(t-VR.tap<350)vrSet(false);VR.tap=t},{passive:true});
 
 /* ================= controles de toque ================= */
 const TOUCH={ui:false,joy:null,x:0,y:0,fire:false,thrId:null,ox:0,oy:0,pausedRot:false};
@@ -1835,7 +1840,7 @@ function updTouch(){const tb=document.getElementById('tBoard');if(tb)tb.classLis
  $('#tLaunch').classList.toggle('hide',P.state!=='cat');$('#tTgt').classList.toggle('hide',G.mission!=='fly');$('#tHook').classList.toggle('hide',!A.naval);$('#tSweep').classList.toggle('hide',!A.sweep);
  $('#tGear').classList.toggle('on',!!P.gear);$('#tFlaps').classList.toggle('on',!!P.flaps);$('#tBrk').classList.toggle('on',!!P.sb);$('#tHook').classList.toggle('on',!!P.hook);$('#tLock').classList.toggle('on',!!P.lock);$('#tSys').classList.toggle('on',!$('#tSysRow').classList.contains('hide'))}
 function touchFrame(){const show=TOUCH.ui&&G.mode==='play'&&!G.paused&&P.state!=='dead';tcEl.classList.toggle('hide',!show);document.body.classList.toggle('touch',TOUCH.ui);
- const port=TOUCH.ui&&innerHeight>innerWidth&&G.mode==='play';$('#rot').classList.toggle('hide',!port);
+ const port=TOUCH.ui&&innerHeight>innerWidth&&G.mode==='play'&&!VR.on;$('#rot').classList.toggle('hide',!port);
  if(port&&!G.paused){TOUCH.pausedRot=true;G.paused=true}else if(!port&&TOUCH.pausedRot){TOUCH.pausedRot=false;G.paused=false}
  if(show)thrVis()}
 $('#tch').checked=TOUCH.ui;$('#tch').onchange=e=>{TOUCH.ui=e.target.checked;try{localStorage.setItem('tomcat-touch',TOUCH.ui?'1':'0')}catch(_){}};
