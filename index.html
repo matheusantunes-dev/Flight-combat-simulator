@@ -74,6 +74,10 @@ body.touch #radio{bottom:auto;top:40px;width:min(470px,60vw)}body.touch #rlog{ma
 #msgs .m{background:rgba(0,0,0,.5);padding:6px 10px;border-radius:7px;font-size:16px;border-left:3px solid var(--hud);transition:opacity .9s}
 #msgs .m.w{border-color:var(--warn)}#msgs .m.a{border-color:var(--amber)}
 #msgs .m.out{opacity:0}
+/* auditoria de UI */
+.goBar{position:sticky;bottom:0;margin:12px -24px -22px;padding:12px 24px 14px;background:linear-gradient(180deg,rgba(14,20,22,0),rgba(14,20,22,.96) 30%);border-radius:0 0 14px 14px;z-index:2}.goBar .go{width:100%;margin:0}
+#pause{align-items:center}#pause .main{order:-1}#pause .keys{max-height:calc(100dvh - 40px);overflow:auto}
+#thrMil::after{right:auto;left:5px;top:-15px}
 #hint{position:fixed;left:50%;top:12px;transform:translateX(-50%);background:rgba(0,0,0,.55);padding:6px 14px;border-radius:8px;font-size:17px;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 20px);overflow:hidden;text-overflow:ellipsis}
 #gv{position:fixed;inset:0;pointer-events:none;opacity:0}
 #flash{position:fixed;inset:0;pointer-events:none;background:#ff3020;opacity:0;transition:opacity .5s}
@@ -132,8 +136,14 @@ html,body{overscroll-behavior:none}#gl{touch-action:none}
 @media (prefers-reduced-motion:reduce){#rot svg{animation:none}}
 body.touch #msgs{width:min(290px,32vw);top:38px;left:calc(8px + env(safe-area-inset-left,0px))}body.touch #msgs .m{font-size:12.5px;line-height:1.3;padding:4px 8px}
 body.touch #top{font-size:11.5px;left:calc(8px + env(safe-area-inset-left,0px));top:8px;max-width:calc(100vw - 330px);flex-wrap:nowrap;overflow:hidden}body.touch #top span{padding:3px 7px;white-space:nowrap}body.touch #top .ac,body.touch #top .mis{display:none}
+#hint{top:46px;font-size:15px}
 body.touch #hint{font-size:14px;top:auto;bottom:calc(62px + env(safe-area-inset-bottom,0px))}
 body.touch #keys1{display:none}
+body.touch #msgs{width:min(260px,30vw)}body.touch #msgs .m{font-size:12px;padding:3px 7px}
+body.touch .keys td:first-child{white-space:normal;min-width:84px}
+body.touch #pause{flex-wrap:nowrap}body.touch #pause .main{flex:0 0 auto}body.touch #pause .keys{width:auto;flex:1 1 280px;max-width:440px;min-width:0}
+body.touch .goBar{margin:10px -16px -14px;padding:10px 16px 12px}
+@media (max-height:420px){body.touch #msgs .m:nth-child(n+3){display:none}}
 body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{width:min(440px,100%);font-size:14px}body.touch #pause .keys td{padding:3px 0}
 @media (max-height:520px){.ov{padding:10px}.card{padding:14px 16px}h1{font-size:34px}.brand svg{width:52px;height:52px}.brand{margin-bottom:6px}.sub{font-size:15px}
  .opts:not(.seg):not(.hang){grid-template-columns:1fr 1fr}.opts button{padding:7px 10px}.opts button b{font-size:16px}.opts button span{font-size:12.5px}.lbl{margin:8px 0 4px}.go,.btn{padding:10px;font-size:19px;margin-top:10px}.chk{min-height:28px;font-size:14px;margin-top:4px}
@@ -207,8 +217,8 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
     <label class="chk"><input type="checkbox" id="kc"> Câmera lenta do abate</label>
     <div class="lbl">Nome do piloto</div><input id="pname" class="pname" maxlength="16" placeholder="Ex.: Maverick" autocomplete="off">
     <label class="chk"><input type="checkbox" id="voi"> Voz do RIO (brevity codes em inglês)</label>
-    <button id="go" class="go">DECOLAR</button>
     <details class="rank" id="mrank"><summary>Ranking dos pilotos</summary><ol></ol><p class="note"></p></details>
+    <div class="goBar"><button id="go" class="go">DECOLAR</button></div>
     <p class="best" id="loadst">Carregando modelos 3D...</p><p class="best">Recorde: <b id="bestv">0</b> pontos · toque, teclado ou gamepad · toque para ativar o som</p>
     <p class="best cred">Modelos: <a href="https://sketchfab.com/3d-models/f-14-tomcat-fighter-jet-free-497f77c311b5411d9b567d8707a81c33">F-14</a>, <a href="https://sketchfab.com/3d-models/f-16-fighting-falcon-fighter-jet-free-f0b00989e5634764848ef2c235c64db5">F-16</a>, <a href="https://sketchfab.com/3d-models/mig-29-fighter-jet-free-0a21787096244220b246ec8747e7b09c">MiG-29</a> e <a href="https://sketchfab.com/3d-models/dassault-mirage-2000-fighter-jet-free-aca93654c4684c5282e723c5b2999f67">Mirage 2000</a> por bohmerang (CC BY-NC-SA 4.0; asas do F-14 separadas, texturas recomprimidas e cockpits adaptados nesta versão) · MiG-29 e Su-27 por <a href="https://github.com/zuujis-cc0/free-game-assets">Zuujis</a> (CC0). Projeto pessoal, sem fins comerciais.</p>
   </div>
@@ -1329,7 +1339,7 @@ rq('rbL').textContent='Baixar IA leve (~'+LLM_MODELS.leve.mb+' MB)';rq('rbE').te
 rq('rbL').addEventListener('click',()=>loadBrain('leve'));rq('rbE').addEventListener('click',()=>loadBrain('esperto'));
 if(!navigator.gpu)rq('rbst').textContent='IA local precisa de WebGPU (Chrome/Edge no computador). Sem ela, o roteiro responde.';
 rq('rmic').addEventListener('click',()=>{const d=RADIO.dict;if(!d)return;if(rq('rmic').classList.contains('on')){d.stop().catch(()=>{});return}d.start().catch(e=>{rq('rmic').classList.remove('on');if(e&&e.code==='not_granted'){RADIO.dict=null;rq('rmic').classList.add('hide')}})});
-press($('#tRadio'),()=>{radioOpen();vib(8)});
+press($('#tRadio'),()=>{radioOpen();vib(8)});if(IS_TOUCH)rq('rin').placeholder='Fale com o copiloto…';
 try{const k=localStorage.getItem('tomcat-llm');if(k&&LLM_MODELS[k]&&navigator.gpu)setTimeout(()=>loadBrain(k),4000)}catch(e){}// já baixado antes: carrega do cache
 // dentro do Claude: bônus opcional (IA, voz e microfone do Claude)
 if(window.claude&&claude.use){
