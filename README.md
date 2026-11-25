@@ -39,6 +39,14 @@ npx gltfpack -i modelo.gltf -o models/modelo.glb -c -noq -kn -km -ke
 ```
 `-noq` mantém as coordenadas em float (o código separa trem de pouso, asas e cockpit pelos nomes e precisa delas assim); `-kn -km -ke` mantêm nomes, materiais e extras.
 
+## Progressão, missões e ranking
+
+- **Hangar com PM (pontos de mérito):** o F-14 começa liberado; F-16 (1.500 PM), Mirage (3.000 PM) e MiG-29 (5.000 PM) são comprados com os pontos das partidas. Missão cumprida rende 1,5× os pontos. A opção "Hangar liberado" no menu desliga a progressão.
+- **Missões 4 e 5:** escolta do AWACS (se ele cair, a missão acaba) e interceptação com relógio (150 s por onda).
+- **Nuvens:** dentro delas, mísseis perdem o alvo com mais facilidade, dos dois lados.
+- **Câmera do abate:** 2 s em câmera lenta seguindo o inimigo abatido por míssil. Qualquer tecla ou toque pula; dá para desligar no menu.
+- **Ranking global:** função `api/score.js` na Vercel + Upstash Redis (plano grátis: 256 MB e 500 mil comandos por mês, sem cartão). Para ligar: Vercel → projeto → **Storage → Create Database → Upstash (Redis)** → conectar ao projeto → **Redeploy**. Sem isso, o ranking fica salvo só no aparelho.
+
 ## Rádio com IA (grátis, sem chave)
 
 Abra com **Enter** (ou o botão **RÁDIO** no celular).
