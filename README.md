@@ -22,7 +22,7 @@ Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fc
 
 ## Testes automáticos
 
-Todo Pull Request roda `.github/workflows/test.yml`: abre o jogo num Chrome headless e confere decolagem por catapulta, pouso com cabo e combate com os alas (`tests/smoke.mjs`), e o multiplayer com 2 abas: lobby, PvP e coop (`tests/multiplayer.mjs`).
+Todo Pull Request roda `.github/workflows/test.yml`: abre o jogo num Chrome headless e confere decolagem por catapulta, pouso com cabo e combate com os alas (`tests/smoke.mjs`), o multiplayer com 2 abas: lobby, PvP e coop (`tests/multiplayer.mjs`), e o Mundo Real com mapa sintético (`tests/world.mjs`).
 
 Rodar no seu PC:
 ```bash
@@ -60,6 +60,23 @@ No menu: **MULTIPLAYER** → **Criar sala** → **Copiar convite** ou **Comparti
 Como funciona: [Trystero](https://github.com/dmotz/trystero) encontra os jogadores por relays públicos do Nostr e liga os navegadores direto por WebRTC. Não tem servidor nosso nem custo. Em algumas redes (4G de certas operadoras, Wi-Fi corporativo) a conexão direta pode falhar, porque não usamos servidor TURN.
 
 Testar sem internet, em duas abas: `http://localhost:8080/?rede=local`.
+
+## Mundo Real: Rio de Janeiro (protótipo)
+
+No menu: **Mundo → Rio de Janeiro (real)** e escolha a **Qualidade do mapa**.
+
+- **Relevo real:** AWS Terrain Tiles (Terrarium), grátis e sem chave.
+- **Chão:** imagem de satélite Sentinel-2 cloudless 2016 (EOX, CC BY 4.0, ~10 m por pixel: bonita do alto, borrada voando baixo).
+- **Prédios:** OpenStreetMap via OpenFreeMap (vector tiles, sem chave e sem limite), extrudados com a altura do OSM. Bater num prédio derruba o avião.
+- **Porta-aviões** no mar, 8 km ao sul de Copacabana; os inimigos chegam do norte, por cima da cidade.
+
+| Qualidade | Detalhe do terreno | Prédios |
+|---|---|---|
+| Baixa (padrão no celular) | até zoom 12 | desligados |
+| Média (padrão no PC) | até zoom 13 | raio de 1,6 km |
+| Alta | até zoom 14 | raio de 3,2 km |
+
+Limitações: o teatro é plano (~200 km em volta do porta-aviões); fora disso o mapa acaba. Os créditos dos dados aparecem no rodapé, como as licenças exigem.
 
 ## Rádio com IA (grátis, sem chave)
 

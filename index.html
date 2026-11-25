@@ -83,6 +83,7 @@ body.touch #radio{bottom:auto;top:40px;width:min(470px,60vw)}body.touch #rlog{ma
 .mplist{margin:4px 0 0;padding:0;list-style:none}.mplist li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.mplist li span{color:var(--muted);font-size:13px}
 .mpgo{background:rgba(140,255,170,.12);color:var(--hud);border:1px solid rgba(140,255,170,.5);font-size:16px;margin-top:8px!important;padding:10px!important}#mpVoice.on{background:#c0392b;color:#fff}
 #mpBoard{position:fixed;left:50%;top:60px;transform:translateX(-50%);min-width:320px;background:rgba(6,12,10,.9);border:1px solid rgba(140,255,170,.4);border-radius:14px;padding:12px 18px;z-index:35;font-size:15px}#mpBoard h3{margin:0 0 6px}#mpBoard ol{margin:0;padding:0;list-style:none}#mpBoard li{display:flex;justify-content:space-between;gap:20px;padding:4px 0;border-bottom:1px solid var(--line)}#mpBoard li span{color:var(--muted);font-family:'Share Tech Mono',monospace}#mpBoard .note{color:var(--muted);font-size:12px;margin:6px 0 0}
+#attr{position:fixed;left:8px;bottom:4px;z-index:20;font:11px Inter,system-ui,sans-serif;color:rgba(255,255,255,.75);text-shadow:0 1px 2px #000;max-width:calc(100vw - 16px);pointer-events:auto}#attr a{color:inherit}body.touch #attr{font-size:9px;left:50%;transform:translateX(-50%);bottom:2px;text-align:center;width:60vw}
 #hint{position:fixed;left:50%;top:12px;transform:translateX(-50%);background:rgba(0,0,0,.55);padding:6px 14px;border-radius:8px;font-size:17px;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 20px);overflow:hidden;text-overflow:ellipsis}
 #gv{position:fixed;inset:0;pointer-events:none;opacity:0}
 #flash{position:fixed;inset:0;pointer-events:none;background:#ff3020;opacity:0;transition:opacity .5s}
@@ -214,6 +215,7 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
       <div><div class="lbl">Horário</div><div class="opts seg" data-k="tod"><button data-v="day">Dia</button><button data-v="dusk">Pôr do sol</button></div></div>
       <div><div class="lbl">Dificuldade</div><div class="opts seg" data-k="diff"><button data-v="easy">Recruta</button><button data-v="ace">Ás</button></div></div>
     </div>
+    <div class="row2"><div><div class="lbl">Mundo</div><div class="opts seg" data-k="world"><button data-v="ilhas">Ilhas</button><button data-v="rio">Rio de Janeiro (real)</button></div></div><div id="wqBox"><div class="lbl">Qualidade do mapa</div><div class="opts seg" data-k="wq"><button data-v="baixa">Baixa</button><button data-v="media">Média</button><button data-v="alta">Alta</button></div></div></div>
     <div class="lbl">Modelo de voo</div><div class="opts seg" data-k="flight"><button data-v="assist">Assistido (anti-estol)</button><button data-v="real">Realista (sem rede)</button></div>
     <label class="chk"><input type="checkbox" id="inv"> Inverter arfagem (W puxa o nariz)</label>
     <label class="chk"><input type="checkbox" id="tch"> Controles de toque na tela</label>
@@ -230,6 +232,7 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
   <div class="card keys" id="keys1"></div>
 </div>
 
+<div id="attr" class="hide">Relevo: <a href="https://registry.opendata.aws/terrain-tiles/" target="_blank" rel="noopener">Mapzen/AWS Terrain Tiles</a> · Imagem: <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX (CC BY 4.0, contém dados Copernicus Sentinel 2016 e 2017) · Prédios: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> © <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">colaboradores do OpenStreetMap</a><span id="attrLoad"></span></div>
 <div id="mp" class="ov hide">
   <div class="card mpcard">
     <div class="mph"><h2>Multiplayer</h2><button class="x" id="mpClose" aria-label="Fechar">✕</button></div>
@@ -284,7 +287,7 @@ const mat=(h,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:lc(h),ro
 const pad=(n,l)=>String(Math.round(n)).padStart(l,'0');
 
 /* ================= configurações ================= */
-const S={mission:'c0',tod:'day',diff:'easy',invert:false,voice:true,sound:true,flight:'assist',ac:'f14'};
+const S={world:'ilhas',mission:'c0',tod:'day',diff:'easy',invert:false,voice:true,sound:true,flight:'assist',ac:'f14'};
 try{Object.assign(S,JSON.parse(localStorage.getItem('tomcat-cfg')||'{}'))}catch(e){}
 const saveCfg=()=>{try{localStorage.setItem('tomcat-cfg',JSON.stringify(S))}catch(e){}};
 let best=0,unlocked=0;try{best=+(localStorage.getItem('tomcat-best')||0);unlocked=+(localStorage.getItem('tomcat-camp')||0)}catch(e){}
@@ -338,10 +341,12 @@ function hash(x,z){const s=Math.sin(x*127.1+z*311.7)*43758.5453;return s-Math.fl
 function vnoise(x,z){const xi=Math.floor(x),zi=Math.floor(z),xf=x-xi,zf=z-zi,u=xf*xf*(3-2*xf),v=zf*zf*(3-2*zf);const a=hash(xi,zi),b=hash(xi+1,zi),c=hash(xi,zi+1),d=hash(xi+1,zi+1);return a+(b-a)*u+(c-a)*v+(a-b-c+d)*u*v}
 function fbm(x,z){let s=0,a=.5,f=1;for(let i=0;i<5;i++){s+=a*vnoise(x*f,z*f);f*=2.03;a*=.5}return s}
 const ISL=[[-6000,-20000,7500,1750],[9000,-30000,5000,1150],[14000,5000,2600,420],[-17000,-2000,5200,1300]];
-function terrainH(x,z){let h=-60;for(const I of ISL){const dx=x-I[0],dz=z-I[1],d=Math.sqrt(dx*dx+dz*dz)/I[2];if(d<1.3){const n=fbm(x*.00045,z*.00045);const t=clamp(1.12-d-(n-.5)*.55,0,1);const e=t*t*(3-2*t);const ridge=1-Math.abs(fbm(x*.0009+7,z*.0009-3)*2-1);h=Math.max(h,-60+e*(I[3]*(.5+.65*ridge*n)+80))}}return h}
+let REAL_WORLD=false,ISLAND_MESH=null;
+function terrainH(x,z){return REAL_WORLD?realH(x,z):islandH(x,z)}
+function islandH(x,z){let h=-60;for(const I of ISL){const dx=x-I[0],dz=z-I[1],d=Math.sqrt(dx*dx+dz*dz)/I[2];if(d<1.3){const n=fbm(x*.00045,z*.00045);const t=clamp(1.12-d-(n-.5)*.55,0,1);const e=t*t*(3-2*t);const ridge=1-Math.abs(fbm(x*.0009+7,z*.0009-3)*2-1);h=Math.max(h,-60+e*(I[3]*(.5+.65*ridge*n)+80))}}return h}
 (function buildTerrain(){
  const g=new THREE.PlaneGeometry(52000,52000,260,260);g.rotateX(-Math.PI/2);g.translate(-2000,0,-15000);
- const p=g.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,terrainH(p.getX(i),p.getZ(i)));
+ const p=g.attributes.position;for(let i=0;i<p.count;i++)p.setY(i,islandH(p.getX(i),p.getZ(i)));
  g.computeVertexNormals();const n=g.attributes.normal,col=new Float32Array(p.count*3),c=new COL();
  const sand=lc(0xcdbb8c),grass=lc(0x5a7440),forest=lc(0x31502c),rock=lc(0x7b746a),snow=lc(0xeef2f5),deep=lc(0x23485a);
  for(let i=0;i<p.count;i++){const h=p.getY(i),ny=n.getY(i);
@@ -349,8 +354,111 @@ function terrainH(x,z){let h=-60;for(const I of ISL){const dx=x-I[0],dz=z-I[1],d
   if(ny<.84&&h>14)c.lerp(rock,clamp((.84-ny)*4,0,1));if(h>1200&&ny>.68)c.lerp(snow,clamp((h-1200)/220,0,1));
   const j=1+(hash(p.getX(i)*.01,p.getZ(i)*.01)-.5)*.16;col[i*3]=c.r*j;col[i*3+1]=c.g*j;col[i*3+2]=c.b*j}
  g.setAttribute('color',new THREE.BufferAttribute(col,3));
- scene.add(new THREE.Mesh(g,new THREE.MeshLambertMaterial({vertexColors:true})));
+ ISLAND_MESH=new THREE.Mesh(g,new THREE.MeshLambertMaterial({vertexColors:true}));scene.add(ISLAND_MESH);
 })();
+/* ================= MUNDO REAL: Rio de Janeiro (relevo + satélite + prédios do OpenStreetMap) =================
+   Teatro plano de ~200 km em volta do porta-aviões (aproximação equiretangular: erro < 0,1% nessa distância,
+   e o float32 da placa de vídeo continua preciso). Dados grátis e sem chave:
+   - relevo: AWS Terrain Tiles (Terrarium, Mapzen) · imagem: Sentinel-2 cloudless 2016 (EOX, CC BY 4.0)
+   - prédios: OpenStreetMap via OpenFreeMap (vector tiles, esquema OpenMapTiles). */
+const WORLD={real:false,lat0:-23.045,lon0:-43.15,R:6378137,cosL:1,nodes:new Map(),HC:new Map(),shown:new Set(),q:[],active:0,selT:0,lastCam:new V3(1e9,0,0),fails:0,imgFail:0,
+ B:{tiles:new Map(),tpl:null,libs:null,boxes:[],tjFail:false},grp:new THREE.Group()};
+scene.add(WORLD.grp);
+const WQ={baixa:{zmax:12,K:2.0,N:16,bR:0,par:4},media:{zmax:13,K:2.6,N:24,bR:1600,par:6},alta:{zmax:14,K:3.2,N:32,bR:3200,par:8}};
+const DEG=Math.PI/180,Z0=9,IMZ=14,HZ=15,RAD=100000;
+const TERRARIUM='https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
+const S2='https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/g/{z}/{y}/{x}.jpg';
+const OFM='https://tiles.openfreemap.org/planet';
+const tUrl=(t,z,x,y)=>t.replace('{z}',z).replace('{x}',x).replace('{y}',y);
+WORLD.cosL=Math.cos(WORLD.lat0*DEG);
+const ll2x=lon=>(lon-WORLD.lon0)*DEG*WORLD.R*WORLD.cosL,ll2z=lat=>-(lat-WORLD.lat0)*DEG*WORLD.R;
+const x2lon=x=>WORLD.lon0+x/(WORLD.R*WORLD.cosL)/DEG,z2lat=z=>WORLD.lat0-z/WORLD.R/DEG;
+const lon2tx=(lon,z)=>(lon+180)/360*(1<<z),lat2ty=(lat,z)=>{const s=Math.sin(lat*DEG);return (.5-Math.log((1+s)/(1-s))/(4*Math.PI))*(1<<z)};
+const tx2lon=(tx,z)=>tx/(1<<z)*360-180,ty2lat=(ty,z)=>{const n=Math.PI*(1-2*ty/(1<<z));return Math.atan(Math.sinh(n))/DEG};
+function wq(){return WQ[S.wq]||WQ[IS_TOUCH?'baixa':'media']}
+function wNode(z,x,y){const key=z+'/'+x+'/'+y;let n=WORLD.nodes.get(key);if(n)return n;
+ const x0=ll2x(tx2lon(x,z)),x1=ll2x(tx2lon(x+1,z)),z0=ll2z(ty2lat(y,z)),z1=ll2z(ty2lat(y+1,z));
+ n={key,z,x,y,x0,x1,z0,z1,cx:(x0+x1)/2,cz:(z0+z1)/2,size:x1-x0,h:null,tex:null,mesh:null,hs:0,is:0,used:0};WORLD.nodes.set(key,n);return n}
+/* ---- fila de downloads (mais perto primeiro) ---- */
+function wEnqueue(job){if(job.queued)return;job.queued=true;WORLD.q.push(job)}
+function wPump(){const cam=camera.position;WORLD.q.sort((a,b)=>a.d(cam)-b.d(cam));
+ while(WORLD.active<wq().par&&WORLD.q.length){const j=WORLD.q.shift();WORLD.active++;j.run().catch(e=>{WORLD.fails++;if(WORLD.fails<6)console.warn('mapa',e)}).finally(()=>{WORLD.active--;j.queued=false})}}
+function loadImg(url){return new Promise((res,rej)=>{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>res(im);im.onerror=()=>rej(new Error('img '+url));im.src=url})}
+const _cv=document.createElement('canvas');_cv.width=_cv.height=256;const _cx=_cv.getContext('2d',{willReadFrequently:true});
+async function wLoadH(n){if(n.hs)return;n.hs=1;const z=Math.min(n.z,HZ);const im=await loadImg(tUrl(TERRARIUM,z,n.x,n.y));_cx.drawImage(im,0,0,256,256);const d=_cx.getImageData(0,0,256,256).data,h=new Float32Array(65536);
+ for(let i=0;i<65536;i++)h[i]=(d[i*4]*256+d[i*4+1]+d[i*4+2]/256)-32768;n.h=h;n.hs=2;WORLD.HC.set(n.key,n);wTrimHC()}
+async function wLoadI(n){if(n.is)return;n.is=1;try{const im=await loadImg(tUrl(S2,n.z,n.x,n.y));const t=new THREE.Texture(im);t.encoding=THREE.sRGBEncoding;t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());t.needsUpdate=true;n.tex=t}catch(e){WORLD.imgFail++;n.tex=null}n.is=2}
+function wTrimHC(){if(WORLD.HC.size<=170)return;const a=[...WORLD.HC.values()].sort((p,q)=>p.used-q.used);for(const n of a.slice(0,WORLD.HC.size-150)){if(n.mesh)continue;n.h=null;n.hs=0;WORLD.HC.delete(n.key)}}
+function wJob(n){if(n.hs===2&&(n.is===2||n.z>IMZ))return;if(!n.job)n.job={d:c=>Math.hypot(n.cx-c.x,n.cz-c.z)-n.size*.5,run:async()=>{await wLoadH(n);if(n.z<=IMZ)await wLoadI(n)}};wEnqueue(n.job)}
+/* ---- altura do terreno (física, colisão, IA) ---- */
+function hSample(n,fx,fy){const px=clamp(fx*255,0,255),py=clamp(fy*255,0,255),ix=Math.min(Math.floor(px),254),iy=Math.min(Math.floor(py),254),ax=px-ix,ay=py-iy,h=n.h;
+ const a=h[iy*256+ix],b=h[iy*256+ix+1],c=h[iy*256+ix+256],d=h[iy*256+ix+257];return a+(b-a)*ax+(c-a)*ay+(a-b-c+d)*ax*ay}
+function realH(x,z){const lat=z2lat(z),lon=x2lon(x);for(let zz=HZ;zz>=Z0;zz--){const tx=lon2tx(lon,zz),ty=lat2ty(lat,zz),k=zz+'/'+Math.floor(tx)+'/'+Math.floor(ty);const n=WORLD.HC.get(k);if(n&&n.h){n.used=performance.now();return hSample(n,tx-Math.floor(tx),ty-Math.floor(ty))}}return -30}
+/* ---- malha de um bloco ---- */
+const wFallMat=new THREE.MeshLambertMaterial({vertexColors:true});
+function wBuild(n){const N=wq().N,G=N+3,pos=new Float32Array(G*G*3),uv=new Float32Array(G*G*2),col=new Float32Array(G*G*3),idx=[];
+ // imagem: a do próprio bloco ou a do ancestral no zoom máximo do satélite
+ let tex=n.tex,su=1,ou=0,ov=0;if(n.z>IMZ){const s=1<<(n.z-IMZ),a=WORLD.nodes.get(IMZ+'/'+Math.floor(n.x/s)+'/'+Math.floor(n.y/s));tex=a&&a.tex;su=1/s;ou=(n.x%s)/s;ov=(n.y%s)/s}
+ const skirt=Math.max(30,n.size*.02),c=new COL(),sand=lc(0xcdbb8c),grass=lc(0x587a3e),rock=lc(0x837a6d),deep=lc(0x23485a);
+ for(let j=0;j<G;j++){const jj=clamp(j-1,0,N),fy=jj/N,lat=ty2lat(n.y+fy,n.z),zz=ll2z(lat);
+  for(let i=0;i<G;i++){const ii=clamp(i-1,0,N),fx=ii/N,xx=ll2x(tx2lon(n.x+fx,n.z));let h=Math.max(hSample(n,fx,fy),-25);if(i===0||j===0||i===G-1||j===G-1)h-=skirt;
+   const k=j*G+i;pos[k*3]=xx;pos[k*3+1]=h;pos[k*3+2]=zz;uv[k*2]=ou+fx*su;uv[k*2+1]=1-(ov+fy*su);
+   if(h<0)c.copy(deep);else if(h<12)c.copy(sand);else if(h<500)c.copy(grass);else c.copy(grass).lerp(rock,clamp((h-500)/700,0,1));col[k*3]=c.r;col[k*3+1]=c.g;col[k*3+2]=c.b}}
+ for(let j=0;j<G-1;j++)for(let i=0;i<G-1;i++){const a=j*G+i,b=a+1,d=a+G,e=d+1;idx.push(a,d,b,b,d,e)}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('uv',new THREE.BufferAttribute(uv,2));g.setAttribute('color',new THREE.BufferAttribute(col,3));g.setIndex(idx);g.computeVertexNormals();g.computeBoundingSphere();
+ const m=new THREE.Mesh(g,tex?new THREE.MeshLambertMaterial({map:tex}):wFallMat);m.matrixAutoUpdate=false;m.updateMatrix();n.mesh=m}
+/* ---- escolha dos blocos visíveis (quadtree com nível de detalhe pela distância) ---- */
+function wSelect(){const cam=camera.position,Q=wq(),D=new Set(),now=performance.now();
+ const lat0=z2lat(-RAD),lat1=z2lat(RAD),lonA=x2lon(-RAD),lonB=x2lon(RAD);
+ const tx0=Math.floor(lon2tx(lonA,Z0)),tx1=Math.floor(lon2tx(lonB,Z0)),ty0=Math.floor(lat2ty(lat0,Z0)),ty1=Math.floor(lat2ty(lat1,Z0));
+ const ready=n=>n.hs===2&&(n.is===2||n.z>IMZ);
+ // refinamento por substituição: o pai só some quando os 4 filhos já estão prontos (sem buracos nem sobreposição)
+ const rec=n=>{wJob(n);if(!ready(n))return;const dx=Math.max(n.x0-cam.x,0,cam.x-n.x1),dz=Math.max(n.z0-cam.z,0,cam.z-n.z1),d=Math.hypot(dx,dz,Math.max(cam.y,0)*.8);
+  if(n.z<Q.zmax&&d<Q.K*n.size){const ch=[];for(let a=0;a<2;a++)for(let b=0;b<2;b++)ch.push(wNode(n.z+1,n.x*2+a,n.y*2+b));for(const c of ch)wJob(c);if(ch.every(ready)){for(const c of ch)rec(c);return}}
+  D.add(n)};
+ for(let x=tx0;x<=tx1;x++)for(let y=ty0;y<=ty1;y++)rec(wNode(Z0,x,y));
+ for(const n of D){if(!n.mesh)wBuild(n);n.used=now;if(!WORLD.shown.has(n)){WORLD.grp.add(n.mesh);WORLD.shown.add(n)}}
+ for(const n of [...WORLD.shown])if(!D.has(n)){WORLD.grp.remove(n.mesh);WORLD.shown.delete(n)}
+ let cnt=0;for(const n of WORLD.nodes.values())if(n.mesh)cnt++;if(cnt>260)for(const n of [...WORLD.nodes.values()].filter(n=>n.mesh&&!WORLD.shown.has(n)).sort((a,b)=>a.used-b.used).slice(0,cnt-220)){n.mesh.geometry.dispose();if(n.mesh.material!==wFallMat)n.mesh.material.dispose();n.mesh=null}
+ // a fila só guarda o que ainda importa: limpa pedidos de blocos que ficaram longe
+ if(WORLD.q.length>240){const cam2=camera.position;WORLD.q.sort((a,b)=>a.d(cam2)-b.d(cam2));for(const j of WORLD.q.splice(200))j.queued=false}}
+/* ---- prédios do OpenStreetMap (OpenFreeMap, zoom 14) ---- */
+const BPAL=[0xd9d4c7,0xc9c2b4,0xb9b6ae,0xe3ddd0,0xa9a49a,0xcfc6b8,0xbfb8a8].map(c=>lc(c));
+async function bLibs(){if(WORLD.B.libs)return WORLD.B.libs;const [vt,pb]=await Promise.all([import('https://esm.run/@mapbox/vector-tile@3'),import('https://esm.run/pbf@5')]);WORLD.B.libs={VectorTile:vt.VectorTile,classifyRings:vt.classifyRings,PbfReader:pb.PbfReader};return WORLD.B.libs}
+async function bTpl(){if(WORLD.B.tpl)return WORLD.B.tpl;const r=await fetch(OFM);const j=await r.json();WORLD.B.tpl=j.tiles[0];return WORLD.B.tpl}
+async function bLoad(t){const [L,tpl]=await Promise.all([bLibs(),bTpl()]);const r=await fetch(tUrl(tpl,14,t.x,t.y));if(!r.ok)throw new Error('pbf '+r.status);const buf=new Uint8Array(await r.arrayBuffer());
+ const tile=new L.VectorTile(new L.PbfReader(buf)),lay=tile.layers.building;t.feats=[];if(!lay){t.state=3;return}
+ for(let i=0;i<lay.length;i++){const f=lay.feature(i);if(f.type!==3)continue;const p=f.properties;if(p.hide_3d)continue;const ext=lay.extent||4096;
+  const rings=f.loadGeometry().map(r=>r.map(q=>[ll2x(tx2lon(t.x+q.x/ext,14)),ll2z(ty2lat(t.y+q.y/ext,14))]));
+  for(const poly of L.classifyRings(rings))t.feats.push({poly,h:+p.render_height||+p.height||(5+Math.random()*7),mh:+p.render_min_height||+p.min_height||0})}
+ t.state=2}
+function bBuild(t){const P=[],Nn=[],C=[],boxes=[];const c=new COL();let ok=0,miss=0;
+ for(const f of t.feats){const outer=f.poly[0];if(!outer||outer.length<4)continue;let cx=0,cz=0,minx=1e9,maxx=-1e9,minz=1e9,maxz=-1e9;
+  for(const [x,z] of outer){cx+=x;cz+=z;minx=Math.min(minx,x);maxx=Math.max(maxx,x);minz=Math.min(minz,z);maxz=Math.max(maxz,z)}cx/=outer.length;cz/=outer.length;
+  const base=realH(cx,cz);if(base<=-30){miss++;continue}ok++;const y0=Math.max(base,0)+f.mh,y1=Math.max(base,0)+f.h;if(y1-y0<1)continue;
+  c.copy(BPAL[(Math.abs(Math.floor(cx*7+cz*13)))%BPAL.length]);const sh=.75+.25*((Math.floor(cx+cz)&7)/7);
+  for(const ring of f.poly){for(let i=0;i<ring.length-1;i++){const [ax,az]=ring[i],[bx,bz]=ring[i+1];const dx=bx-ax,dz=bz-az,l=Math.hypot(dx,dz)||1,nx=dz/l,nz=-dx/l;
+    P.push(ax,y0,az,bx,y0,bz,bx,y1,bz,ax,y0,az,bx,y1,bz,ax,y1,az);for(let k=0;k<6;k++){Nn.push(nx,0,nz);C.push(c.r*sh,c.g*sh,c.b*sh)}}}
+  // telhado
+  const toV=r=>r.slice(0,-1).map(([x,z])=>new THREE.Vector2(x,z));const contour=toV(outer),holes=f.poly.slice(1).map(toV);let tris=[];try{tris=THREE.ShapeUtils.triangulateShape(contour,holes)}catch(e){}
+  const all=contour.concat(...holes);for(const tr of tris)for(const k of [tr[0],tr[2],tr[1]]){const v=all[k];P.push(v.x,y1,v.y);Nn.push(0,1,0);C.push(c.r*.78,c.g*.78,c.b*.78)}
+  boxes.push([minx,maxx,minz,maxz,y1])}
+ if(miss>ok&&t.tries<4){t.tries++;t.state=2;return false}// terreno ainda não carregou: tenta de novo depois
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(Nn,3));g.setAttribute('color',new THREE.Float32BufferAttribute(C,3));g.computeBoundingSphere();
+ t.mesh=new THREE.Mesh(g,bMat);t.mesh.matrixAutoUpdate=false;t.boxes=boxes;t.feats=null;t.state=3;WORLD.grp.add(t.mesh);return true}
+const bMat=new THREE.MeshLambertMaterial({vertexColors:true,side:THREE.DoubleSide});
+function bSelect(){const Q=wq(),cam=camera.position;const want=new Set();if(Q.bR>0&&cam.y<4500){const lat=z2lat(cam.z),lon=x2lon(cam.x),tx=lon2tx(lon,14),ty=lat2ty(lat,14),tsz=Math.abs(ll2x(tx2lon(1,14))-ll2x(tx2lon(0,14))),r=Math.ceil(Q.bR/tsz);
+  for(let x=Math.floor(tx)-r;x<=Math.floor(tx)+r;x++)for(let y=Math.floor(ty)-r;y<=Math.floor(ty)+r;y++){const cx=ll2x(tx2lon(x+.5,14)),cz=ll2z(ty2lat(y+.5,14));if(Math.hypot(cx-cam.x,cz-cam.z)<Q.bR+tsz*.7)want.add(x+'/'+y)}}
+ for(const k of want){let t=WORLD.B.tiles.get(k);if(!t){const [x,y]=k.split('/').map(Number);t={k,x,y,state:0,tries:0,cx:ll2x(tx2lon(x+.5,14)),cz:ll2z(ty2lat(y+.5,14))};WORLD.B.tiles.set(k,t)}
+  if(t.state===0&&!WORLD.B.tjFail){t.state=1;wEnqueue({d:c=>Math.hypot(t.cx-c.x,t.cz-c.z),run:()=>bLoad(t).catch(e=>{t.state=4;if(String(e).includes('Failed to fetch')||String(e).includes('JSON'))WORLD.B.tjFail=true;throw e})})}
+  else if(t.state===2)bBuild(t);else if(t.state===3&&t.mesh&&!t.mesh.parent)WORLD.grp.add(t.mesh)}
+ for(const t of WORLD.B.tiles.values())if(!want.has(t.k)&&t.mesh){if(Math.hypot(t.cx-cam.x,t.cz-cam.z)>Q.bR*1.6+3000){WORLD.grp.remove(t.mesh);t.mesh.geometry.dispose();t.mesh=null;t.boxes=null;t.state=0}}}
+function hitBuilding(p){for(const t of WORLD.B.tiles.values()){if(!t.boxes||Math.abs(t.cx-p.x)>2600||Math.abs(t.cz-p.z)>2600)continue;for(const b of t.boxes)if(p.y<b[4]+1&&p.x>b[0]&&p.x<b[1]&&p.z>b[2]&&p.z<b[3])return true}return false}
+/* ---- liga/desliga e laço ---- */
+function worldSet(real){WORLD.real=!!real;REAL_WORLD=WORLD.real;WORLD.grp.visible=WORLD.real;if(typeof ISLAND_MESH!=='undefined'&&ISLAND_MESH)ISLAND_MESH.visible=!WORLD.real;const at=document.getElementById('attr');if(at)at.classList.toggle('hide',!WORLD.real);WORLD.selT=0}
+function worldTick(dt){if(!WORLD.real)return;WORLD.selT-=dt;const moved=camera.position.distanceTo(WORLD.lastCam)>150;if(WORLD.selT<=0||moved&&WORLD.selT<.6){WORLD.selT=.35;WORLD.lastCam.copy(camera.position);wSelect();bSelect()}wPump();
+ const at=document.getElementById('attrLoad');if(at)at.textContent=WORLD.q.length+WORLD.active?' · carregando mapa ('+(WORLD.q.length+WORLD.active)+')':WORLD.imgFail>5?' · satélite indisponível, usando cores do relevo':''}
+
 
 /* ================= nuvens ================= */
 const cloudTex=canvasTex(128,128,x=>{for(let i=0;i<30;i++){const px=rnd(28,100),py=rnd(42,92),r=rnd(12,34);const g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill()}});
@@ -1123,7 +1231,10 @@ $('#keys1').innerHTML=$('#keys2').innerHTML=kh;
 const KEYS_T=[['MANCHE','Toque e arraste em qualquer lugar da metade esquerda: ele aparece sob o seu polegar'],['MANETE','Arraste a barra da direita. Acima da linha MIL entra o pós-combustor (AB)'],['FOGO','Canhão: segure. Míssil de radar sem trava: o 1º toque trava, o 2º dispara'],['ARMA / TRAVA','Troca a arma / trava e alterna alvos'],['FLARE / CHAFF','Solta as duas contramedidas de uma vez'],['ALA','Ordem aos 6 alas: Cobrir · Atacar seu alvo · Dispersar'],['RÁDIO','Converse com o copiloto (IA) por texto ou voz'],['SISTEMAS','Trem, flaps, freio aerodinâmico, gancho e asas'],['LEME','Botões ◀ ▶ embaixo, para alinhar no pouso'],['OLHAR','Arraste o centro da tela; solte e a cabeça volta'],['CÂMERA','Cockpit ou câmera externa']];
 const khT='<h2>Controles de toque</h2><table>'+KEYS_T.map(([a,b])=>'<tr><td>'+a+'</td><td>'+b+'</td></tr>').join('')+'</table><p class="tip">Dica: na final do pouso, mexa pouco no manche e acerte a descida com a manete.</p>';
 document.querySelectorAll('.opts').forEach(g=>{const k=g.dataset.k;const sync=()=>g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===S[k]));sync();
- g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;S[k]=b.dataset.v;saveCfg();sync();initAudio();click();if(k==='tod')applyTOD()})});
+ g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;S[k]=b.dataset.v;saveCfg();sync();initAudio();click();if(k==='tod')applyTOD();if(k==='world'||k==='wq')worldApply(k==='wq')})});
+function worldApply(rebuild){if(!S.wq)S.wq=IS_TOUCH?'baixa':'media';document.getElementById('wqBox').style.visibility=S.world==='rio'?'visible':'hidden';
+ if(rebuild){for(const n of WORLD.nodes.values())if(n.mesh){WORLD.grp.remove(n.mesh);n.mesh.geometry.dispose();if(n.mesh.material!==wFallMat)n.mesh.material.dispose();n.mesh=null}WORLD.shown.clear()}worldSet(S.world==='rio')}
+document.querySelectorAll('[data-k=wq] button').forEach(b=>b.classList.toggle('on',b.dataset.v===(S.wq||(IS_TOUCH?'baixa':'media'))));worldApply(false);
 $('#fh').checked=!!S.freeHangar;$('#fh').onchange=e=>{S.freeHangar=e.target.checked;saveCfg();hangarUI()};$('#kc').checked=S.kcam!==false;$('#kc').onchange=e=>{S.kcam=e.target.checked;saveCfg()};
 $('#pname').value=S.name||'';$('#pname').onchange=e=>{S.name=cleanName(e.target.value);e.target.value=S.name;saveCfg()};
 $('#inv').checked=S.invert;$('#voi').checked=S.voice;$('#inf').checked=!!S.inf;$('#inf').onchange=e=>{S.inf=e.target.checked;saveCfg()};$('#inv').onchange=e=>{S.invert=e.target.checked;saveCfg()};$('#voi').onchange=e=>{S.voice=e.target.checked;saveCfg()};
@@ -1189,7 +1300,7 @@ function update(dt){
  if(live){updPS(SMK,dt);updPS(FIR,dt);updPS(SPK,dt);updFX(dt);flashL.intensity*=Math.exp(-dt*6);sea.material.normalMap.offset.x+=dt*.0012;sea.material.normalMap.offset.y+=dt*.0007;
   if(G.carrierHp<75&&Math.random()<.5)emit(SMK,tA.set(rnd(-8,8),DECK+2,rnd(-60,40)),rnd(-2,2),rnd(8,14),rnd(-2,2),rnd(5,9),8,45,.12,.11,.1,.6,.3,1);
   if(P.state==='cat'&&Math.random()<.15)emit(SMK,tA.set(rnd(-.5,.5),DECK+.3,rnd(-150,CAT_Z)),0,rnd(1,3),0,2.5,2,8,.85,.87,.9,.25,.6)}
- mpTick(dt);
+ mpTick(dt);worldTick(dt);if(run&&WORLD.real&&P.state==='fly'&&hitBuilding(P.pos))crash('Você bateu num prédio do Rio!');
  return run}
 function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.05);last=now;const run=update(dt);
  updCamera(dt);syncModel(dt);touchFrame();
@@ -1589,7 +1700,7 @@ function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.
 resetP();placeCat();applyTOD();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
 // PWA: instala como app e funciona offline (só em HTTPS ou localhost)
 if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
-window.__tomcat={RADIO,endGame,NET,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={RADIO,endGame,NET,WORLD,realH,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>
