@@ -43,6 +43,10 @@ npx gltfpack -i modelo.gltf -o models/modelo.glb -c -noq -kn -km -ke
 
 - **Hangar com PM (pontos de mérito):** o F-14 começa liberado; F-16 (1.500 PM), Mirage (3.000 PM) e MiG-29 (5.000 PM) são comprados com os pontos das partidas. Missão cumprida rende 1,5× os pontos. A opção "Hangar liberado" no menu desliga a progressão.
 - **Missões 4 e 5:** escolta do AWACS (se ele cair, a missão acaba) e interceptação com relógio (150 s por onda).
+- **Campanha 2 · ataque ao solo e ao mar (missões 6 a 10):** liberada desde o início, com sequência própria. Ataque à ilha (radar e depósitos), SEAD (três baterias SAM), comboio que precisa ser parado antes do porto, três fragatas com SAM e uma missão final mista com ás.
+- **Alvos de solo e mar:** SAM (míssil de radar: solte CHAFF e faça curva), antiaérea de canhão (fique alto), radar de busca (sem ele os SAMs só enxergam de perto, então derrube primeiro), tanques, caminhões, depósitos de combustível e fragatas (aguentam dois mísseis e afundam devagar). No HUD aparecem como losangos; os laranja com "ALVO" são os objetivos da missão.
+- **Arma 5, ar-solo:** AGM-65 Maverick no F-14 e no F-16 (4 no F-16), Kh-25ML no MiG-29 e AS-30L no Mirage. Selecione com a tecla 5 (ou ARMA no celular), trave com T e dispare. Com a arma 5, o T trava primeiro os alvos no solo; com as outras, os aviões. Míssil ar-ar não vai em alvo de solo, mas o canhão vale para os dois.
+- **Menu em abas:** Jogar, Mundo, Ajustes e Ranking. O botão DECOLAR fica sempre visível com o resumo do que vai decolar; no celular deitado ele vira uma coluna à direita.
 - **Nuvens:** dentro delas, mísseis perdem o alvo com mais facilidade, dos dois lados.
 - **Câmera do abate:** 2 s em câmera lenta seguindo o inimigo abatido por míssil. Qualquer tecla ou toque pula; dá para desligar no menu.
 - **Ranking global:** função `api/score.js` na Vercel + Upstash Redis (plano grátis: 256 MB e 500 mil comandos por mês, sem cartão). Para ligar: Vercel → projeto → **Storage → Create Database → Upstash (Redis)** → conectar ao projeto → **Redeploy**. Sem isso, o ranking fica salvo só no aparelho.
