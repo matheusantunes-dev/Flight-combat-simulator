@@ -57,6 +57,7 @@ No menu: **MULTIPLAYER** → **Criar sala** → **Copiar convite** ou **Comparti
 
 - **Cooperativo vs IA:** a sala inteira defende a frota contra as ondas. Os inimigos rodam no aparelho do anfitrião; se ele sair, a partida acaba.
 - **PvP por times (Azul × Vermelho, até 3 por time):** quem entra vai para o time menor e dá para trocar no lobby. Sem fogo amigo; colegas aparecem como losango azul no HUD e não entram no radar de alvos. Cada time nasce de um lado do mapa. Primeiro time a 12 abates vence, ou o melhor em 8 minutos. Quem cai volta em 5 s.
+- **Se alguém cair, a partida continua:** se o anfitrião sai, o próximo da lista assume (no coop, a IA passa a rodar no aparelho dele). Quem volta pelo mesmo link, no mesmo aparelho e navegador, recupera o time e os abates. No PvP, se um time fica sem ninguém, o outro vence por W.O. depois de 15 s, a menos que alguém volte antes.
 - **Só dois jeitos de jogar junto:** todos contra a IA (cooperativo) ou time contra time. Não existe todos contra todos.
 - **Placar:** Tab (PC) ou botão PLACAR (celular).
 - **Chat:** o rádio (Enter) vira chat da sala; comece com "ia," para falar com o copiloto.
