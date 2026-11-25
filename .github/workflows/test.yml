@@ -23,6 +23,8 @@ jobs:
         run: node tests/smoke.mjs
       - name: Teste do multiplayer (2 abas, rede local)
         run: node tests/multiplayer.mjs
+      - name: Teste do multiplayer quando alguém cai
+        run: node tests/mpresiliente.mjs
       - name: Teste do Mundo Real (dados sintéticos)
         run: node tests/world.mjs
       - name: Teste do joystick e do VR
