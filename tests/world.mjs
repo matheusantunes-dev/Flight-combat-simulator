@@ -42,6 +42,13 @@ await p.evaluate(()=>{const t=__tomcat;t.P.pos.set(-2300,260,-6300);t.setQ(0,-.1
 // colisão com prédio: põe o avião dentro de um bloco
 const crash=await p.evaluate(()=>{const W=__tomcat.WORLD;for(const t of W.B.tiles.values())if(t.boxes&&t.boxes.length){const bx=t.boxes[0];__tomcat.P.pos.set((bx[0]+bx[1])/2,bx[4]-3,(bx[2]+bx[3])/2);__tomcat.sim(.05);return __tomcat.P.state}return 'sem prédios'});
 const st=await p.evaluate(()=>{const W=__tomcat.WORLD;let bt=0;for(const t of W.B.tiles.values())if(t.boxes)bt++;return {shown:W.shown.size,bt,land:__tomcat.realH(0,-7500),sea:__tomcat.realH(0,0)}});
-const ok={terreno:st.shown>8,alturaTerra:st.land>20,alturaMar:st.sea<0,predios:st.bt>0,colisao:crash==='dead'};console.log(JSON.stringify(ok,null,2));
+// lugar sem mar (no relevo falso, só há mar ao sul do Rio): vira decolagem no ar, sem porta-aviões
+await p.evaluate(()=>__tomcat.worldGo('Nova York',40.71,-74.0));await p.waitForTimeout(500);
+const ny=await p.evaluate(()=>({nc:__tomcat.WORLD.noCarrier,lat:__tomcat.WORLD.lat0}));
+await p.evaluate(()=>__tomcat.worldGo('Rio de Janeiro',-22.97,-43.18));await p.waitForTimeout(500);
+const rio=await p.evaluate(()=>({nc:__tomcat.WORLD.noCarrier,lat:__tomcat.WORLD.lat0}));
+// voo sem fim: no Voo livre, passar de 60 km recentraliza o mundo
+const shift=await p.evaluate(()=>{const t=__tomcat;t.S.mission='fly';t.startGame();const lat0=t.WORLD.lat0;t.P.pos.set(0,3000,-61000);t.sim(.1);return {moved:Math.abs(t.WORLD.lat0-lat0)>.4,near:Math.hypot(t.P.pos.x,t.P.pos.z)<2000,state:t.P.state}});
+const ok={terreno:st.shown>8,alturaTerra:st.land>20,alturaMar:st.sea<0,predios:st.bt>0,colisao:crash==='dead',semMar:ny.nc===true&&ny.lat>40,comMar:rio.nc===false&&rio.lat<-22.98,vooSemFim:shift.moved&&shift.near&&shift.state==='fly'};console.log(JSON.stringify(ok,null,2));
 const bad=errs.filter(e=>!/GL Driver|GPU stall/.test(e));await b.close();const failed=Object.entries(ok).filter(([,v])=>!v).map(([k])=>k);
 if(bad.length)console.error(bad.join('\n'));if(failed.length||bad.length){console.error('FALHOU: '+failed.join(', '));process.exit(1)}console.log('OK: mundo real passou');

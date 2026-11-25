@@ -84,6 +84,12 @@ body.touch #radio{bottom:auto;top:40px;width:min(470px,60vw)}body.touch #rlog{ma
 .mpgo{background:rgba(140,255,170,.12);color:var(--hud);border:1px solid rgba(140,255,170,.5);font-size:16px;margin-top:8px!important;padding:10px!important}#mpVoice.on{background:#c0392b;color:#fff}
 #mpBoard{position:fixed;left:50%;top:60px;transform:translateX(-50%);min-width:320px;background:rgba(6,12,10,.9);border:1px solid rgba(140,255,170,.4);border-radius:14px;padding:12px 18px;z-index:35;font-size:15px}#mpBoard h3{margin:0 0 6px}#mpBoard ol{margin:0;padding:0;list-style:none}#mpBoard li{display:flex;justify-content:space-between;gap:20px;padding:4px 0;border-bottom:1px solid var(--line)}#mpBoard li span{color:var(--muted);font-family:'Share Tech Mono',monospace}#mpBoard .note{color:var(--muted);font-size:12px;margin:6px 0 0}
 #attr{position:fixed;left:8px;bottom:4px;z-index:20;font:11px Inter,system-ui,sans-serif;color:rgba(255,255,255,.75);text-shadow:0 1px 2px #000;max-width:calc(100vw - 16px);pointer-events:auto}#attr a{color:inherit}body.touch #attr{font-size:9px;left:50%;transform:translateX(-50%);bottom:2px;text-align:center;width:60vw}
+#ctl{background:rgba(5,8,10,.72);justify-content:center}.ctlcard{width:min(620px,100%)}.ctlcard h3{margin:16px 0 4px;font-size:17px}#joyPads{white-space:pre-wrap;font:12px 'Share Tech Mono',monospace;margin:4px 0}
+.jrow{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:5px 0;border-bottom:1px solid var(--line);font-size:14px}.jrow:has(.jbar){grid-template-columns:1fr auto 70px auto auto}.jrow code{font:12px 'Share Tech Mono',monospace;color:var(--hud)}
+.jrow button{all:unset;cursor:pointer;padding:4px 10px;border-radius:8px;border:1px solid var(--line);font-size:12.5px}.jrow button:hover{border-color:var(--hud)}
+.jbar{display:block;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--hud) calc(var(--v,0)*100%),rgba(255,255,255,.12) 0)}.jsl label{flex:1;font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.ctlbtn{margin-top:10px;font-size:14px!important;padding:9px!important}.wpres{display:flex;flex-wrap:wrap;gap:6px}.wpres button,.wres button{all:unset;cursor:pointer;padding:5px 10px;border-radius:999px;border:1px solid var(--line);font-size:13px;background:rgba(255,255,255,.04)}.wpres button:hover,.wres button:hover{border-color:var(--hud)}.wres{display:flex;flex-direction:column;gap:4px;margin-top:6px}.wres button{border-radius:8px}.wplace .mprow .btn{flex:0 0 auto;margin-top:8px}.wplace input{margin-top:8px}
+body.vr #top,body.vr #msgs,body.vr #tc,body.vr #hint,body.vr #attr,body.vr #radio,body.vr #liveChip{display:none!important}
 #hint{position:fixed;left:50%;top:12px;transform:translateX(-50%);background:rgba(0,0,0,.55);padding:6px 14px;border-radius:8px;font-size:17px;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 20px);overflow:hidden;text-overflow:ellipsis}
 #gv{position:fixed;inset:0;pointer-events:none;opacity:0}
 #flash{position:fixed;inset:0;pointer-events:none;background:#ff3020;opacity:0;transition:opacity .5s}
@@ -215,7 +221,8 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
       <div><div class="lbl">Horário</div><div class="opts seg" data-k="tod"><button data-v="day">Dia</button><button data-v="dusk">Pôr do sol</button></div></div>
       <div><div class="lbl">Dificuldade</div><div class="opts seg" data-k="diff"><button data-v="easy">Recruta</button><button data-v="ace">Ás</button></div></div>
     </div>
-    <div class="row2"><div><div class="lbl">Mundo</div><div class="opts seg" data-k="world"><button data-v="ilhas">Ilhas</button><button data-v="rio">Rio de Janeiro (real)</button></div></div><div id="wqBox"><div class="lbl">Qualidade do mapa</div><div class="opts seg" data-k="wq"><button data-v="baixa">Baixa</button><button data-v="media">Média</button><button data-v="alta">Alta</button></div></div></div>
+    <div class="row2"><div><div class="lbl">Mundo</div><div class="opts seg" data-k="world"><button data-v="ilhas">Ilhas</button><button data-v="rio">Mundo real</button></div></div><div id="wqBox"><div class="lbl">Qualidade do mapa</div><div class="opts seg" data-k="wq"><button data-v="baixa">Baixa</button><button data-v="media">Média</button><button data-v="alta">Alta</button></div></div></div>
+    <div id="wPlace" class="wplace"><div class="lbl">Onde voar</div><div class="wpres" id="wpres"></div><div class="mprow"><input id="wq" class="pname" placeholder="Buscar lugar: cidade, ilha, montanha…" autocomplete="off"><button class="btn alt" id="wgo" type="button">Buscar</button></div><div class="wres" id="wres"></div><p class="sub" id="wst"></p></div>
     <div class="lbl">Modelo de voo</div><div class="opts seg" data-k="flight"><button data-v="assist">Assistido (anti-estol)</button><button data-v="real">Realista (sem rede)</button></div>
     <label class="chk"><input type="checkbox" id="inv"> Inverter arfagem (W puxa o nariz)</label>
     <label class="chk"><input type="checkbox" id="tch"> Controles de toque na tela</label>
@@ -223,6 +230,7 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
     <label class="chk"><input type="checkbox" id="fh"> Hangar liberado (todos os caças, sem progressão)</label>
     <label class="chk"><input type="checkbox" id="kc"> Câmera lenta do abate</label>
     <div class="lbl">Nome do piloto</div><input id="pname" class="pname" maxlength="16" placeholder="Ex.: Maverick" autocomplete="off">
+    <button class="btn alt ctlbtn" id="ctlOpen" type="button">CONTROLES · JOYSTICK · VR</button>
     <label class="chk"><input type="checkbox" id="voi"> Voz do RIO (brevity codes em inglês)</label>
     <details class="rank" id="mrank"><summary>Ranking dos pilotos</summary><ol></ol><p class="note"></p></details>
     <div class="goBar"><button id="go" class="go">DECOLAR</button><button id="mpOpen" class="go mpgo" type="button">MULTIPLAYER · até 6 pilotos</button></div>
@@ -255,12 +263,26 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
     <p class="sub" id="mpst"></p>
   </div>
 </div>
+<div id="ctl" class="ov hide"><div class="card ctlcard">
+  <div class="mph"><h2>Controles, joystick e VR</h2><button class="x" id="ctlClose" aria-label="Fechar">✕</button></div>
+  <h3>Joystick USB ou Bluetooth</h3>
+  <pre id="joyPads" class="sub"></pre>
+  <div class="mprow"><button class="btn alt" id="joyAuto" type="button">Palpite automático</button><button class="btn alt" id="joyClear" type="button">Limpar tudo</button></div>
+  <p class="sub">Toque em <b>Definir</b> e mexa o eixo ou aperte o botão que você quer. Vale qualquer joystick, volante ou manete; dá para misturar aparelhos. Esc cancela.</p>
+  <div id="joyList"></div>
+  <div class="mprow jsl"><label>Zona morta <input type="range" id="joyDz" min="0" max=".3" step=".01"></label><label>Curva (suavidade no centro) <input type="range" id="joyEx" min="0" max=".8" step=".05"></label></div>
+  <p class="sub" id="joyMsg"></p>
+  <h3>VR com óculos de celular</h3>
+  <p class="sub">Tela dividida em dois olhos e o giroscópio do celular mexe a cabeça dentro do cockpit. Com o celular no óculos, use um joystick Bluetooth/USB (OTG) para pilotar. Toque 2× na tela para sair.</p>
+  <div class="mprow"><button class="btn" id="vrBtn" type="button">Entrar no VR</button><button class="btn alt" id="vrRe" type="button">Recentralizar</button></div>
+  <label class="chk"><input type="checkbox" id="gyroLook"> Olhar com o giroscópio, sem óculos (mexa o celular para olhar em volta)</label>
+</div></div>
 <div id="mpBoard" class="hide"><h3>Placar</h3><ol></ol><p class="note"></p></div>
 
 <div id="pause" class="ov hide">
   <div class="card keys" id="keys2"></div>
   <div class="card main"><h1>PAUSA</h1><p class="sub">O RIO aproveitou para tomar um café kkk</p>
-    <div class="btns"><button class="btn" id="resume">Continuar</button><button class="btn alt" id="tomenu1">Menu</button></div></div>
+    <div class="btns"><button class="btn" id="resume">Continuar</button><button class="btn alt" id="tomenu1">Menu</button></div><button class="btn alt ctlbtn" id="ctlOpen2" type="button">Controles · Joystick · VR</button></div>
 </div>
 
 <div id="over" class="ov hide">
@@ -455,10 +477,43 @@ function bSelect(){const Q=wq(),cam=camera.position;const want=new Set();if(Q.bR
  for(const t of WORLD.B.tiles.values())if(!want.has(t.k)&&t.mesh){if(Math.hypot(t.cx-cam.x,t.cz-cam.z)>Q.bR*1.6+3000){WORLD.grp.remove(t.mesh);t.mesh.geometry.dispose();t.mesh=null;t.boxes=null;t.state=0}}}
 function hitBuilding(p){for(const t of WORLD.B.tiles.values()){if(!t.boxes||Math.abs(t.cx-p.x)>2600||Math.abs(t.cz-p.z)>2600)continue;for(const b of t.boxes)if(p.y<b[4]+1&&p.x>b[0]&&p.x<b[1]&&p.z>b[2]&&p.z<b[3])return true}return false}
 /* ---- liga/desliga e laço ---- */
-function worldSet(real){WORLD.real=!!real;REAL_WORLD=WORLD.real;WORLD.grp.visible=WORLD.real;if(typeof ISLAND_MESH!=='undefined'&&ISLAND_MESH)ISLAND_MESH.visible=!WORLD.real;const at=document.getElementById('attr');if(at)at.classList.toggle('hide',!WORLD.real);WORLD.selT=0}
+function worldSet(real){WORLD.real=!!real;REAL_WORLD=WORLD.real;WORLD.grp.visible=WORLD.real;if(typeof ISLAND_MESH!=='undefined'&&ISLAND_MESH)ISLAND_MESH.visible=!WORLD.real;const at=document.getElementById('attr');if(at)at.classList.toggle('hide',!WORLD.real);WORLD.selT=0;if(typeof carrier!=='undefined')carrierVis()}
 function worldTick(dt){if(!WORLD.real)return;WORLD.selT-=dt;const moved=camera.position.distanceTo(WORLD.lastCam)>150;if(WORLD.selT<=0||moved&&WORLD.selT<.6){WORLD.selT=.35;WORLD.lastCam.copy(camera.position);wSelect();bSelect()}wPump();
  const at=document.getElementById('attrLoad');if(at)at.textContent=WORLD.q.length+WORLD.active?' · carregando mapa ('+(WORLD.q.length+WORLD.active)+')':WORLD.imgFail>5?' · satélite indisponível, usando cores do relevo':''}
 
+
+/* ================= Mundo real em qualquer lugar: busca de lugares + voo sem fim ================= */
+const PLACES=[['Rio de Janeiro',-22.97,-43.18],['São Paulo',-23.55,-46.63],['Florianópolis',-27.6,-48.55],['Fernando de Noronha',-3.85,-32.42],['Brasília',-15.79,-47.88],['Nova York',40.71,-74.0],['San Francisco',37.77,-122.42],['Grand Canyon',36.1,-112.11],['Dubai',25.2,55.27],['Tóquio',35.68,139.76],['Alpes suíços (Zermatt)',46.02,7.75],['Hong Kong',22.3,114.17]];
+WORLD.noCarrier=false;WORLD.placeName='Rio de Janeiro';
+// muda a origem do teatro e reaproveita o que já foi baixado (alturas e imagens ficam no cache por bloco)
+function worldReorigin(lat0,lon0){WORLD.lat0=lat0;WORLD.lon0=lon0;WORLD.cosL=Math.cos(lat0*DEG);
+ for(const n of WORLD.nodes.values()){if(n.mesh){WORLD.grp.remove(n.mesh);n.mesh.geometry.dispose();if(n.mesh.material!==wFallMat)n.mesh.material.dispose();n.mesh=null}
+  n.x0=ll2x(tx2lon(n.x,n.z));n.x1=ll2x(tx2lon(n.x+1,n.z));n.z0=ll2z(ty2lat(n.y,n.z));n.z1=ll2z(ty2lat(n.y+1,n.z));n.cx=(n.x0+n.x1)/2;n.cz=(n.z0+n.z1)/2;n.size=n.x1-n.x0}
+ WORLD.shown.clear();for(const t of WORLD.B.tiles.values()){if(t.mesh){WORLD.grp.remove(t.mesh);t.mesh.geometry.dispose()}}WORLD.B.tiles.clear();WORLD.q.length=0;WORLD.selT=0}
+// procura mar perto do lugar para o porta-aviões (pixels do relevo abaixo de -3 m, com vizinhos também no mar)
+async function findSea(lat,lon){const z=10,txf=lon2tx(lon,z),tyf=lat2ty(lat,z),tx=Math.floor(txf),ty=Math.floor(tyf);let best=null,bd=1e9;
+ for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){let n=wNode(z,tx+dx,ty+dy);try{if(n.hs!==2)await wLoadH(n)}catch(e){continue}if(!n.h)continue;
+  for(let j=2;j<254;j+=3)for(let i=2;i<254;i+=3){const k=j*256+i;if(n.h[k]>=-3)continue;let ok=true;for(const o of[-2,2,-512,512,-514,514])if(n.h[k+o]>=-3){ok=false;break}if(!ok)continue;
+   const plat=ty2lat(n.y+j/256,z),plon=tx2lon(n.x+i/256,z),d=Math.hypot((plat-lat)*111,(plon-lon)*111*Math.cos(lat*DEG));if(d<bd){bd=d;best=[plat,plon]}}}
+ return best&&bd<60?{lat:best[0],lon:best[1],km:bd}:null}
+async function worldGo(name,lat,lon){const st=document.getElementById('wst');st.textContent='Procurando mar para o porta-aviões perto de '+name+'…';
+ worldReorigin(lat,lon);let sea=null;try{sea=await findSea(lat,lon)}catch(e){}
+ if(sea){worldReorigin(sea.lat,sea.lon);WORLD.noCarrier=false;st.textContent=name+': porta-aviões no mar a '+sea.km.toFixed(0)+' km do centro.'}
+ else{WORLD.noCarrier=true;st.textContent=name+': sem mar por perto, então a decolagem é no ar (sem porta-aviões).'}
+ WORLD.placeName=name;S.place={name,lat,lon};saveCfg();carrierVis();syncMenu()}
+function carrierVis(){const v=!(WORLD.real&&WORLD.noCarrier);carrier.visible=v;for(const p of PARKED)if(p&&p.visible!==undefined)p.visible=v}
+// busca grátis no OpenStreetMap (Nominatim): só ao apertar Buscar, nunca a cada letra, como pede a política de uso
+async function worldSearch(q){const st=document.getElementById('wst'),out=document.getElementById('wres');q=(q||'').trim();if(q.length<2)return;st.textContent='Buscando…';out.textContent='';
+ try{const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&accept-language=pt-BR&q='+encodeURIComponent(q));const j=await r.json();if(!j.length){st.textContent='Nada encontrado.';return}st.textContent='Escolha:';
+  for(const p of j){const b=document.createElement('button');b.type='button';b.textContent=p.display_name.split(',').slice(0,3).join(',');b.onclick=()=>{out.textContent='';worldGo(p.display_name.split(',')[0],+p.lat,+p.lon)};out.appendChild(b)}}
+ catch(e){st.textContent='A busca falhou (sem internet?). Use um dos lugares prontos.'}}
+// voo sem fim: no Voo livre, a cada 60 km o mundo se recentraliza no avião
+function worldShift(){if(!WORLD.real||G.mode!=='play'||G.mission!=='fly'||NET.match)return;const d=Math.hypot(P.pos.x,P.pos.z);if(d<60000)return;
+ const dx=P.pos.x,dz=P.pos.z,lat=z2lat(dz),lon=x2lon(dx),off=new V3(dx,0,dz);
+ P.pos.sub(off);for(const t of T){t.pos.sub(off);if(t.mesh)t.mesh.position.copy(t.pos);if(t.np)t.np.sub(off)}for(const a of AL){a.pos.sub(off);a.mesh.position.copy(a.pos)}
+ for(const m of MS){m.pos.sub(off);m.mesh.position.copy(m.pos)}for(const f of FL)f.pos.sub(off);for(const d2 of DEB)d2.m.position.sub(off);for(const s2 of SHK)s2.m.position.sub(off);
+ for(const ps of[SMK,FIR,SPK]){for(let i=0;i<ps.max;i++){ps.pos[i*3]-=dx;ps.pos[i*3+2]-=dz}}for(let i=0;i<bp.length/3;i++){bp[i*3]-=dx;bp[i*3+2]-=dz}
+ WORLD.noCarrier=true;carrierVis();worldReorigin(lat,lon);say('Voo sem fim: novo trecho do mapa carregando. O porta-aviões ficou para trás.','a')}
 
 /* ================= nuvens ================= */
 const cloudTex=canvasTex(128,128,x=>{for(let i=0;i<30;i++){const px=rnd(28,100),py=rnd(42,92),r=rnd(12,34);const g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill()}});
@@ -662,7 +717,7 @@ function rearm(){P.fuel=A.fuel;P.gun=A.gun.n;P.flr=P.chf=30;P.hp=100;for(const k
 const K={},IN={pitch:0,roll:0,yaw:0};let fireHeld=false,gpPrev=[];
 let view='cock',headYaw=0,headPitch=0,lookYaw=0,lookPitch=0,dragging=false,fovT=65,extDist=34,extYaw=0,extPitch=-.12;
 const keyBlock=['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab','Digit1','Digit2','Digit3','Digit4'];
-addEventListener('keydown',e=>{if(G.kcam){G.kcam=null;return}if(e.code==='Tab'&&NET.match&&!(e.target&&e.target.tagName==='INPUT')){e.preventDefault();mpBoardShow(true);return}if(e.target&&e.target.id==='rin'){if(e.code==='Escape')radioOpen(false);return}if(e.code==='Enter'&&G.mode==='play'){e.preventDefault();radioOpen(true);return}if(G.mode==='play'&&keyBlock.includes(e.code))e.preventDefault();if(e.repeat)return;K[e.code]=true;initAudio();onKey(e.code)});
+addEventListener('keydown',e=>{if(JOY.cap&&e.code==='Escape'){JOY.cap=null;joyUI('Cancelado.');return}if(G.kcam){G.kcam=null;return}if(e.code==='Tab'&&NET.match&&!(e.target&&e.target.tagName==='INPUT')){e.preventDefault();mpBoardShow(true);return}if(e.target&&e.target.id==='rin'){if(e.code==='Escape')radioOpen(false);return}if(e.code==='Enter'&&G.mode==='play'){e.preventDefault();radioOpen(true);return}if(G.mode==='play'&&keyBlock.includes(e.code))e.preventDefault();if(e.repeat)return;K[e.code]=true;initAudio();onKey(e.code)});
 addEventListener('keyup',e=>{if(e.code==='Tab')mpBoardShow(false);K[e.code]=false});
 addEventListener('blur',()=>{for(const k in K)K[k]=false;if(G.mode==='play'&&!G.paused)setPause(true)});
 let lpx=0,lpy=0;glc.addEventListener('pointerdown',e=>{dragging=true;lpx=e.clientX;lpy=e.clientY;glc.setPointerCapture(e.pointerId);initAudio()});
@@ -702,12 +757,13 @@ function readInput(dt){
  let tr=((K.KeyD||K.ArrowRight)?1:0)-((K.KeyA||K.ArrowLeft)?1:0),ty=(K.KeyE?1:0)-(K.KeyQ?1:0);
  let up=K.KeyR,dn=K.KeyF,analog=false;fireHeld=!!K.Space||TOUCH.fire;
  let gp=null;try{gp=navigator.getGamepads?[...navigator.getGamepads()].find(g=>g&&g.connected):null}catch(e){}
- if(gp){const dz=v=>Math.abs(v)<.12?0:v,ax=gp.axes,bt=gp.buttons.map(b=>b.pressed);
+ if(gp&&!joyActive()){const dz=v=>Math.abs(v)<.12?0:v,ax=gp.axes,bt=gp.buttons.map(b=>b.pressed);
   if(dz(ax[1])||dz(ax[0])){tp=S.invert?-ax[1]:ax[1];tr=ax[0];analog=true}if(dz(ax[2]||0))ty=ax[2];
   if(gp.buttons[7]&&gp.buttons[7].value>.2)up=true;if(gp.buttons[6]&&gp.buttons[6].value>.2)dn=true;
   if(bt[0])fireHeld=true;const ed=i=>bt[i]&&!gpPrev[i];
   if(ed(0)&&P.wpn>1&&G.mode==='play'&&!G.paused)fireMissile();if(ed(1))dropCM('flare');if(ed(4))dropCM('chaff');if(ed(2)){P.wpn=P.wpn%4+1;click()}if(ed(3))lockCycle();if(ed(5))onKey('KeyC');if(ed(9))onKey('KeyP');if(ed(12))onKey('KeyG');if(ed(13))onKey('KeyL');if(ed(14))onKey('KeyH');if(ed(15))onKey('KeyK');
   gpPrev=bt}
+ {const J=joyRead();if(J){if(J.pitch!==undefined){tp=S.invert?-J.pitch:J.pitch;analog=true}if(J.roll!==undefined){tr=J.roll;analog=true}if(J.yaw!==undefined)ty=J.yaw;if(J.fire)fireHeld=true;if(J.up)up=true;if(J.dn)dn=true;if(J.thr!==undefined&&P.state!=='dead'&&Math.abs(J.thr-(JOY.lastT??-1))>.004){JOY.lastT=J.thr;P.thr=thrFromAxis(J.thr);P.detent=P.thr>=1}}}
  if(TOUCH.joy!==null){tp=S.invert?-TOUCH.y:TOUCH.y;tr=TOUCH.x;analog=true}
  if(analog){IN.pitch=tp;IN.roll=tr}else{IN.pitch=appr(IN.pitch,tp,dt*(tp?3.2:6));IN.roll=appr(IN.roll,tr,dt*(tr?2.6:8))}
  IN.yaw=appr(IN.yaw,ty,dt*4);
@@ -768,7 +824,7 @@ function stepPlayer(dt){
  if(ground){att();const hd=P.hdg*D2R+IN.yaw*.5*dt*clamp(spd/8,0,1)*(spd<40?1:.3);setQ(hd,Math.max(P.pitch,0),0);
   const f2=tD.set(P.fwd.x,0,P.fwd.z).normalize();let vl=P.vel.dot(f2);vl=appr(vl,0,(P.sb?4.5:.25)*dt);P.vel.x=f2.x*vl;P.vel.z=f2.z*vl}
  P.pos.addScaledVector(P.vel,dt);
- const onFoot=Math.abs(P.pos.x)<DECK_HW&&P.pos.z>BOW_Z&&P.pos.z<STERN_Z,wh=P.pos.y-GEAR_H;
+ const onFoot=!(WORLD.real&&WORLD.noCarrier)&&Math.abs(P.pos.x)<DECK_HW&&P.pos.z>BOW_Z&&P.pos.z<STERN_Z,wh=P.pos.y-GEAR_H;
  if(onFoot){
   if(wh<=DECK){if(P.prevWh>=DECK-.7){if(P.state==='fly'&&!touchdown())return;if(P.state==='deck'){P.pos.y=DECK+GEAR_H;if(P.vel.y<0)P.vel.y=0}}else return crash('Rampa! Você bateu na popa do porta-aviões.')}
   else if(P.state==='deck'&&wh>DECK+.4)P.state='fly';
@@ -875,7 +931,7 @@ function kill(t,src){
 const ETYPE={mig29:{name:'MiG-29',spd:270,turn:[.21,.29],ammo:4,rmax:7500,cm:8},su27:{name:'Su-27',spd:285,turn:[.2,.28],ammo:6,rmax:11000,cm:10}};
 function spawnBandit(pos,role,type='mig29',ace=null){const et=ETYPE[type],tpl=(ENEMY[type]&&ENEMY[type][ace?'ace':'std'])||banditTpl;const mesh=tpl.clone();scene.add(mesh);const dot=new THREE.Sprite(dotMat);dot.scale.set(.0055,.0055,1);scene.add(dot);
  const ti=S.diff==='easy'?0:1;
- const b={kind:'bandit',type,tname:ace?ace:et.name,ace,role:role==='ace'||role==='hunter'?'fighter':role,hunter:role==='hunter',pos:pos.clone(),vel:tA.set(-pos.x,0,-pos.z).normalize().multiplyScalar(et.spd).clone(),spd:et.spd,spdBase:et.spd,hp:ace?2:1,alive:true,dying:false,mesh,dot,state:role==='striker'?'strike':'ingress',cd:rnd(4,10),ammo:ace?8:et.ammo,rmax:et.rmax,cm:ace?24:et.cm,alt:pos.y,upS:new V3(0,1,0),t:0,locking:false,fired:false,turn:et.turn[ti]*(ace?1.3:1),smoking:false};T.push(b);
+ const b={kind:'bandit',type,tname:ace?ace:et.name,ace,role:role==='ace'||role==='hunter'||(role==='striker'&&WORLD.real&&WORLD.noCarrier)?'fighter':role,hunter:role==='hunter',pos:pos.clone(),vel:tA.set(-pos.x,0,-pos.z).normalize().multiplyScalar(et.spd).clone(),spd:et.spd,spdBase:et.spd,hp:ace?2:1,alive:true,dying:false,mesh,dot,state:role==='striker'?'strike':'ingress',cd:rnd(4,10),ammo:ace?8:et.ammo,rmax:et.rmax,cm:ace?24:et.cm,alt:pos.y,upS:new V3(0,1,0),t:0,locking:false,fired:false,turn:et.turn[ti]*(ace?1.3:1),smoking:false};T.push(b);
  if(ace)say('[Rádio inimigo interceptado] '+ace+': "Tomcat... finalmente um adversário de verdade."','w');return b}
 function spawnDrone(){if(T.filter(t=>t.alive&&!t.dying).length>=6){say('Já tem 6 alvos no céu. Derruba alguns primeiro kkk','a');return}
  const ty=Math.random()<.5?'mig29':'su27',d=rnd(3000,5000),side=Math.random()<.5?-1:1;const p=P.pos.clone().addScaledVector(tA.set(P.fwd.x,0,P.fwd.z).normalize(),d).addScaledVector(tB.set(P.right.x,0,P.right.z).normalize(),side*rnd(300,1200));p.y=clamp(P.pos.y+rnd(-300,300),800,12000);
@@ -1201,7 +1257,7 @@ function clearWorld(){for(const t of T)scene.remove(t.mesh,t.dot);T.length=0;for
 let todOverride=null;
 function startGame(){initAudio();clearWorld();msgBox.innerHTML='';try{speechSynthesis.cancel()}catch(e){}resetP();me.g.visible=true;const mi=S.mission,camp=mi[0]==='c'?+mi.slice(1):-1;
  Object.assign(G,{mode:'play',paused:false,wave:0,waveActive:false,kills:0,vamps:0,score:0,carrierHp:100,traps:0,aces:0,mission:camp>=0?'camp':mi,camp,t:0,win:false,wcmd:'cover',allyKills:0,allyLost:0});
- let start=camp>=0?CAMPAIGN[camp].start:mi==='free'||mi==='fly'||mi==='pvp'||mi==='coopc'?'air':'trap';if(!A.naval&&start==='cat')start='air';todOverride=camp>=0?CAMPAIGN[camp].tod:null;
+ let start=camp>=0?CAMPAIGN[camp].start:mi==='free'||mi==='fly'||mi==='pvp'||mi==='coopc'?'air':'trap';if((!A.naval||WORLD.real&&WORLD.noCarrier)&&start==='cat')start='air';if(WORLD.real&&WORLD.noCarrier&&start==='trap')start='air';todOverride=camp>=0?CAMPAIGN[camp].tod:null;
  if(camp>=0)say('BRIEFING · Missão '+(camp+1)+': '+CAMPAIGN[camp].name+'. '+CAMPAIGN[camp].brief,'a');
  if(start==='cat'){placeCat();G.waveT=40;say('Torre: Tomcat 101 na catapulta 1. Potência MIL (segure R) e depois L para lançar.')}
  else if(start==='air'){placeAir();G.waveT=10;P.thr=P.spool=.85;say(mi==='fly'?'Voo livre: céu limpo, sem inimigos. J chama um alvo de treino; o porta-aviões fica ao sul para pousar e reabastecer.':'Olho Azul: Tomcat 101, bandidos vindo do norte. Radar quente, armas livres.')}
@@ -1232,14 +1288,26 @@ const KEYS_T=[['MANCHE','Toque e arraste em qualquer lugar da metade esquerda: e
 const khT='<h2>Controles de toque</h2><table>'+KEYS_T.map(([a,b])=>'<tr><td>'+a+'</td><td>'+b+'</td></tr>').join('')+'</table><p class="tip">Dica: na final do pouso, mexa pouco no manche e acerte a descida com a manete.</p>';
 document.querySelectorAll('.opts').forEach(g=>{const k=g.dataset.k;const sync=()=>g.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===S[k]));sync();
  g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;S[k]=b.dataset.v;saveCfg();sync();initAudio();click();if(k==='tod')applyTOD();if(k==='world'||k==='wq')worldApply(k==='wq')})});
-function worldApply(rebuild){if(!S.wq)S.wq=IS_TOUCH?'baixa':'media';document.getElementById('wqBox').style.visibility=S.world==='rio'?'visible':'hidden';
+function worldApply(rebuild){if(!S.wq)S.wq=IS_TOUCH?'baixa':'media';document.getElementById('wqBox').style.visibility=S.world==='rio'?'visible':'hidden';document.getElementById('wPlace').classList.toggle('hide',S.world!=='rio');
  if(rebuild){for(const n of WORLD.nodes.values())if(n.mesh){WORLD.grp.remove(n.mesh);n.mesh.geometry.dispose();if(n.mesh.material!==wFallMat)n.mesh.material.dispose();n.mesh=null}WORLD.shown.clear()}worldSet(S.world==='rio')}
 document.querySelectorAll('[data-k=wq] button').forEach(b=>b.classList.toggle('on',b.dataset.v===(S.wq||(IS_TOUCH?'baixa':'media'))));worldApply(false);
+{const wp=document.getElementById('wpres');for(const [n,la,lo] of PLACES){const b=document.createElement('button');b.type='button';b.textContent=n;b.onclick=()=>worldGo(n,la,lo);wp.appendChild(b)}
+ document.getElementById('wgo').onclick=()=>worldSearch(document.getElementById('wq').value);document.getElementById('wq').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();worldSearch(e.target.value)}});
+ if(S.place&&S.place.name&&S.place.name!=='Rio de Janeiro')setTimeout(()=>worldGo(S.place.name,S.place.lat,S.place.lon),300);else document.getElementById('wst').textContent='Rio de Janeiro: porta-aviões no mar, ao sul de Copacabana.'}
+// controles / joystick / VR (roda depois do script inteiro, quando JOY e VR já existem)
+setTimeout(()=>{document.getElementById('ctlOpen').onclick=document.getElementById('ctlOpen2').onclick=()=>{document.getElementById('ctl').classList.remove('hide');joyUI()};
+document.getElementById('ctlClose').onclick=()=>{JOY.cap=null;document.getElementById('ctl').classList.add('hide')};
+document.getElementById('joyAuto').onclick=joyAuto;document.getElementById('joyClear').onclick=()=>{JOY.b={};joySave();joyUI('Tudo limpo: voltou o controle padrão.')};
+{const dz=document.getElementById('joyDz'),ex=document.getElementById('joyEx');dz.value=JOY.dz;ex.value=JOY.expo;dz.oninput=()=>{JOY.dz=+dz.value;joySave()};ex.oninput=()=>{JOY.expo=+ex.value;joySave()}}
+addEventListener('gamepadconnected',()=>{if(!document.getElementById('ctl').classList.contains('hide'))joyUI();say('Controle conectado. Programe em CONTROLES · JOYSTICK · VR.','a')});
+document.getElementById('vrBtn').onclick=async()=>{document.getElementById('ctl').classList.add('hide');if(G.paused)setPause(false);await vrSet(true)};
+{const gl=document.getElementById('gyroLook');gl.checked=!!S.gyroLook;gl.onchange=async e=>{S.gyroLook=e.target.checked;saveCfg();if(S.gyroLook){const ok=await vrGyro(true);if(!ok){S.gyroLook=false;e.target.checked=false}}else if(!VR.on)vrGyro(false)}}
+document.getElementById('vrRe').onclick=vrRecenter;},0);
 $('#fh').checked=!!S.freeHangar;$('#fh').onchange=e=>{S.freeHangar=e.target.checked;saveCfg();hangarUI()};$('#kc').checked=S.kcam!==false;$('#kc').onchange=e=>{S.kcam=e.target.checked;saveCfg()};
 $('#pname').value=S.name||'';$('#pname').onchange=e=>{S.name=cleanName(e.target.value);e.target.value=S.name;saveCfg()};
 $('#inv').checked=S.invert;$('#voi').checked=S.voice;$('#inf').checked=!!S.inf;$('#inf').onchange=e=>{S.inf=e.target.checked;saveCfg()};$('#inv').onchange=e=>{S.invert=e.target.checked;saveCfg()};$('#voi').onchange=e=>{S.voice=e.target.checked;saveCfg()};
 $('#go').onclick=()=>{goFull();startGame()};$('#nextm').onclick=()=>{S.mission='c'+(G.camp+1);saveCfg();syncMenu();startGame()};
-function syncMenu(){document.querySelectorAll('[data-k=ac] button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.ac));{const tb=document.querySelector('[data-k=mission] [data-v=trap]');const nv=ACFT[S.ac].naval;if(tb){tb.disabled=!nv;tb.title=nv?'':'Só o F-14 pousa em porta-aviões'}if(!nv&&S.mission==='trap')S.mission='fly'}document.querySelectorAll('[data-k=mission] button').forEach(b=>{const v=b.dataset.v;const lock=(v[0]==='c'&&+v.slice(1)>unlocked)||(v==='trap'&&!ACFT[S.ac].naval);b.disabled=lock;b.title=lock?'Complete a missão anterior':'';b.classList.toggle('on',v===S.mission)});
+function syncMenu(){document.querySelectorAll('[data-k=ac] button').forEach(b=>b.classList.toggle('on',b.dataset.v===S.ac));{const tb=document.querySelector('[data-k=mission] [data-v=trap]');const nv=ACFT[S.ac].naval;if(tb){tb.disabled=!nv;tb.title=nv?'':'Só o F-14 pousa em porta-aviões'}if(!nv&&S.mission==='trap')S.mission='fly'}document.querySelectorAll('[data-k=mission] button').forEach(b=>{const v=b.dataset.v;const lock=(v[0]==='c'&&+v.slice(1)>unlocked)||(v==='trap'&&(!ACFT[S.ac].naval||WORLD.real&&WORLD.noCarrier));b.disabled=lock;b.title=lock?'Complete a missão anterior':'';b.classList.toggle('on',v===S.mission)});
  if(S.mission[0]==='c'&&+S.mission.slice(1)>unlocked){S.mission='c'+unlocked;syncMenu()}}$('#again').onclick=startGame;$('#resume').onclick=()=>setPause(false);$('#tomenu1').onclick=toMenu;$('#tomenu2').onclick=()=>{if(typeof NET!=='undefined'&&NET.on&&!NET.match){mpBackToRoom();return}toMenu()};$('#bestv').textContent=best;
 const topEl=$('#top'),hintEl=$('#hint');let uiT=0;
 function updUI(){if(G.mode!=='play'){return}updTouch();
@@ -1283,9 +1351,9 @@ function updCamera(dt){
  if(G.kcam){const t=G.kcam.tg,v=XV.copy(t.vel);if(v.lengthSq()<1)v.set(0,0,-1);v.normalize();const side=tB.crossVectors(v,tC.set(0,1,0)).normalize().multiplyScalar(G.kcam.side);const k=G.kcam.t/2.2;camera.position.copy(t.pos).addScaledVector(side,70-k*25).addScaledVector(v,-40+k*60).add(tC.set(0,18,0));camera.lookAt(t.pos);return}
  if(view==='cock'){const back=!dragging;headYaw=lerp(headYaw,back?lookYaw*.0:lookYaw,1-Math.exp(-dt*(back?3:14)));headPitch=lerp(headPitch,back?-.06:lookPitch,1-Math.exp(-dt*(back?3:14)));if(back){lookYaw=headYaw;lookPitch=headPitch}
   const buf=P.state==='fly'&&P.aoa>P.aSt*.78?(P.aoa/P.aSt-.78)*1.2:0,sh=(P.shake+buf+(P.state==='launch'?.6:0)+P.ab*clamp(1-P.pos.y/3000,0,1)*.15)*.006;P.shake=Math.max(0,P.shake-dt*1.6);
-  headQ.setFromEuler(tE.set(headPitch+rnd(-sh,sh),headYaw+rnd(-sh,sh),rnd(-sh,sh)*.5,'YXZ'));cockCam.quaternion.copy(headQ);
+  headQ.setFromEuler(tE.set(headPitch+rnd(-sh,sh),headYaw+rnd(-sh,sh),rnd(-sh,sh)*.5,'YXZ'));if(VR.gyro)headQ.premultiply(VR.rel);cockCam.quaternion.copy(headQ);
   const hs=clamp(-headYaw/1.5,-1,1);cockCam.position.set(hs*.14,-clamp((P.g-1)*.006,-.02,.045)+Math.max(0,headPitch)*.03,(P.state==='launch'?.05:0)-Math.abs(hs)*.05);eye.copy(cockCam.position).applyQuaternion(P.q).add(P.pos);camera.position.copy(eye);camera.quaternion.copy(P.q).multiply(headQ)}
- else{orbQ.setFromEuler(tE.set(extPitch,extYaw,0,'YXZ'));camQ.slerp(tQ.copy(P.q).multiply(orbQ),1-Math.exp(-dt*4));camera.position.set(0,3,extDist).applyQuaternion(camQ).add(P.pos);camera.quaternion.copy(camQ)}}
+ else{orbQ.setFromEuler(tE.set(extPitch,extYaw,0,'YXZ'));camQ.slerp(tQ.copy(P.q).multiply(orbQ),1-Math.exp(-dt*4));camera.position.set(0,3,extDist).applyQuaternion(camQ).add(P.pos);camera.quaternion.copy(camQ);if(VR.gyro)camera.quaternion.multiply(VR.rel)}}
 function syncModel(dt){me.g.position.copy(P.pos);me.g.quaternion.copy(P.q);me.sweep(P.sweep);if(HD.ok){for(const h of[me.hd,COCK.hd]){h.sweep(P.sweep);h.gear(P.gearPos>.5)}for(const f of me.hdFl)f.scale.y=.4+P.ab*.9+Math.random()*.15}for(const g of me.gear){g.visible=P.gearPos>.05;g.scale.y=P.gearPos}me.hook.rotation.x=P.hookPos*.5;
  flameMat.opacity=P.ab*.85;for(const f of me.flames)f.scale.y=.4+P.ab*.9+Math.random()*.15;me.g.visible=P.state!=='dead'&&(G.mode!=='play'||view==='ext');
  if(G.mode==='play'&&P.hp<70&&P.state==='fly'){P.smokeT-=dt;if(P.smokeT<=0){P.smokeT=.05;emit(SMK,tA.copy(P.pos).addScaledVector(P.fwd,-16),0,0,0,3,3,14,.18,.18,.18,.55,.8,1)}}
@@ -1300,7 +1368,7 @@ function update(dt){
  if(live){updPS(SMK,dt);updPS(FIR,dt);updPS(SPK,dt);updFX(dt);flashL.intensity*=Math.exp(-dt*6);sea.material.normalMap.offset.x+=dt*.0012;sea.material.normalMap.offset.y+=dt*.0007;
   if(G.carrierHp<75&&Math.random()<.5)emit(SMK,tA.set(rnd(-8,8),DECK+2,rnd(-60,40)),rnd(-2,2),rnd(8,14),rnd(-2,2),rnd(5,9),8,45,.12,.11,.1,.6,.3,1);
   if(P.state==='cat'&&Math.random()<.15)emit(SMK,tA.set(rnd(-.5,.5),DECK+.3,rnd(-150,CAT_Z)),0,rnd(1,3),0,2.5,2,8,.85,.87,.9,.25,.6)}
- mpTick(dt);worldTick(dt);if(run&&WORLD.real&&P.state==='fly'&&hitBuilding(P.pos))crash('Você bateu num prédio do Rio!');
+ mpTick(dt);worldTick(dt);worldShift();if(JOY.cap)joyCapPoll();if(!document.getElementById('ctl').classList.contains('hide'))joyBars();if(run&&WORLD.real&&P.state==='fly'&&hitBuilding(P.pos))crash('Você bateu num prédio do Rio!');
  return run}
 function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.05);last=now;const run=update(dt);
  updCamera(dt);syncModel(dt);touchFrame();
@@ -1309,9 +1377,9 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/10
  tA.copy(sunDir).applyQuaternion(tQ.copy(P.q).invert());cSun.position.copy(tA).multiplyScalar(5);cSun.target.position.set(0,0,0);
  const scl=renderer.getPixelRatio()*H/(2*Math.tan(camera.fov*D2R/2));SMK.m.uniforms.scale.value=FIR.m.uniforms.scale.value=SPK.m.uniforms.scale.value=scl;
  const gv=$('#gv');if(G.mode==='play'){const b=clamp(P.gload,0,1.15),r=clamp(-P.gload,0,1);gv.style.opacity=Math.max(b,r);gv.style.background=r>b?'radial-gradient(ellipse at center,rgba(150,0,0,.2) 0%,rgba(150,0,0,.95) 75%)':'radial-gradient(ellipse at center,rgba(0,0,0,'+clamp(b-.7,0,1)+') 0%,rgba(0,0,0,1) '+(90-b*45)+'%)'}else gv.style.opacity=0;
- renderer.clear();renderer.render(scene,camera);
- const showC=view==='cock'&&G.mode==='play'&&P.state!=='dead'&&!G.kcam;if(showC){renderer.clearDepth();renderer.render(cockScene,cockCam);if(now-panelT>66){panelT=now;drawPanel()}}
- const warn=run?warnings():[];drawHUD(warn);updAudio(warn.length&&warn.some(w=>w!=='MISSILE'));
+ const vrOn=VR.on;if(!vrOn){renderer.clear();renderer.render(scene,camera)}
+ const showC=view==='cock'&&G.mode==='play'&&P.state!=='dead'&&!G.kcam;if(showC){if(!vrOn){renderer.clearDepth();renderer.render(cockScene,cockCam)}if(now-panelT>66){panelT=now;drawPanel()}}
+ const warn=run?warnings():[];if(vrOn)vrRender(showC,warn);else drawHUD(warn);updAudio(warn.length&&warn.some(w=>w!=='MISSILE'));
  if(now-uiT>200){uiT=now;updUI()}}
 
 /* ================= modelos 3D reais (GLB) ================= */
@@ -1557,9 +1625,10 @@ function mpOnMsg(d,from){if(!d||!d.t||(d.to&&d.to!==NET.me))return;const p=NET.p
 function mpOnLeave(id){const p=NET.peers.get(id);NET.peers.delete(id);const r=NET.R.get(id);if(r)mpRemoveRemote(r);NET.R.delete(id);const a=NET.audio.get(id);if(a){a.remove();NET.audio.delete(id)}
  if(p&&NET.match)say(p.name+' saiu da sala.','a');if(id===NET.hostId&&!NET.host){if(NET.match)mpEnd('O anfitrião saiu da sala.');NET.hostId='';mpStatus('O anfitrião saiu.')}mpLobbyUI()}
 /* ---- início da partida ---- */
-function mpHostStart(){if(!NET.host)return;NET.cfg={mode:NET.mode,tod:S.tod,diff:S.diff,seed:Math.floor(Math.random()*1e9),t0:Date.now()};mpSend('start',{cfg:NET.cfg});mpStartMatch(NET.cfg)}
+function mpHostStart(){if(!NET.host)return;NET.cfg={world:{real:S.world==='rio',lat0:WORLD.lat0,lon0:WORLD.lon0,nc:WORLD.noCarrier,name:WORLD.placeName},mode:NET.mode,tod:S.tod,diff:S.diff,seed:Math.floor(Math.random()*1e9),t0:Date.now()};mpSend('start',{cfg:NET.cfg});mpStartMatch(NET.cfg)}
 function mpStartMatch(cfg){NET.match=true;NET.mode=cfg.mode;NET.endT=0;mpq('mp').classList.add('hide');S.tod=cfg.tod||S.tod;
  for(const id of [NET.me,...NET.peers.keys()])if(!NET.board.has(id))NET.board.set(id,{k:0,d:0});
+ if(cfg.world&&!NET.host){S.world=cfg.world.real?'rio':'ilhas';if(cfg.world.real&&(Math.abs(cfg.world.lat0-WORLD.lat0)>1e-6||Math.abs(cfg.world.lon0-WORLD.lon0)>1e-6))worldReorigin(cfg.world.lat0,cfg.world.lon0);WORLD.noCarrier=!!cfg.world.nc;WORLD.placeName=cfg.world.name||WORLD.placeName;worldSet(cfg.world.real);if(cfg.world.real)say('Mapa da sala: '+WORLD.placeName+'.','a')}
  S.mission=cfg.mode==='pvp'?'pvp':NET.host?'free':'coopc';goFull();startGame();
  if(cfg.mode==='pvp'){mpSpawnPvP();say('PvP · '+(NET.peers.size+1)+' pilotos. Primeiro a '+PVP_KILLS+' abates vence, ou o melhor em '+(PVP_TIME/60)+' minutos. Boa caçada kkk','a')}
  else say('Cooperativo · sala '+NET.code+': '+(NET.peers.size+1)+(NET.peers.size?' pilotos':' piloto')+' defendendo a frota. '+(NET.host?'Você é o anfitrião: os inimigos rodam no seu aparelho.':''),'a')}
@@ -1653,6 +1722,80 @@ mpq('mpShare').addEventListener('click',async()=>{const u=mpInviteURL();if(navig
 mpq('mpVoice').addEventListener('click',async()=>{const on=!NET.voice;const ok=await mpVoice(on);mpq('mpVoice').classList.toggle('on',!!NET.voice);mpq('mpVoice').textContent=NET.voice?'🔴 Voz da sala ligada':'🎙 Voz da sala'});
 {const q=new URLSearchParams(location.search).get('sala');if(q)setTimeout(()=>{mpq('mp').classList.remove('hide');mpq('mpIn').value=q;mpStatus('Convite para a sala '+q.toUpperCase()+'. Confira seu nome e toque em Entrar.')},600)}
 
+/* ================= JOYSTICK USB/Bluetooth programável =================
+   Qualquer controle que o navegador enxergar (Gamepad API). Joysticks de voo chegam com eixos e botões
+   "crus", sem layout padrão: por isso cada ação é gravada apertando o botão / mexendo o eixo, como no
+   MSFS e no DCS. Vários aparelhos ao mesmo tempo (manche + manete separados) funcionam. */
+const JACT=[
+ ['pitch','Arfagem (puxe o manche para TRÁS)','a'],['roll','Rolagem (incline para a DIREITA)','a'],['yaw','Leme (pedal DIREITO)','a'],['thr','Manete (empurre toda para FRENTE)','a'],
+ ['fire','Disparar','b'],['weapon','Trocar arma','b'],['lock','Travar alvo','b'],['flare','Flare','b'],['chaff','Chaff','b'],['wing','Ordem às alas','b'],
+ ['cam','Câmera','b'],['gear','Trem de pouso','b'],['hook','Gancho','b'],['flaps','Flaps','b'],['brake','Freio aerodinâmico','b'],['launch','Catapulta','b'],
+ ['radio','Rádio','b'],['pause','Pausa','b'],['vrc','Recentrar VR / giroscópio','b'],['thrUp','Manete + (se não tiver eixo)','b'],['thrDn','Manete − (se não tiver eixo)','b']];
+const JOY={b:{},cap:null,prev:{},expo:.3,dz:.08,seen:new Map()};
+try{const j=JSON.parse(localStorage.getItem('fcs-joy')||'null');if(j){JOY.b=j.b||{};JOY.expo=j.expo??.3;JOY.dz=j.dz??.08}}catch(e){}
+const joySave=()=>{try{localStorage.setItem('fcs-joy',JSON.stringify({b:JOY.b,expo:JOY.expo,dz:JOY.dz}))}catch(e){}};
+function joyPads(){let a=[];try{a=[...(navigator.getGamepads?navigator.getGamepads():[])].filter(g=>g&&g.connected)}catch(e){}for(const g of a)JOY.seen.set(g.id,g);return a}
+const joyPad=(pads,id)=>pads.find(g=>g.id===id);
+function joyActive(){return Object.keys(JOY.b).length>0}
+function joyAxis(pads,act){const b=JOY.b[act];if(!b||b.t!=='a')return null;const g=joyPad(pads,b.id);if(!g)return null;let v=g.axes[b.i]||0;if(b.inv)v=-v;return v}
+function joyBtn(pads,act){const b=JOY.b[act];if(!b)return false;const g=joyPad(pads,b.id);if(!g)return false;if(b.t==='b'){const x=g.buttons[b.i];return !!x&&(x.pressed||x.value>.5)}return false}
+const joyCurve=v=>{const s=Math.sign(v),a=Math.max(0,(Math.abs(v)-JOY.dz)/(1-JOY.dz));return s*(a*(1-JOY.expo)+a*a*a*JOY.expo)};
+// chamado pelo readInput: devolve {pitch,roll,yaw,thr,fire} ou null se não houver joystick programado
+function joyRead(){if(!joyActive())return null;const pads=joyPads();if(!pads.length)return null;const o={};
+ const p=joyAxis(pads,'pitch'),r=joyAxis(pads,'roll'),y=joyAxis(pads,'yaw'),t=joyAxis(pads,'thr');
+ if(p!==null)o.pitch=joyCurve(p);if(r!==null)o.roll=joyCurve(r);if(y!==null)o.yaw=joyCurve(y);if(t!==null)o.thr=(clamp(t,-1,1)+1)/2;
+ o.fire=joyBtn(pads,'fire');o.up=joyBtn(pads,'thrUp');o.dn=joyBtn(pads,'thrDn');
+ const ed=a=>{const now=joyBtn(pads,a),was=JOY.prev[a];JOY.prev[a]=now;return now&&!was};
+ if(ed('fire')&&P.wpn>1&&G.mode==='play'&&!G.paused)fireMissile();if(ed('weapon')){P.wpn=P.wpn%4+1;click()}if(ed('lock'))lockCycle();if(ed('flare'))dropCM('flare');if(ed('chaff'))dropCM('chaff');
+ if(ed('wing'))onKey('KeyV');if(ed('cam'))onKey('KeyC');if(ed('gear'))onKey('KeyG');if(ed('hook'))onKey('KeyH');if(ed('flaps'))onKey('KeyK');if(ed('brake'))onKey('KeyB');if(ed('launch'))onKey('KeyL');
+ if(ed('radio'))radioOpen();if(ed('pause'))onKey('KeyP');if(ed('vrc'))vrRecenter();return o}
+// manete do eixo → escala do jogo (0..1 = até MIL, 1..1.3 = pós-combustor; MIL em 76% do curso, igual à manete de toque)
+const thrFromAxis=t=>t<.76?t/.76:1+(t-.76)/.24*.3;
+/* ---- gravação de comandos ("mova o eixo / aperte o botão") ---- */
+function joyCapture(act){const pads=joyPads();JOY.cap={act,t:performance.now(),base:new Map(pads.map(g=>[g.id,{a:[...g.axes],b:g.buttons.map(x=>x.pressed)}]))};joyUI()}
+function joyCapPoll(){const c=JOY.cap;if(!c)return;const pads=joyPads(),kind=JACT.find(a=>a[0]===c.act)[2];
+ for(const g of pads){const base=c.base.get(g.id);if(!base){c.base.set(g.id,{a:[...g.axes],b:g.buttons.map(x=>x.pressed)});continue}
+  if(kind==='a'){for(let i=0;i<g.axes.length;i++){const d=(g.axes[i]||0)-(base.a[i]||0);if(Math.abs(d)>.55){JOY.b[c.act]={id:g.id,t:'a',i,inv:d<0};joyDone();return}}}
+  else for(let i=0;i<g.buttons.length;i++)if(g.buttons[i].pressed&&!base.b[i]){JOY.b[c.act]={id:g.id,t:'b',i};joyDone();return}}
+ if(performance.now()-c.t>10000){JOY.cap=null;joyUI('Tempo esgotado. Tente de novo.')}}
+function joyDone(){const a=JOY.cap.act;JOY.cap=null;JOY.prev={};joySave();blip(1200,.06,.12);joyUI('Gravado: '+JACT.find(x=>x[0]===a)[1].split(' (')[0]+'.')}
+function joyName(id){return (id||'').replace(/\(.*?Vendor.*?\)/i,'').replace(/\s+/g,' ').trim().slice(0,40)}
+function joyUI(msg){const el=document.getElementById('joyList');if(!el)return;const pads=joyPads();
+ document.getElementById('joyPads').textContent=pads.length?pads.map(g=>'🎮 '+joyName(g.id)+' · '+g.axes.length+' eixos, '+g.buttons.length+' botões'+(g.mapping==='standard'?' (controle padrão)':'')).join('\n'):'Nenhum controle visível. Conecte o joystick e APERTE QUALQUER BOTÃO dele (o navegador só mostra depois disso).';
+ el.textContent='';for(const [k,label,kind] of JACT){const b=JOY.b[k],row=document.createElement('div');row.className='jrow';const l=document.createElement('span');l.textContent=label;
+  const v=document.createElement('code');v.textContent=JOY.cap&&JOY.cap.act===k?(kind==='a'?'mova o eixo…':'aperte o botão…'):b?(b.t==='a'?'Eixo '+b.i+(b.inv?' (invertido)':''):'Botão '+b.i)+(pads.length>1&&b?' · '+joyName(b.id).slice(0,14):''):'—';
+  const set=document.createElement('button');set.type='button';set.textContent='Definir';set.onclick=()=>joyCapture(k);const clr=document.createElement('button');clr.type='button';clr.textContent='✕';clr.title='Limpar';clr.onclick=()=>{delete JOY.b[k];joySave();joyUI()};
+  if(kind==='a'&&b){const bar=document.createElement('i');bar.className='jbar';bar.dataset.act=k;row.append(l,v,bar,set,clr)}else row.append(l,v,set,clr);el.appendChild(row)}
+ if(msg)document.getElementById('joyMsg').textContent=msg}
+function joyBars(){const pads=joyPads();for(const e of document.querySelectorAll('.jbar')){const k=e.dataset.act,v=joyAxis(pads,k);e.style.setProperty('--v',v===null?0:(k==='thr'?(v+1)/2:(v+1)/2))}}
+function joyAuto(){const pads=joyPads();const g=pads.find(p=>p.mapping!=='standard')||pads[0];if(!g){joyUI('Aperte um botão do joystick primeiro.');return}JOY.b={};
+ // palpite comum para manches USB: eixo 0 rolagem, 1 arfagem (para trás = positivo), 2 manete, 3 ou 5 leme
+ JOY.b.roll={id:g.id,t:'a',i:0,inv:false};JOY.b.pitch={id:g.id,t:'a',i:1,inv:false};if(g.axes.length>2)JOY.b.thr={id:g.id,t:'a',i:2,inv:true};if(g.axes.length>5)JOY.b.yaw={id:g.id,t:'a',i:5,inv:false};else if(g.axes.length>3)JOY.b.yaw={id:g.id,t:'a',i:3,inv:false};
+ const bs=['fire','weapon','lock','flare','chaff','cam','gear','flaps','hook','brake','wing','pause'];bs.forEach((a,i)=>{if(i<g.buttons.length)JOY.b[a]={id:g.id,t:'b',i}});joySave();joyUI('Palpite aplicado. Teste cada comando e regrave o que estiver trocado.')}
+/* ================= VR (tela dividida tipo Cardboard) + olhar pelo giroscópio ================= */
+const VR={on:false,gyro:false,ok:false,dq:new Q4(),ref:new Q4(),rel:new Q4(),ipd:.064,needRef:true,tap:0};
+{const zee=new V3(0,0,1),eu=new THREE.Euler(),q0=new Q4(),q1=new Q4(-Math.sqrt(.5),0,0,Math.sqrt(.5));
+ VR.onOri=e=>{if(e.alpha===null)return;VR.ok=true;const o=((screen.orientation&&screen.orientation.angle)||window.orientation||0)*DEG;eu.set(e.beta*DEG,e.alpha*DEG,-e.gamma*DEG,'YXZ');VR.dq.setFromEuler(eu).multiply(q1).multiply(q0.setFromAxisAngle(zee,-o));
+  if(VR.needRef){VR.ref.copy(VR.dq);VR.needRef=false}VR.rel.copy(VR.ref).invert().multiply(VR.dq)}}
+async function vrGyro(on){if(on){try{if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){const r=await DeviceOrientationEvent.requestPermission();if(r!=='granted'){say('Sem permissão para o giroscópio.','w');return false}}}catch(e){say('O giroscópio precisa de HTTPS e de um toque na tela.','w');return false}
+  addEventListener('deviceorientation',VR.onOri);VR.gyro=true;VR.needRef=true;setTimeout(()=>{if(!VR.ok)say('Este aparelho não mandou dados do giroscópio.','w')},1500);return true}
+ removeEventListener('deviceorientation',VR.onOri);VR.gyro=false;VR.rel.identity();return false}
+function vrRecenter(){VR.needRef=true;say('Visão recentralizada.','')}
+async function vrSet(on){if(on){const ok=await vrGyro(true);if(!ok)return;VR.on=true;document.body.classList.add('vr');goFull();try{await screen.orientation.lock('landscape')}catch(e){}renderer.setPixelRatio(Math.min(devicePixelRatio,IS_TOUCH?1.1:1.5));say('VR ligado. Encaixe o celular no óculos; toque 2x na tela para sair.','')}
+ else{VR.on=false;document.body.classList.remove('vr');if(!S.gyroLook)vrGyro(false);renderer.setPixelRatio(Math.min(devicePixelRatio,IS_TOUCH?1.3:1.75));resize()}}
+// desenha os dois olhos: cenário + cockpit + HUD em cada metade
+function vrRender(showC,warn){const w=W,h=H,hw=w/2;camera.aspect=cockCam.aspect=hw/h;camera.updateProjectionMatrix();cockCam.updateProjectionMatrix();
+ renderer.setScissorTest(false);renderer.clear();renderer.setScissorTest(true);const cp=camera.position.clone(),kp=cockCam.position.clone(),rt=new V3();
+ for(const e of [-1,1]){const x=e<0?0:hw;renderer.setViewport(x,0,hw,h);renderer.setScissor(x,0,hw,h);
+  rt.set(1,0,0).applyQuaternion(camera.quaternion);camera.position.copy(cp).addScaledVector(rt,e*VR.ipd/2);camera.updateMatrixWorld();renderer.render(scene,camera);
+  if(showC){renderer.clearDepth();rt.set(1,0,0).applyQuaternion(cockCam.quaternion);cockCam.position.copy(kp).addScaledVector(rt,e*VR.ipd/2);cockCam.updateMatrixWorld();renderer.render(cockScene,cockCam)}}
+ camera.position.copy(cp);cockCam.position.copy(kp);renderer.setScissorTest(false);renderer.setViewport(0,0,w,h);
+ // HUD: desenha na metade esquerda e copia para a direita
+ hx.setTransform(1,0,0,1,0,0);hx.clearRect(0,0,hc.width,hc.height);W=hw;try{drawHUD(warn)}finally{W=w}hx.setTransform(1,0,0,1,0,0);hx.clearRect(Math.floor(hw*DPR),0,hc.width,hc.height);hx.drawImage(hc,0,0,Math.floor(hw*DPR),Math.floor(h*DPR),Math.floor(hw*DPR),0,Math.floor(hw*DPR),Math.floor(h*DPR));
+ hx.fillStyle='#000';hx.fillRect(Math.floor(hw*DPR)-1,0,2,Math.floor(h*DPR))}
+// toque duplo sai do VR (o celular está dentro do óculos)
+addEventListener('touchend',()=>{if(!VR.on)return;const t=performance.now();if(t-VR.tap<350)vrSet(false);VR.tap=t},{passive:true});
+
 /* ================= controles de toque ================= */
 const TOUCH={ui:false,joy:null,x:0,y:0,fire:false,thrId:null,ox:0,oy:0,pausedRot:false};
 try{const v=localStorage.getItem('tomcat-touch');TOUCH.ui=v===null?IS_TOUCH:v==='1'}catch(e){TOUCH.ui=IS_TOUCH}
@@ -1700,7 +1843,7 @@ function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.
 resetP();placeCat();applyTOD();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
 // PWA: instala como app e funciona offline (só em HTTPS ou localhost)
 if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
-window.__tomcat={RADIO,endGame,NET,WORLD,realH,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>
