@@ -2,18 +2,15 @@
 
 Jogo de combate aéreo 3D em HTML/CSS/JS (Three.js), com cockpit do F-14, esquadrilha de 6 alas e rádio com IA que roda no navegador.
 
-## Publicar no GitHub Pages (5 minutos)
+## Publicar na Vercel
 
-1. Crie um repositório público no GitHub (ex.: `tomcat`).
-2. Envie esta pasta inteira:
-   ```bash
-   git init && git add . && git commit -m "Tomcat: primeira versão"
-   git branch -M main
-   git remote add origin https://github.com/SEU_USUARIO/tomcat.git
-   git push -u origin main
-   ```
-3. No repositório: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-4. O workflow `.github/workflows/pages.yml` roda sozinho. O link aparece em **Actions** e fica assim: `https://SEU_USUARIO.github.io/tomcat/`.
+1. Em [vercel.com](https://vercel.com), entre com o GitHub e clique em **Add New → Project**.
+2. Importe o repositório `Flight-combat-simulator`.
+3. Configure assim:
+   - **Framework Preset:** Other
+   - **Build Command:** vazio
+   - **Output Directory:** vazio (a raiz do repo)
+4. Clique em **Deploy**. Cada push na `main` publica de novo, e cada Pull Request ganha um link de prévia.
 
 Testar local antes: `python3 -m http.server 8080` e abra `http://localhost:8080` (abrir o arquivo direto com duplo clique não funciona, porque os modelos 3D são carregados por HTTP).
 
@@ -31,7 +28,7 @@ Abra com **Enter** (ou o botão **RÁDIO** no celular).
 Observações honestas:
 - O reconhecimento de voz do Chrome é gratuito, mas o áudio é processado nos servidores do Google.
 - A IA local pequena erra fatos às vezes; por isso as ordens do jogo nunca passam por ela.
-- O microfone exige HTTPS (o GitHub Pages já é HTTPS).
+- O microfone exige HTTPS (a Vercel já é HTTPS).
 
 ## Créditos e licenças
 
