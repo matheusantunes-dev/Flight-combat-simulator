@@ -85,7 +85,7 @@ Limitações: o teatro é plano (~200 km em volta do porta-aviões); fora disso 
 Menu (ou Pausa) → **CONTROLES · JOYSTICK · VR**.
 
 - **Joystick:** qualquer manche, manete, volante ou controle USB/Bluetooth que o navegador enxergar. Aperte um botão do aparelho para ele aparecer, toque em **Definir** em cada ação e mexa o eixo ou aperte o botão. O sentido do eixo é gravado sozinho (por isso a tela pede "puxe para trás", "incline para a direita"). Dá para misturar aparelhos (manche + manete separados). Zona morta e curva ajustáveis; tudo fica salvo no navegador.
-- **VR de celular:** tela dividida em dois olhos e o giroscópio mexe a cabeça dentro do cockpit. Funciona com óculos tipo Cardboard ou qualquer suporte de celular. Com o celular no óculos, pilote com joystick Bluetooth ou USB (OTG). Toque 2× na tela para sair; o botão "Recentralizar" (ou a ação gravada no joystick) zera a direção da cabeça.
+- **VR de celular:** tela dividida em dois olhos e o giroscópio mexe a cabeça dentro do cockpit. Funciona com óculos tipo Cardboard ou qualquer suporte de celular. Com o celular no óculos, pilote com joystick Bluetooth ou USB (OTG). Funciona mesmo com a rotação automática do celular desligada: o jogo detecta o celular deitado pelo giroscópio e gira a imagem. Toque 2× na tela para sair; segure 1 s se a imagem ficar de cabeça para baixo. O botão "Recentralizar" (ou a ação gravada no joystick) zera a direção da cabeça.
 - **Olhar com o giroscópio sem óculos:** opção no mesmo painel.
 
 ## Rádio com IA (grátis, sem chave)

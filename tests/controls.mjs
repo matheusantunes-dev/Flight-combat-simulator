@@ -54,6 +54,20 @@ if (process.env.SHOTS) await p.screenshot({ path: process.env.SHOTS + '/vr.png' 
 await p.evaluate(() => __tomcat.vrSet(false)); await p.waitForTimeout(300);
 ok.saiuVR = await p.evaluate(() => !__tomcat.VR.on && !document.body.classList.contains('vr'));
 
+// celular em pé (rotação travada) com o óculos deitado: o jogo desenha em paisagem e gira a tela
+const m = await b.newContext({ viewport: { width: 412, height: 915 }, isMobile: true, hasTouch: true });
+if (process.env.LIBS) await m.route(/three\.min\.js|GLTFLoader\.js|meshopt_decoder\.mjs|fonts\.g/, (r) => {
+  const u = r.request().url(), lib = (f) => readFileSync(process.env.LIBS + '/' + f, 'utf8');
+  const f = u.includes('three.min') ? 'three.min.js' : u.includes('GLTFLoader') ? 'GLTFLoader.js' : u.includes('meshopt') ? 'meshopt_decoder.mjs' : null;
+  return f ? r.fulfill({ body: lib(f), contentType: 'application/javascript', headers: { 'Access-Control-Allow-Origin': '*' } }) : r.fulfill({ body: '' });
+});
+const q = await m.newPage(); q.on('pageerror', (e) => errs.push(String(e)));
+await q.goto(URL0); await q.waitForFunction(() => window.__tomcat && !document.querySelector('#go').disabled, null, { timeout: 120000 });
+await q.evaluate(() => { const t = __tomcat; t.S.mission = 'fly'; t.startGame(); t.sim(0.3); });
+await q.evaluate(() => __tomcat.vrSet(true)); await q.waitForTimeout(300);
+await q.evaluate(() => dispatchEvent(new DeviceOrientationEvent('deviceorientation', { alpha: 0, beta: 0, gamma: -88 }))); await q.waitForTimeout(600);
+const pr = await q.evaluate(() => { const c = document.querySelector('#gl'); return { rot: __tomcat.VR.rot, wide: c.width > c.height, aviso: !document.querySelector('#rot').classList.contains('hide') }; });
+ok.vrDeitadoComTelaEmPe = pr.rot === 90 && pr.wide && !pr.aviso;
 console.log(JSON.stringify(ok, null, 2));
 await b.close();
 const failed = Object.entries(ok).filter(([, v]) => !v).map(([k]) => k);
