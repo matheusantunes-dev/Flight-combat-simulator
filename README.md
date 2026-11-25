@@ -14,6 +14,31 @@ Jogo de combate aéreo 3D em HTML/CSS/JS (Three.js), com cockpit do F-14, esquad
 
 Testar local antes: `python3 -m http.server 8080` e abra `http://localhost:8080` (abrir o arquivo direto com duplo clique não funciona, porque os modelos 3D são carregados por HTTP).
 
+## Instalar como app (PWA)
+
+No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inicial"). No PC: ícone de instalar na barra de endereço. Depois da primeira visita, o jogo abre até sem internet (a IA local e o multiplayer continuam precisando de rede).
+
+Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
+
+## Testes automáticos
+
+Todo Pull Request roda `.github/workflows/test.yml`: abre o jogo num Chrome headless e confere decolagem por catapulta, pouso com cabo e combate com os alas.
+
+Rodar no seu PC:
+```bash
+npm i --no-save playwright@1 && npx playwright install chromium
+python3 -m http.server 8080 &
+node tests/smoke.mjs
+```
+
+## Modelos 3D
+
+Os modelos ficam em `models/*.glb`, comprimidos com [gltfpack](https://github.com/zeux/meshoptimizer/tree/master/gltf) (meshopt): de 21 MB para 9 MB. Para comprimir um modelo novo:
+```bash
+npx gltfpack -i modelo.gltf -o models/modelo.glb -c -noq -kn -km -ke
+```
+`-noq` mantém as coordenadas em float (o código separa trem de pouso, asas e cockpit pelos nomes e precisa delas assim); `-kn -km -ke` mantêm nomes, materiais e extras.
+
 ## Rádio com IA (grátis, sem chave)
 
 Abra com **Enter** (ou o botão **RÁDIO** no celular).

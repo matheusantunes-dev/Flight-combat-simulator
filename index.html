@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0f12"><meta name="mobile-web-app-capable" content="yes">
 <title>FCS · Flight Combat Simulator</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b1114">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%E2%9C%88%EF%B8%8F%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -473,13 +476,13 @@ const BODY_OFF=new V3(0,-1.0,4.2);
 const P={pos:new V3(),vel:new V3(),q:new Q4(),w:new V3(),fwd:new V3(0,0,-1),up:new V3(0,1,0),right:new V3(1,0,0),alive:true,contacts:[]};
 // Hangar: dados aproximados de fontes públicas (área de asa, pesos, empuxo militar/pós-combustão por avião)
 const ACFT={
- f14:{name:'F-14B Tomcat',file:'models/f14.json',scale:.1,eye:[8.2,1.0],gearH:3.73,sweep:true,naval:true,panel:true,rio:true,hudB:9,S:52.5,empty:19838,fuel:7348,mil:150000,ab:98000,CLa:4.6,aSt:.42,cd0:.021,k:.075,gLim:7.5,fbw:false,roll:2.3,
+ f14:{name:'F-14B Tomcat',file:'models/f14.glb',scale:.1,eye:[8.2,1.0],gearH:3.73,sweep:true,naval:true,panel:true,rio:true,hudB:9,S:52.5,empty:19838,fuel:7348,mil:150000,ab:98000,CLa:4.6,aSt:.42,cd0:.021,k:.075,gLim:7.5,fbw:false,roll:2.3,
   fl:[[-1.3,-.85,15.8],[1.3,-.85,15.8]],wpn:{aim9:{m:'aim9',n:2,kg:86,name:'AIM-9M Sidewinder',sh:'SW'},aim7:{m:'aim7',n:2,kg:231,name:'AIM-7M Sparrow',sh:'SP'},aim54:{m:'aim54',n:2,kg:453,name:'AIM-54C Phoenix',sh:'PH'}},gun:{n:675,rate:100,v:1030,dmg:.075}},
- f16:{name:'F-16C Fighting Falcon',file:'models/f16.json',scale:.1,eye:[5.95,.92],gearH:2.81,sweep:false,naval:false,hudB:12,wave:.85,S:27.87,empty:8570,fuel:3175,mil:76000,ab:55000,CLa:4.0,aSt:.44,cd0:.019,k:.1,gLim:9,fbw:true,roll:4.2,
+ f16:{name:'F-16C Fighting Falcon',file:'models/f16.glb',scale:.1,eye:[5.95,.92],gearH:2.81,sweep:false,naval:false,hudB:12,wave:.85,S:27.87,empty:8570,fuel:3175,mil:76000,ab:55000,CLa:4.0,aSt:.44,cd0:.019,k:.1,gLim:9,fbw:true,roll:4.2,
   fl:[[0,-.47,12.6]],wpn:{aim9:{m:'aim9x',n:2,kg:85,name:'AIM-9X Sidewinder',sh:'9X'},aim7:null,aim54:{m:'aim120',n:4,kg:161,name:'AIM-120C AMRAAM',sh:'AM'}},gun:{n:511,rate:100,v:1030,dmg:.075}},
- mig29:{name:'MiG-29A Fulcrum',file:'models/mig29hd.json',scale:.1,eye:[6.65,1.1],gearH:3.07,sweep:false,naval:false,hudB:11,wave:.8,S:38,empty:11000,fuel:3500,mil:98800,ab:64000,CLa:4.3,aSt:.48,cd0:.022,k:.09,gLim:9,fbw:false,roll:3.6,
+ mig29:{name:'MiG-29A Fulcrum',file:'models/mig29hd.glb',scale:.1,eye:[6.65,1.1],gearH:3.07,sweep:false,naval:false,hudB:11,wave:.8,S:38,empty:11000,fuel:3500,mil:98800,ab:64000,CLa:4.3,aSt:.48,cd0:.022,k:.09,gLim:9,fbw:false,roll:3.6,
   fl:[[-.7,-.8,13.9],[.7,-.8,13.9]],wpn:{aim9:{m:'r73',n:2,kg:105,name:'R-73 Archer',sh:'R73'},aim7:{m:'r27',n:2,kg:253,name:'R-27R Alamo',sh:'R27'},aim54:null},gun:{n:150,rate:25,v:870,dmg:.22}},
- m2000:{name:'Mirage 2000C',file:'models/m2000.json',scale:1,eye:[6.45,2.76],gearH:2.76,sweep:false,naval:false,hudB:12,wave:.55,S:41,empty:7500,fuel:3160,mil:64000,ab:31000,CLa:3.3,aSt:.5,cd0:.019,k:.12,gLim:9,fbw:true,roll:4.0,
+ m2000:{name:'Mirage 2000C',file:'models/m2000.glb',scale:1,eye:[6.45,2.76],gearH:2.76,sweep:false,naval:false,hudB:12,wave:.55,S:41,empty:7500,fuel:3160,mil:64000,ab:31000,CLa:3.3,aSt:.5,cd0:.019,k:.12,gLim:9,fbw:true,roll:4.0,
   fl:[[0,-.16,12.1]],wpn:{aim9:{m:'magic',n:2,kg:89,name:'Magic II',sh:'MAG'},aim7:{m:'s530',n:2,kg:270,name:'Super 530D',sh:'530'},aim54:null},gun:{n:250,rate:60,v:850,dmg:.2}}};
 let A=ACFT.f14;const SLOT=['','','aim9','aim7','aim54'];
 function resetP(){Object.assign(P,{thr:0,spool:0,ab:0,abLit:0,detent:false,gear:1,gearPos:1,flaps:1,flapsPos:1,sb:0,sbPos:0,hook:0,hookPos:0,sweep:20,sweepAuto:true,sweepMan:20,
@@ -1100,7 +1103,9 @@ function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/10
 /* ================= modelos 3D reais (GLB) ================= */
 // Caças: bohmerang (CC BY-NC-SA 4.0). Inimigos MiG-29/Su-27: Zuujis (CC0). Asas do F-14 separadas aqui em tempo de carga.
 const HD={ok:false},ENEMY={},ACM={},PIV={x:.9,z:2.75};
-const loadGLB=u=>new Promise(res=>{try{if(!THREE.GLTFLoader)return res(null);new THREE.GLTFLoader().load(u,g=>res(g.scene),undefined,()=>res(null))}catch(e){res(null)}});
+// modelos comprimidos com gltfpack (meshopt): 21 MB -> 9 MB; o decodificador WASM vem do CDN
+const MESHOPT=import('https://cdn.jsdelivr.net/npm/meshoptimizer@1.3.0/meshopt_decoder.mjs').then(m=>m.MeshoptDecoder.ready.then(()=>m.MeshoptDecoder)).catch(e=>{console.warn('meshopt',e);return null});
+const loadGLB=u=>MESHOPT.then(dec=>new Promise(res=>{try{if(!THREE.GLTFLoader)return res(null);const l=new THREE.GLTFLoader();if(dec)l.setMeshoptDecoder(dec);l.load(u,g=>res(g.scene),undefined,e=>{console.warn('modelo',u,e);res(null)})}catch(e){res(null)}}));
 // o CSP do artefato bloqueia fetch() de blob:, então as texturas devem vir por <img> (TextureLoader), não ImageBitmapLoader
 const _cib=window.createImageBitmap;let loading=0;
 function loadQ(u){loading++;try{window.createImageBitmap=undefined}catch(e){}return Promise.race([loadGLB(u),new Promise(r=>setTimeout(()=>r(null),45000))]).then(x=>{if(--loading===0)try{window.createImageBitmap=_cib}catch(e){}return x})}
@@ -1142,7 +1147,7 @@ function selectAircraft(id){S.ac=id;saveCfg();const go=$('#go');go.disabled=true
   $('#loadst').textContent=R?ACFT[id].name+': modelo 3D e cockpit original carregados.':'Modelo 3D indisponível aqui: usando o modelo simplificado.';syncMenu()})}
 document.querySelector('[data-k=ac]').addEventListener('click',e=>{const b=e.target.closest('button');if(b&&!$('#go').disabled)selectAircraft(b.dataset.v)});
 if(!ACFT[S.ac])S.ac='f14';
-Promise.all([loadQ('models/mig29.json'),loadQ('models/su27.json'),loadAircraft('f14')]).then(([mig,su])=>{
+Promise.all([loadQ('models/mig29.glb'),loadQ('models/su27.glb'),loadAircraft('f14')]).then(([mig,su])=>{
  try{if(mig)ENEMY.mig29=prepEnemy(mig,'mig29');if(su)ENEMY.su27=prepEnemy(su,'su27');parkF14()}catch(e){console.error(e)}
  return selectAircraft(S.ac)}).then(()=>loadAircraft('mig29')).then(R=>{if(!R)return;// MiG-29 inimigo no modelo HD, trem recolhido; o ás ganha pintura avermelhada
  const mk=ace=>{const h=makeHD(R,false);h.gear(false);h.g.traverse(n=>{if(n.isMesh&&!n.material.transparent){n.material=n.material.clone();if(ace)n.material.color.multiply(lc(0xc0726a))}});return h.g};ENEMY.mig29={std:mk(0),ace:mk(1)}}).catch(e=>console.error(e));
@@ -1315,6 +1320,8 @@ function touchFrame(){const show=TOUCH.ui&&G.mode==='play'&&!G.paused&&P.state!=
 $('#tch').checked=TOUCH.ui;$('#tch').onchange=e=>{TOUCH.ui=e.target.checked;try{localStorage.setItem('tomcat-touch',TOUCH.ui?'1':'0')}catch(_){}};
 function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.requestFullscreen||d.webkitRequestFullscreen;if(rq&&!document.fullscreenElement){const p=rq.call(d,{navigationUI:'hide'});if(p&&p.then)p.then(()=>{try{screen.orientation.lock('landscape').catch(()=>{})}catch(_){}}).catch(()=>{})}}catch(_){}}
 resetP();placeCat();applyTOD();drawPanel();syncMenu();$('#go').disabled=true;
+// PWA: instala como app e funciona offline (só em HTTPS ou localhost)
+if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
 window.__tomcat={RADIO,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }

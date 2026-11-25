@@ -1,0 +1,23 @@
+# Roda o teste de fumaça em todo Pull Request e em todo push na main.
+name: Teste do jogo
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Instalar Playwright
+        run: |
+          npm i --no-save playwright@1
+          npx playwright install --with-deps chromium
+      - name: Servir o jogo
+        run: python3 -m http.server 8080 &
+      - name: Teste de fumaça
+        run: node tests/smoke.mjs
