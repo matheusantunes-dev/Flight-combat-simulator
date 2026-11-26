@@ -8,6 +8,45 @@ No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inici
 
 Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
 
+## Bases em terra, pouso na pista e teleporte
+
+- **Duas bases aéreas** nas ilhas (SBIG e SBNO). A pista é um platô plano na **cota natural do morro** (a borda é misturada com o terreno, sem penhasco), com eixo tracejado, cabeceiras pintadas e luzes de borda.
+- **PAPI de verdade:** 4 caixas ao lado da zona de toque, com os ângulos oficiais (2°30′, 2°50′, 3°10′, 3°30′). Na rampa certa você vê **duas brancas perto da pista e duas vermelhas**; tudo branco = alto, tudo vermelho = baixo (*"red over red, you're dead"*).
+- **Pouso em terra:** trem baixado, menos de 9,5 m/s de razão de descida, asas niveladas e alinhado com a pista (até 35° de desalinhamento). Depois é corrida na pista: manete em idle e **B** para frear.
+- **Rearme e reabastecimento:** pare na pista (ou no convés) abaixo de **15 kt** e espere **5 s** — a equipe reabastece, rearma e conserta. Se você sair andando, o serviço é cancelado.
+- **Seta da base mais próxima:** no HUD, uma seta azul na borda aponta a pista ou o porta-aviões mais perto, com a distância em **NM**.
+- **Teleporte:** no menu de **Pausa**, lugares famosos (Anápolis, Estreito de Ormuz, Atlântico, Grand Canyon, Rio, Nellis). Liga o Mundo Real, muda o cenário e te põe no ar com tanque cheio.
+
+## Câmeras de cinema, replay e som de fora
+
+Teclas: **F2** fly-by · **F6** câmera do míssil · **F3** replay (F é manete, como antes).
+
+- **Fly-by (F2):** a câmera para no ar ~320 m à frente e o avião passa raspando por ela, como o F4 do DCS. Quando você se afasta muito ela se reposiciona sozinha pra te dar outra passagem.
+- **Doppler de verdade:** nas câmeras externas o som usa `f' = f·c/(c+vr)` — agudo quando o avião vem, grave quando passa — e o volume cai com a distância. Vale para o motor sintetizado e para as camadas de vento.
+- **Câmera do míssil (F6):** cola atrás do seu último míssil no ar, olhando para o alvo. Sem míssil no ar ela avisa e não liga.
+- **Replay (F3):** fita circular com os últimos **20 s** do seu avião (30 amostras/s: posição, atitude, trem, enflechamento). O jogo pausa enquanto você assiste, numa órbita em volta da fita. F3 de novo volta ao voo. Hoje a fita guarda só o **seu** avião — inimigos e mísseis ficam congelados no replay.
+- **Cone de vapor + estouro sônico:** perto de Mach 1 aparece o cone de condensação (Prandtl–Glauert), mais forte em altitude baixa (ar úmido). O boom só é ouvido nas câmeras de fora: na vida real o piloto nunca ouve o próprio estouro, ele fica atrás do avião.
+- **Vento por ângulo de ataque:** o ar na cabine fica mais alto e mais agudo conforme você puxa alfa e pressão dinâmica (buffet).
+- **Respiração anti-G:** acima de ~5 G você ouve o piloto fazendo a manobra anti-G.
+- **Vozes:** "OVER G" acima de 7,8 G e "PULL UP" quando a razão de descida come o terreno, com intervalo mínimo entre avisos (como a *Bitching Betty* dos caças).
+
+## Aerodinâmica de verdade
+
+- **Estol com quebra de nariz:** passou do ângulo de ataque crítico, a sustentação cai e o nariz despenca. O aviso de estol toca antes.
+- **Parafuso:** estolado, abaixo de ~230 kt, com pedal ou glissada, o avião entra em autorrotação (gira, afunda e perde o controle normal). Só acontece no modo **Real** ou em aviões sem fly-by-wire. O F-16, o F-22 e outros FBW protegem você, como na vida real.
+- **Saída do parafuso (PARE):** manete em idle, **pedal contrário** ao giro e **manche à frente**. Segure até a rotação parar e depois puxe com calma.
+- **Efeito solo:** a menos de uma envergadura do chão, o arrasto induzido cai e o avião "flutua" no pouso (fórmula de McCormick).
+- **Inércia da cabeça:** em G alto e em turbulência, a câmera do cockpit balança como a cabeça do piloto. Isso fica desligado no VR para não enjoar.
+
+## Mísseis e contramedidas realistas
+
+- **Três fases de voo:** boost (aceleração forte e fumaça densa), sustentação e planeio. A sustentação existe nos motores de dois estágios: AIM-7, AIM-54, AIM-120, R-27, R-77 e o Meteor, que é ramjet e sustenta quase o voo todo. Nela, o empuxo baixo só compensa o arrasto e a fumaça fica fina. No planeio o motor apaga, não sai fumaça e o míssil só perde velocidade.
+- **Energia:** o G máximo depende da pressão dinâmica. Lento ou em ar rarefeito, o míssil curva pouco, e cada curva fechada gasta energia (arrasto induzido). Um alvo que puxa G no momento certo faz o míssil "morrer" sem energia.
+- **Flares:** com pós-combustor ligado o avião fica mais quente que o flare, então ele quase não engana. Com a manete reduzida, engana mais. Pela cauda, o buscador vê o bocal e o flare engana menos. Buscadores modernos (AIM-9X, IRIS-T, ASRAAM, R-74, Python 5) quase não caem.
+- **Chaff:** só funciona no feixe (notch), a cerca de 90° da linha de visada do míssil. É aí que o radar doppler perde a velocidade relativa. De frente ou de cauda, quase não engana. O RIO avisa quando a contramedida não tem chance.
+- **Visual:** a chama do motor-foguete agora é curta, com núcleo pequeno e claro, e de longe vira um ponto brilhante. Antes era uma "bola de luz" de 7 m. Quem aparece mesmo é a trilha de fumaça.
+- **Mira do canhão:** o pipper preditivo (que já existia) agora usa a velocidade de saída real de cada canhão.
+
 ## Céu, Sol, Lua e clima
 
 - **Céu físico:** modelo de Preetham, o mesmo do `THREE.Sky`, com espalhamento Rayleigh e Mie. Fica azul de dia e vai para laranja e roxo quando o Sol baixa, sem cores pintadas à mão. Luz, névoa, mar e nuvens seguem a altura do Sol.
@@ -21,15 +60,25 @@ Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fc
 
 ## Sons dos motores
 
-O som de cada motor é feito em camadas que seguem a rotação e a potência, do mesmo jeito que os simuladores (MSFS e X-Plane com FMOD, DCS). Sem gravações, as camadas são calculadas a partir da física do motor:
+O som de cada motor é montado com **gravações reais** em loop. O tom e o volume de cada camada seguem a rotação e a potência, como o FMOD faz no MSFS e no X-Plane:
 
-- **Jato/turbofan:** ronco grave, tom do fan (número de pás × N1, que sobe de ~600 Hz em marcha lenta para ~3 kHz no máximo) e "buzzsaw" em alta potência. Tem também o assobio do núcleo e, no pós-combustor, rugido com estalos.
-- **Turboélice (A-29, PT6A-68):** zumbido da hélice na frequência de passagem das pás (5 pás × 2000 rpm ÷ 60 ≈ 167 Hz, com harmônicos e um leve batimento). Por cima vêm o assobio agudo do compressor, que domina em marcha lenta, e o ronco do escape. A hélice tem governador, então a rotação quase não muda; o que muda é a carga.
-- **Hélice a pistão:** pulsos de ignição (rpm ÷ 60 × cilindros ÷ 2, com irregularidade), mais a rotação do eixo e a hélice.
+- **Jato:** um motor a jato de verdade gravado em bancada, mais o assobio de um turbofan e o pós-combustor. Cada caça tem a sua "voz", com tom, assobio e ronco do motor real: TF30 do F-14, F110 do F-16, RD-33 do MiG-29, M53 do Mirage, J79 do F-4 (turbojato, mais rouco), TF34 do A-10 (alto bypass, mais assobio) e assim por diante. Por cima vai uma camada sintetizada do tom do fan, com o número de pás × N1 de cada motor.
+- **Turboélice (A-29, PT6A-68):** gravação de um PT6 de verdade. Em marcha lenta domina o chiado do compressor; com potência, entram o ronco do escape e a hélice, cuja rotação quase não muda por causa do governador.
+- **Hélice a pistão:** gravações de motor radial em marcha lenta, média e alta, misturadas pela rotação.
+- **Canhão:** gravação real do GAU-8 do A-10, reamostrada pela cadência de cada arma (M61, .50 do A-29 etc.).
+- **Vento:** ruído de ar de um avião militar em voo, que cresce com a pressão dinâmica.
 
-No cockpit o som fica abafado. O canhão acompanha a cadência real de cada arma: GAU-8 do A-10, M61, as duas .50 do A-29.
+No cockpit, tudo fica abafado.
 
-**Trocar sons:** no hangar, toque em **🔊 Sons do avião selecionado**. Lá dá para mudar o tipo de motor e carregar gravações em loop do motor e do pós-combustor, de um arquivo do aparelho ou de um link. Também dá para ajustar o tom na marcha lenta e no máximo, o volume e a mistura com o som sintetizado, e ouvir antes com uma manete de teste. Tudo fica salvo para cada avião, no IndexedDB. A janela tem links para gravações CC0 no Freesound e no BigSoundBank.
+**Trocar sons:** no hangar, toque em **🔊 Sons do avião selecionado**. Dá para mudar o tipo de motor e carregar gravações próprias em loop do motor e do pós-combustor, por arquivo ou link. Também dá para ajustar o tom, o volume e a mistura, e ouvir antes de salvar. Tudo fica salvo por avião.
+
+**Gravações usadas** (editadas: cortadas, em loop, com o nível ajustado):
+- PT6 e hélice: "seaplane takeoff/start" por jerry.berumen (Freesound 772822 e 772823, **CC BY 4.0**), processadas por ROPlanes+ (fakekerman).
+- Radial: "PZL 104 Wilga start engine" por jarekgie (Freesound 140436, **CC BY 3.0**) e "P-47 Flyby" por Fight2FlyPhoto (Freesound 143560, **CC BY 3.0**), processadas por ROPlanes+.
+- Jato: "Jet Engine" por m_cel (Freesound 534856, **CC0**) e "jetengine loop.aif" por smidoid (Freesound 128614, **CC BY 4.0**).
+- Pós-combustor: "Rocket Boost Engine Loop" por qubodup (Freesound 146770, **CC0**).
+- Ar: "Plane Loop" por qubodup (Freesound 184723, **CC0**).
+- GAU-8: "A-10 Warthog flyby and shooting" por qubodup (Freesound 205582, **CC0**), recortado pelo projeto WARTHOG.
 
 ## Câmera do cockpit ajustável (qualquer avião)
 
