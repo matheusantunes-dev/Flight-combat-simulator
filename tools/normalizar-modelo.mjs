@@ -1,4 +1,4 @@
-// Uso: node tools/normalizar-modelo.mjs entrada.glb saida.glb id [glass=regex] [gear=regex] [drop=regex] [ax=X|Z] [nose=1|-1] [blend=1] [paint=r,g,b] [fixroot=1] [gearmat=regex] [shift=x,y,z]
+// Uso: node tools/normalizar-modelo.mjs entrada.glb saida.glb id [glass=regex] [gear=regex] [drop=regex] [ax=X|Z] [nose=1|-1] [blend=1] [paint=r,g,b] [fixroot=1] [gearmat=regex] [shift=x,y,z] [prop=regex]
 // Depende de: npm i @gltf-transform/core @gltf-transform/extensions meshoptimizer
 // Normaliza um GLB genérico pro padrão do jogo: nariz em +X, Y pra cima, nós renomeados (airframe/canopy/landingOn).
 import {NodeIO} from '@gltf-transform/core';import {ALL_EXTENSIONS} from '@gltf-transform/extensions';import {MeshoptDecoder} from 'meshoptimizer';
@@ -18,7 +18,7 @@ const cls={};const get=k=>cls[k]||(cls[k]=(()=>{const n=doc.createNode(tag+'-'+k
 const cnt={};let dropped=0;
 for(const it of items){if(DR&&DR.test(it.a)){it.n.setMesh(null);dropped++;continue}
  const mats=it.n.getMesh().listPrimitives().map(p=>p.getMaterial());const glass=mats.every(m=>m&&((O.blend&&m.getAlphaMode()==='BLEND')||GL.test(m.getName())));
- const GM=O.gearmat?new RegExp(O.gearmat):null;const k=(GR&&GR.test(it.a))||(GM&&mats.every(m=>m&&GM.test(m.getName())))?'landingOn':glass?'canopy':'airframe';cnt[k]=(cnt[k]||0)+1;
+ const GM=O.gearmat?new RegExp(O.gearmat):null;const PR=O.prop?new RegExp(O.prop,'i'):null;const k=PR&&PR.test(it.a)?'prop':(GR&&GR.test(it.a))||(GM&&mats.every(m=>m&&GM.test(m.getName())))?'landingOn':glass?'canopy':'airframe';cnt[k]=(cnt[k]||0)+1;
  const n=doc.createNode(tag+'-'+k).setMesh(it.n.getMesh()).setMatrix(it.W);it.n.setMesh(null);get(k).addChild(n)}
 if(O.paint){const c=O.paint.split(',').map(Number);for(const m of r.listMaterials())if(!m.getBaseColorTexture()&&m.getBaseColorFactor().slice(0,3).every(v=>v>.95)&&m.getAlphaMode()==='OPAQUE')m.setBaseColorFactor([...c,1]).setMetallicFactor(.25).setRoughnessFactor(.55)}
 for(const ch of sc.listChildren())sc.removeChild(ch);sc.addChild(root);
