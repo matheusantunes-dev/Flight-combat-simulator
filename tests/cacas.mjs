@@ -36,6 +36,6 @@ for (const id of ids) {
   }, id);
 }
 const enemy = await p.evaluate(() => !!(__tomcat.ENEMY.su27 && __tomcat.ENEMY.su27.std && __tomcat.ENEMY.su27.std.children.length));
-const ok = Object.values(res).every((v) => v === 'ok') && ids.length >= 16 && enemy && errs.length === 0;
+const ok = Object.values(res).every((v) => v === 'ok') && ids.length >= 19 && enemy && errs.length === 0;
 console.log(JSON.stringify(res), 'caças:', ids.length, 'J-11 inimigo:', enemy, errs.slice(0, 3)); await b.close();
 if (ok) console.log('OK: todos os caças carregam, tocam o chão e voam'); else { console.log('FALHOU'); process.exit(1); }

@@ -247,6 +247,9 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
       <button data-v="f117"><b>F-117A Nighthawk</b><span>Furtivo subsônico, 2 GBU-27</span></button>
       <button data-v="su30"><b>Su-30MKK Flanker-G</b><span>Dois lugares, Kh-59M, R-77</span></button>
       <button data-v="f22"><b>F-22A Raptor</b><span>Furtivo, supercruzeiro, 6 AIM-120D</span></button>
+      <button data-v="fa18e"><b>F/A-18E Super Hornet</b><span>Naval, pousa no porta-aviões, AGM-65E</span></button>
+      <button data-v="f4e"><b>F-4E Phantom II</b><span>Clássico Mach 2, Sparrow, Mk 84</span></button>
+      <button data-v="a29"><b>A-29 Super Tucano</b><span>Turboélice da FAB, MAA-1, metralhadoras .50</span></button>
     </div>
     <p class="sub soon" id="soonLine"></p>
     <div class="lbl">Campanha 1 · combate aéreo</div>
@@ -298,7 +301,7 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
     </section>
     <div class="goBar"><p id="selLine"></p><div class="goRow"><button id="go" class="go">DECOLAR</button><button id="mpOpen" class="go mpgo" type="button">MULTIPLAYER<small>até 6 pilotos</small></button></div></div>
     <p class="best" id="loadst">Carregando modelos 3D...</p><p class="best">Recorde: <b id="bestv">0</b> pontos · toque, teclado ou gamepad · toque para ativar o som</p>
-    <p class="best cred">Modelos: <a href="https://sketchfab.com/3d-models/f-14-tomcat-fighter-jet-free-497f77c311b5411d9b567d8707a81c33">F-14</a>, <a href="https://sketchfab.com/3d-models/f-16-fighting-falcon-fighter-jet-free-f0b00989e5634764848ef2c235c64db5">F-16</a>, <a href="https://sketchfab.com/3d-models/mig-29-fighter-jet-free-0a21787096244220b246ec8747e7b09c">MiG-29</a> e <a href="https://sketchfab.com/3d-models/dassault-mirage-2000-fighter-jet-free-aca93654c4684c5282e723c5b2999f67">Mirage 2000</a> por bohmerang (CC BY-NC-SA 4.0; asas do F-14 separadas, texturas recomprimidas e cockpits adaptados nesta versão) · MiG-29 e Su-27 por <a href="https://github.com/zuujis-cc0/free-game-assets">Zuujis</a> (CC0) · F-15E, Rafale, Su-57, Gripen, Su-35 e Su-34 por <a href="https://sketchfab.com/bohmerang">bohmerang</a> (CC BY-NC-SA 4.0) · F-117 e F-22 por <a href="https://sketchfab.com/andertan">andertan</a> (CC BY 4.0) · F-16F Block 60 por <a href="https://sketchfab.com/MirzaArrafiERV_45">MirzaArrafiERV_45</a> (CC BY 4.0) · A-10C por <a href="https://sketchfab.com/blarg1">blarg</a> (CC BY 4.0) · Su-30MKK por <a href="https://sketchfab.com/Jeyhun1985">Jeyhun1985</a> (CC BY 4.0) · Su-25 por <a href="https://sketchfab.com/Alexios_Apokaukos">Alexios_Apokaukos</a> (CC BY 4.0) · J-11 por <a href="https://sketchfab.com/Rhine_Lab_Muelsyse">Rhine_Lab_Muelsyse</a> (CC BY 4.0). Modelos genéricos reorientados, simplificados e com trem de pouso desenhado no jogo quando vinham recolhidos. Projeto pessoal, sem fins comerciais.</p>
+    <p class="best cred">Modelos: <a href="https://sketchfab.com/3d-models/f-14-tomcat-fighter-jet-free-497f77c311b5411d9b567d8707a81c33">F-14</a>, <a href="https://sketchfab.com/3d-models/f-16-fighting-falcon-fighter-jet-free-f0b00989e5634764848ef2c235c64db5">F-16</a>, <a href="https://sketchfab.com/3d-models/mig-29-fighter-jet-free-0a21787096244220b246ec8747e7b09c">MiG-29</a> e <a href="https://sketchfab.com/3d-models/dassault-mirage-2000-fighter-jet-free-aca93654c4684c5282e723c5b2999f67">Mirage 2000</a> por bohmerang (CC BY-NC-SA 4.0; asas do F-14 separadas, texturas recomprimidas e cockpits adaptados nesta versão) · MiG-29 e Su-27 por <a href="https://github.com/zuujis-cc0/free-game-assets">Zuujis</a> (CC0) · F-15E, Rafale, Su-57, Gripen, Su-35 e Su-34 por <a href="https://sketchfab.com/bohmerang">bohmerang</a> (CC BY-NC-SA 4.0) · F-117 e F-22 por <a href="https://sketchfab.com/andertan">andertan</a> (CC BY 4.0) · F-16F Block 60 por <a href="https://sketchfab.com/MirzaArrafiERV_45">MirzaArrafiERV_45</a> (CC BY 4.0) · A-10C por <a href="https://sketchfab.com/blarg1">blarg</a> (CC BY 4.0) · Su-30MKK por <a href="https://sketchfab.com/Jeyhun1985">Jeyhun1985</a> (CC BY 4.0) · Su-25 por <a href="https://sketchfab.com/Alexios_Apokaukos">Alexios_Apokaukos</a> (CC BY 4.0) · F/A-18E por <a href="https://sketchfab.com/Jeyhun1985">Jeyhun1985</a> (CC BY 4.0) · F-4E por <a href="https://sketchfab.com/Kenny3D89">Kenny3D89</a> (CC BY 4.0) · A-29 por <a href="https://sketchfab.com/ioai25312">KOG_THORNS</a> (CC BY 4.0) · J-11 por <a href="https://sketchfab.com/Rhine_Lab_Muelsyse">Rhine_Lab_Muelsyse</a> (CC BY 4.0). Modelos genéricos reorientados, simplificados e com trem de pouso desenhado no jogo quando vinham recolhidos. Projeto pessoal, sem fins comerciais.</p>
   </div>
   <div class="card keys" id="keys1"></div>
   <div id="hgStats" class="hgpanel"></div>
@@ -967,7 +970,7 @@ const tracers=new THREE.LineSegments(trG,new THREE.LineBasicMaterial({vertexColo
 function shoot(o,v0,d,spd,owner,spr){const i=bi;bi=(bi+1)%BMAX;const dx=d.x+rnd(-spr,spr),dy=d.y+rnd(-spr,spr),dz=d.z+rnd(-spr,spr);bp[i*3]=o.x;bp[i*3+1]=o.y;bp[i*3+2]=o.z;bv[i*3]=v0.x+dx*spd;bv[i*3+1]=v0.y+dy*spd;bv[i*3+2]=v0.z+dz*spd;bl[i]=2.4;bo[i]=owner;
  const cc=owner===1?[1,.3,.2]:[1,.86,.55];for(let k=0;k<2;k++){trC[i*6+k*3]=cc[0];trC[i*6+k*3+1]=cc[1];trC[i*6+k*3+2]=cc[2]}trG.attributes.color.needsUpdate=true;
  if(Math.random()<.25)emit(FIR,o,v0.x,v0.y,v0.z,.05,1.2,2.6,1,.75,.35,1,0)}
-const MSZ={aim9:[2.9,.064],aim9x:[3,.064],r73:[2.9,.085],magic:[2.75,.08],eir:[2.9,.085],aim7:[3.66,.1],r27:[4,.115],s530:[3.8,.13],erad:[4,.115],aim120:[3.65,.09],aim54:[4,.19],agm:[2.5,.16],gsam:[5.8,.17]};
+const MSZ={maa1:[2.82,.09],agm65e:[2.5,.16],aim9:[2.9,.064],aim9x:[3,.064],r73:[2.9,.085],magic:[2.75,.08],eir:[2.9,.085],aim7:[3.66,.1],r27:[4,.115],s530:[3.8,.13],erad:[4,.115],aim120:[3.65,.09],aim54:[4,.19],agm:[2.5,.16],gsam:[5.8,.17]};
 const MMAT={w:mat(0xe9eae4,{roughness:.4,metalness:.15}),d:mat(0x3b3e41,{roughness:.6}),b:mat(0xc99a2a,{roughness:.6}),g:mat(0x8a958c,{roughness:.5})};
 const plumeMat=new THREE.MeshBasicMaterial({color:lc(0xffb066),transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}),plumeMat2=new THREE.MeshBasicMaterial({color:lc(0xfff4d8),transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
 const glowMat=new THREE.SpriteMaterial({map:softTex,color:0xffc88a,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}),MTPL={},ZN=new V3(0,0,-1);
@@ -981,6 +984,9 @@ function missileModel(type){if(!MTPL[type]){const [L,r]=MSZ[type]||[3,.1],g=new 
 const MDEF={aim9:{burn:2.2,acc:330,dv:700,turn:35,life:22,prox:14,ir:1,voice:'Fox two',min:300,max:9000},aim7:{burn:3.5,acc:260,dv:900,turn:25,life:40,prox:18,semi:1,voice:'Fox one',min:1500,max:26000},
  aim54:{burn:6,acc:230,dv:1150,turn:16,life:80,prox:22,semi:1,voice:'Fox three',min:3500,max:75000},eir:{burn:2,acc:320,dv:650,turn:30,life:18,prox:14,ir:1},erad:{burn:3,acc:260,dv:800,turn:22,life:35,prox:18}};
 MDEF.aim54.arh=1;MDEF.aim54.pitbull=18000;
+Object.assign(MDEF,{maa1:{burn:2.2,acc:320,dv:680,turn:38,life:22,prox:14,ir:1,voice:'Fox two',min:300,max:8000},// MAA-1 Piranha (Brasil, IR)
+ mk84:{bomb:1,ag:1,kg:907,blast:48,dmg:4.5,cda:.09,voice:'Bombs away',min:0,max:9000},// Mk 84, 2000 lb
+ agm65e:{burn:5,acc:200,dv:520,turn:16,life:45,prox:10,ag:1,voice:'Rifle',min:900,max:16000}});// Maverick laser
 Object.assign(MDEF,{agm:{burn:5,acc:200,dv:520,turn:16,life:45,prox:10,ag:1,voice:'Rifle',min:900,max:15000},gsam:{burn:4,acc:320,dv:900,turn:24,life:35,prox:18}});
 Object.assign(MDEF,{aim9x:{burn:2.4,acc:340,dv:750,turn:45,life:24,prox:14,ir:1,voice:'Fox two',min:300,max:10000},
  aim120:{burn:4,acc:260,dv:1000,turn:30,life:60,prox:18,semi:1,arh:1,pitbull:15000,voice:'Fox three',min:1800,max:45000},
@@ -1038,11 +1044,14 @@ const LOAD={// [IR, radar, longo, ar-solo, bomba]
  su30:[WP('r73',2,105,'R-73','R73'),WP('r77',4,175,'R-77','R77'),null,WP('kh59',2,930,'Kh-59M','KH59'),WP('kab500',2,500,'KAB-500L','KAB')],
  f22:[WP('aim9x',2,85,'AIM-9X Sidewinder','9X'),null,WP('aim120d',6,161,'AIM-120D AMRAAM','AMD'),null,WP('gbu39',8,129,'GBU-39 SDB (interna)','SDB')],
  f16e:[WP('aim9',2,86,'AIM-9M Sidewinder','SW'),null,WP('aim120',4,161,'AIM-120C AMRAAM','AM'),WP('agm',4,210,'AGM-65D Maverick','AGM'),WP('gbu12',2,227,'GBU-12 Paveway II','GBU12')],
+ fa18e:[WP('aim9x',2,85,'AIM-9X Sidewinder','9X'),null,WP('aim120',4,161,'AIM-120C AMRAAM','AM'),WP('agm65e',2,293,'AGM-65E Maverick (laser)','AGM'),WP('gbu12',4,227,'GBU-12 Paveway II','GBU12')],
+ f4e:[WP('aim9',4,86,'AIM-9P Sidewinder','SW'),WP('aim7',4,231,'AIM-7F Sparrow','SP'),null,WP('agm',2,210,'AGM-65B Maverick','AGM'),WP('mk84',2,907,'Mk 84 (2000 lb)','MK84')],
+ a29:[WP('maa1',2,89,'MAA-1 Piranha','MAA1'),null,null,null,WP('mk82',4,227,'Mk 82 (bomba burra)','MK82')],
  su25:[WP('r60',2,44,'R-60 Aphid','R60'),null,null,WP('kh25',2,300,'Kh-25ML','KH25'),WP('fab500',4,500,'FAB-500','FAB')]};
 const GUNS={f14:{n:675,rate:100,v:1030,dmg:.075,name:'M61A1 20 mm'},f16:{n:511,rate:100,v:1030,dmg:.075,name:'M61A1 20 mm'},mig29:{n:150,rate:25,v:870,dmg:.22,name:'GSh-30-1 30 mm'},m2000:{n:250,rate:60,v:850,dmg:.2,name:'DEFA 554 30 mm'},
  f15e:{n:512,rate:100,v:1030,dmg:.075,name:'M61A1 20 mm'},rafale:{n:125,rate:41,v:1025,dmg:.22,name:'GIAT 30M791 30 mm'},su57:{n:150,rate:30,v:860,dmg:.22,name:'GSh-30-1 30 mm'},gripen:{n:120,rate:28,v:1025,dmg:.16,name:'BK-27 27 mm'},
  su35:{n:150,rate:25,v:860,dmg:.22,name:'GSh-30-1 30 mm'},su34:{n:180,rate:25,v:860,dmg:.22,name:'GSh-30-1 30 mm'},f117:{n:0,rate:1,v:1000,dmg:0,name:'sem canhão'},a10:{n:1174,rate:65,v:1010,dmg:.35,name:'GAU-8/A Avenger 30 mm'},
- su30:{n:150,rate:25,v:860,dmg:.22,name:'GSh-30-1 30 mm'},f22:{n:480,rate:100,v:1030,dmg:.075,name:'M61A2 20 mm'},su25:{n:250,rate:50,v:870,dmg:.22,name:'GSh-30-2 30 mm'},f16e:{n:511,rate:100,v:1030,dmg:.075,name:'M61A1 20 mm'}};
+ su30:{n:150,rate:25,v:860,dmg:.22,name:'GSh-30-1 30 mm'},f22:{n:480,rate:100,v:1030,dmg:.075,name:'M61A2 20 mm'},su25:{n:250,rate:50,v:870,dmg:.22,name:'GSh-30-2 30 mm'},f16e:{n:511,rate:100,v:1030,dmg:.075,name:'M61A1 20 mm'},fa18e:{n:412,rate:100,v:1030,dmg:.075,name:'M61A2 20 mm'},f4e:{n:639,rate:100,v:1030,dmg:.075,name:'M61A1 20 mm'},a29:{n:400,rate:37,v:890,dmg:.035,name:'2× FN M3P 12,7 mm'}};
 // caças que ainda esperam o modelo 3D: ficha e física prontas, aparecem como "chegando" até o .glb entrar em models/
 const NEWAC={f15e:{name:'F-15E Strike Eagle',vne:800,S:56.5,empty:14300,fuel:5950,mil:158000,ab:101000,CLa:4.0,aSt:.45,cd0:.022,k:.09,gLim:9,fbw:false,roll:3.5,wave:.1,ram:.454,cost:4000},
  rafale:{name:'Rafale M',vne:750,S:45.7,empty:10600,fuel:4700,mil:100000,ab:50000,CLa:3.6,aSt:.5,cd0:.018,k:.11,gLim:9,fbw:true,roll:4.2,naval:true,wave:.266,cost:4500},
@@ -1054,13 +1063,16 @@ const NEWAC={f15e:{name:'F-15E Strike Eagle',vne:800,S:56.5,empty:14300,fuel:595
  a10:{name:'A-10C Thunderbolt II',vne:450,S:47,empty:11321,fuel:4990,mil:80600,ab:0,CLa:5.2,aSt:.4,cd0:.032,k:.06,gLim:7.3,fbw:false,roll:2.6,wave:1,ram:-.935,cost:3000},
  su30:{name:'Su-30MKK Flanker-G',vne:760,S:62,empty:17700,fuel:9400,mil:153000,ab:92000,CLa:4.1,aSt:.55,cd0:.022,k:.09,gLim:9,fbw:true,roll:3.5,wave:.192,cost:6000},
  f22:{name:'F-22A Raptor',vne:800,S:78.04,empty:19700,fuel:8200,mil:232000,ab:80000,CLa:3.9,aSt:.6,cd0:.017,k:.1,gLim:9,fbw:true,roll:4.0,wave:.145,stealth:.1,cost:10000},
+ fa18e:{name:'F/A-18E Super Hornet',vne:750,S:46.45,empty:14550,fuel:6780,mil:115600,ab:80400,CLa:4.2,aSt:.52,cd0:.024,k:.1,gLim:7.5,fbw:true,roll:3.3,wave:.6,naval:true,cost:3500},
+ f4e:{name:'F-4E Phantom II',vne:750,S:49.24,empty:13760,fuel:5950,mil:105600,ab:53600,CLa:3.6,aSt:.4,cd0:.022,k:.12,gLim:7.33,fbw:false,roll:2.6,wave:.1,ram:.6,cost:2200},
+ a29:{name:'A-29 Super Tucano',vne:320,S:19.4,empty:3200,fuel:550,mil:17000,ab:0,CLa:4.8,aSt:.28,cd0:.025,k:.06,gLim:7,fbw:false,roll:2.2,wave:0,ram:-1.2,prop:true,cost:1200},
  f16e:{name:'F-16F Block 60 Desert Falcon',vne:800,S:27.87,empty:10250,fuel:4300,mil:84000,ab:60000,CLa:4.0,aSt:.44,cd0:.021,k:.1,gLim:9,fbw:true,roll:4.2,wave:.465,cost:2500},
  su25:{name:'Su-25 Frogfoot',vne:520,S:30.1,empty:9800,fuel:3000,mil:88000,ab:0,CLa:4.6,aSt:.4,cd0:.035,k:.07,gLim:6.5,fbw:false,roll:2.5,wave:1,ram:-.5,cost:2500}};
 for(const [id,d] of Object.entries(NEWAC))if(!ACFT[id])ACFT[id]=Object.assign({file:'models/'+id+'.glb',scale:1,eye:[6,1],gearH:2.8,sweep:false,naval:false,hudB:12,fl:[[0,0,10]],soon:true},d);
 // velocidades calibradas (ferramenta tools/velocidade.mjs): máxima real em altitude e limite estrutural ao nível do mar
 Object.assign(ACFT.f14,{wave:.239,vne:800});Object.assign(ACFT.f16,{wave:.465,vne:800});Object.assign(ACFT.mig29,{wave:.065,vne:810});Object.assign(ACFT.m2000,{wave:.1,ram:.846,vne:750});
 for(const [id,L] of Object.entries(LOAD))if(ACFT[id]){const a=ACFT[id];a.wpn={aim9:L[0],aim7:L[1],aim54:L[2],agm:L[3],bomb:L[4]};a.gun=GUNS[id]}
-setTimeout(()=>{SEATS.f15e='ACES II';SEATS.rafale='Martin-Baker Mk 16F';SEATS.su57='Zvezda K-36D-5';SEATS.gripen='Martin-Baker Mk 10LS';SEATS.su35=SEATS.su34=SEATS.su30='Zvezda K-36D-3.5';SEATS.f117='ACES II';SEATS.a10='ACES II';SEATS.f22='ACES II';SEATS.su25='Zvezda K-36L';SEATS.f16e='ACES II'},0);
+setTimeout(()=>{SEATS.f15e='ACES II';SEATS.rafale='Martin-Baker Mk 16F';SEATS.su57='Zvezda K-36D-5';SEATS.gripen='Martin-Baker Mk 10LS';SEATS.su35=SEATS.su34=SEATS.su30='Zvezda K-36D-3.5';SEATS.f117='ACES II';SEATS.a10='ACES II';SEATS.f22='ACES II';SEATS.su25='Zvezda K-36L';SEATS.f16e='ACES II';SEATS.fa18e='Martin-Baker SJU-17 (NACES)';SEATS.f4e='Martin-Baker Mk H7';SEATS.a29='Martin-Baker Mk 10LCX'},0);
 // modelos que já chegaram (medidos com tools/medir-modelo.mjs): escala pelo comprimento real, olho do piloto, altura do trem, bocais
 const MODELS={f15e:{scale:.1001,eye:[9.45,1.35],gearH:3.65,fl:[[-.72,-.7,16.8],[.72,-.7,16.8]],rio:true},
  rafale:{scale:.0978,eye:[6.43,.96],gearH:3.38,fl:[[-.55,-.55,13.2],[.55,-.55,13.2]]},
@@ -1076,6 +1088,9 @@ Object.assign(MODELS,{
  f22:{scale:1.5457,eye:[-4.15,1.3],gearH:4.05,fl:[[-.75,-1.3,14.9],[.75,-1.3,14.9]],pgear:{gy:-2.75,w:[[-5.4,0,-.9,.3,.18],[-11.2,-1.6,-1.0,.4,.24],[-11.2,1.6,-1.0,.4,.24]]}},
  a10:{scale:.9635,eye:[4.6,3.15],gearH:3.3,fl:[[-1.55,.25,9.6],[1.55,.25,9.6]],gcut:{y:1.6,b:[[-2.2,0,2.0,3.5],[3.4,6.0,0,.6]]}},
  su25:{scale:1.3028,eye:[3.55,2.8],gearH:2.91,fl:[[-.9,-1.4,11],[.9,-1.4,11]]},
+ fa18e:{scale:.9957,eye:[4.5,1.35],gearH:3.23,fl:[[-.55,-.45,13.6],[.55,-.45,13.6]],pgear:{gy:-1.88,w:[[5.0,0,-.2,.3,.18,2],[-.6,-1.55,-.35,.42,.26],[-.6,1.55,-.35,.42,.26]]}},
+ f4e:{scale:.9567,eye:[4.7,3.4],gearH:3.4,fl:[[-.6,-1.8,10.2],[.6,-1.8,10.2]],rio:true,gcut:{y:1.15,b:[[-2.7,-.9,2.1,3.2],[4.5,6.1,0,.5]]}},
+ a29:{scale:1.1617,eye:[2.25,1.68],gearH:2.46,fl:[]},
  j11:{scale:.9545,eye:[3.3,0],gearH:3,fl:[[-1.45,-.2,10.8],[1.45,-.2,10.8]],enemyOnly:true,name:'J-11B Flanker',file:'models/j11.glb',sweep:false}});
 for(const [id,m] of Object.entries(MODELS))Object.assign(ACFT[id]||(ACFT[id]={}),m,{soon:false});
 const playable=()=>Object.keys(ACFT).filter(id=>!ACFT[id].soon&&!ACFT[id].enemyOnly);
@@ -1455,7 +1470,7 @@ function pbHUD(c){const b=PB.b;c.font='600 15px "Share Tech Mono",monospace';c.t
  L.forEach((t,i)=>t&&c.fillText(t,16,H-22-(L.length-1-i)*22));c.shadowBlur=0}
 
 /* ================= esquadrilha (6 alas do mesmo caça do jogador) ================= */
-const AL=[],FR=[],ALLY_CS={f14:'Felino',f16:'Víbora',mig29:'Falcão',m2000:'Mistral',f15e:'Águia',rafale:'Tufão',su57:'Fantasma',gripen:'Grifo',su35:'Urso',su34:'Pato',f117:'Sombra',a10:'Javali',su30:'Dragão',f22:'Raptor',su25:'Gralha',f16e:'Sabre'},FORM=[[1,0,1],[-1,0,1],[2,.15,2],[-2,.15,2],[3,-.15,3],[-3,-.15,3]],WCMD={cover:'COBRIR',attack:'ATACAR',disperse:'DISPERSAR'};
+const AL=[],FR=[],ALLY_CS={f14:'Felino',f16:'Víbora',mig29:'Falcão',m2000:'Mistral',f15e:'Águia',rafale:'Tufão',su57:'Fantasma',gripen:'Grifo',su35:'Urso',su34:'Pato',f117:'Sombra',a10:'Javali',su30:'Dragão',f22:'Raptor',su25:'Gralha',f16e:'Sabre',fa18e:'Vespa',f4e:'Rino',a29:'Tucano'},FORM=[[1,0,1],[-1,0,1],[2,.15,2],[-2,.15,2],[3,-.15,3],[-3,-.15,3]],WCMD={cover:'COBRIR',attack:'ATACAR',disperse:'DISPERSAR'};
 const allyDot=new THREE.SpriteMaterial({map:softTex,color:0x58c8ff,sizeAttenuation:false,transparent:true,depthWrite:false,opacity:.9});
 const ALLY_FL=new THREE.MeshBasicMaterial({color:lc(0xff9548),transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
 function allySay(a,txt,cls=''){if(a)say(a.cs+': '+txt,cls)}

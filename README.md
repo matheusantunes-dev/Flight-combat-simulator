@@ -152,6 +152,7 @@ Observações honestas:
 - F-15E, Rafale M, Su-57, Gripen, Su-35 e Su-34: bohmerang, **CC BY-NC-SA 4.0**.
 - F-117A e F-22A: andertan, **CC BY 4.0**. F-16F Block 60: MirzaArrafiERV_45, **CC BY 4.0**.
 - A-10C: blarg, **CC BY 4.0** (bombas do modelo removidas). Su-30MKK: Jeyhun1985, **CC BY 4.0**. Su-25: Alexios_Apokaukos, **CC BY 4.0**.
+- F/A-18E Super Hornet: Jeyhun1985, **CC BY 4.0**. F-4E Phantom II: Kenny3D89, **CC BY 4.0** (canopis, que vieram abertos, removidos). A-29 Super Tucano: KOG_THORNS, **CC BY 4.0** (malha de colisão removida).
 - J-11B (usado como Flanker inimigo): Rhine_Lab_Muelsyse, **CC BY 4.0**.
 - Alterações nos modelos CC BY: reorientados (nariz em +X), simplificados, texturas recomprimidas; F-117, F-22 e Su-30 ganham trem de pouso procedural no jogo (os modelos vieram com o trem recolhido); no F-16F e no A-10 o trem, que veio fundido na fuselagem, é recortado para recolher em voo.
 
