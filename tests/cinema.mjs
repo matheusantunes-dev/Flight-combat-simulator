@@ -78,6 +78,22 @@ const vx = await p.evaluate(() => { const t = __tomcat, P = t.P; t.VOX.og = t.VO
 ok.vozOverG = vx.og1 > 3 && vx.og2 < vx.og1;
 ok.vozPullUp = vx.pu > 3;
 
+// 6) botões de toque (celular não tem F2/F6/F3): a linha CINE liga as mesmas câmeras
+await start('f16', 'assist');
+const tap = (id) => p.evaluate((id) => { const el = document.getElementById(id);
+  for (const t of ['pointerdown', 'pointerup']) el.dispatchEvent(new PointerEvent(t, { bubbles: true, pointerId: 1, isPrimary: true })); }, id);
+const st = () => p.evaluate(() => ({ fby: __tomcat.FBY.on, mcam: __tomcat.MCAM.on, rpl: __tomcat.RPL.on, row: !document.getElementById('tCineRow').classList.contains('hide'), onCine: document.getElementById('tCine').classList.contains('on') }));
+await p.evaluate(() => { const t = __tomcat, P = t.P; __tomcat.TOUCH.ui = true; document.getElementById('tc').classList.remove('hide'); P.pos.set(0, 4000, -30000); P.vel.set(0, 0, -280); t.RPL.n = 0; t.simc(2); });
+await tap('tCine'); const s1 = await st();
+await tap('tFby'); const s2 = await st();
+await tap('tFby'); const s3 = await st();
+await tap('tRpl'); const s4 = await st();
+await tap('tRpl'); const s5 = await st();
+ok.toqueAbreLinhaCine = s1.row;
+ok.toqueLigaFlyby = s2.fby && s2.onCine;
+ok.toqueDesligaFlyby = !s3.fby;
+ok.toqueReplay = s4.rpl && !s5.rpl;
+
 ok.semErros = errs.length === 0;
-console.log(JSON.stringify(ok), JSON.stringify({ fb, mc, rp, vp, vx }).slice(0, 700), errs.slice(0, 3)); await b.close();
+console.log(JSON.stringify(ok), JSON.stringify({ fb, mc, rp, vp, vx, s1, s2, s4 }).slice(0, 700), errs.slice(0, 3)); await b.close();
 if (Object.values(ok).every(Boolean)) console.log('OK: câmeras de cinema e áudio passaram'); else { console.log('FALHOU'); process.exit(1); }

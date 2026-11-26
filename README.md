@@ -19,7 +19,7 @@ Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fc
 
 ## Câmeras de cinema, replay e som de fora
 
-Teclas: **F2** fly-by · **F6** câmera do míssil · **F3** replay (F é manete, como antes).
+Teclas: **F2** fly-by · **F6** câmera do míssil · **F3** replay (F é manete, como antes). No **celular**, o botão **CINE** (ao lado de CAM) abre a linha com FLY-BY · MÍSSIL · REPLAY.
 
 - **Fly-by (F2):** a câmera para no ar ~320 m à frente e o avião passa raspando por ela, como o F4 do DCS. Quando você se afasta muito ela se reposiciona sozinha pra te dar outra passagem.
 - **Doppler de verdade:** nas câmeras externas o som usa `f' = f·c/(c+vr)` — agudo quando o avião vem, grave quando passa — e o volume cai com a distância. Vale para o motor sintetizado e para as camadas de vento.
