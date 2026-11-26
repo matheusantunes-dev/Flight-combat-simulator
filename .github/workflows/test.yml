@@ -51,3 +51,5 @@ jobs:
         run: node tests/camera.mjs
       - name: Hélice do A-29 (gira e vira disco)
         run: node tests/helice.mjs
+      - name: Sons dos motores (jato, turboélice, pistão e gravação própria)
+        run: node tests/sons.mjs
