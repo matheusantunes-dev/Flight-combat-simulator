@@ -78,7 +78,7 @@ body.touch #radio{bottom:auto;top:40px;width:min(470px,60vw)}body.touch #rlog{ma
 .goBar{position:sticky;bottom:0;margin:12px -24px -22px;padding:12px 24px 14px;background:linear-gradient(180deg,rgba(14,20,22,0),rgba(14,20,22,.96) 30%);border-radius:0 0 14px 14px;z-index:2}.goBar .go{width:100%;margin:0}
 #pause{align-items:center}#pause .main{order:-1}#pause .keys{max-height:calc(100dvh - 40px);overflow:auto}
 #thrMil::after{right:auto;left:5px;top:-15px}
-#mp{background:rgba(5,8,10,.7);justify-content:center}.mpcard{width:min(480px,100%)}.mph{display:flex;align-items:center;justify-content:space-between}.mph h2{margin:0;font-size:28px}.mph .x{all:unset;cursor:pointer;font-size:20px;padding:4px 8px}
+#mp{background:rgba(5,8,10,.7);justify-content:center}#cust{background:rgba(5,8,10,.72);justify-content:center}.camed{margin-top:12px}.camgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.camgrid .btn{margin:0;padding:8px 4px;font-size:13px}#camReset{font-size:13px;padding:8px 10px;flex:0 0 auto}.camed .mprow{flex-wrap:wrap}.camed p.sub{font-size:12px}#cust select,#cust input[type=number]{background:#0c1418;color:#cfe;border:1px solid #2a3a40;border-radius:8px;padding:4px 6px}#custOpen{margin-top:8px;width:100%}#custList button{margin-left:8px}.mpcard{width:min(480px,100%)}.mph{display:flex;align-items:center;justify-content:space-between}.mph h2{margin:0;font-size:28px}.mph .x{all:unset;cursor:pointer;font-size:20px;padding:4px 8px}
 .mprow{display:flex;gap:8px;align-items:center}.mprow .btn{flex:1;margin-top:10px}.mpcode{text-transform:uppercase;letter-spacing:.2em;font-family:'Share Tech Mono',monospace;margin-top:10px}.mpcodebox{margin-top:12px;font-size:15px;color:var(--muted)}.mpcodebox b{font:700 30px 'Share Tech Mono',monospace;color:var(--hud);letter-spacing:.15em;flex:1}
 .mplist{margin:4px 0 0;padding:0;list-style:none}.mplist li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.mplist li span{color:var(--muted);font-size:13px}
 .mpgo{background:rgba(140,255,170,.12);color:var(--hud);border:1px solid rgba(140,255,170,.5);font-size:16px;margin-top:8px!important;padding:10px!important}#mpVoice.on{background:#c0392b;color:#fff}
@@ -241,13 +241,17 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
       <button data-v="su34"><b>Su-34 Fullback</b><span>Bombardeiro, Kh-59M, KAB-250</span></button>
       <button data-v="su35"><b>Su-35S Flanker-E</b><span>Supermanobrável, R-37M</span></button>
       <button data-v="su57"><b>Su-57 Felon</b><span>Furtivo, R-74M, R-37M</span></button>
-      <button data-v="f16e"><b>F-16E Block 60</b><span>Desert Falcon, CFT, AMRAAM, 4 Maverick</span></button>
+      <button data-v="f16e"><b>F-16F Block 60</b><span>Dois lugares, CFT, AMRAAM, 4 Maverick</span></button>
       <button data-v="a10"><b>A-10C Warthog</b><span>GAU-8 de 30 mm, blindado, Maverick, SDB</span></button>
       <button data-v="su25"><b>Su-25 Frogfoot</b><span>Apoio aéreo, Kh-25ML, FAB-500</span></button>
       <button data-v="f117"><b>F-117A Nighthawk</b><span>Furtivo subsônico, 2 GBU-27</span></button>
       <button data-v="su30"><b>Su-30MKK Flanker-G</b><span>Dois lugares, Kh-59M, R-77</span></button>
       <button data-v="f22"><b>F-22A Raptor</b><span>Furtivo, supercruzeiro, 6 AIM-120D</span></button>
+      <button data-v="fa18e"><b>F/A-18E Super Hornet</b><span>Naval, pousa no porta-aviões, AGM-65E</span></button>
+      <button data-v="f4e"><b>F-4E Phantom II</b><span>Clássico Mach 2, Sparrow, Mk 84</span></button>
+      <button data-v="a29"><b>A-29 Super Tucano</b><span>Turboélice da FAB, MAA-1, metralhadoras .50</span></button>
     </div>
+    <button class="btn alt" id="custOpen" type="button">＋ Avião por link (Sketchfab ou .glb)</button>
     <p class="sub soon" id="soonLine"></p>
     <div class="lbl">Campanha 1 · combate aéreo</div>
     <div class="opts mis" data-k="mission">
@@ -298,7 +302,7 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
     </section>
     <div class="goBar"><p id="selLine"></p><div class="goRow"><button id="go" class="go">DECOLAR</button><button id="mpOpen" class="go mpgo" type="button">MULTIPLAYER<small>até 6 pilotos</small></button></div></div>
     <p class="best" id="loadst">Carregando modelos 3D...</p><p class="best">Recorde: <b id="bestv">0</b> pontos · toque, teclado ou gamepad · toque para ativar o som</p>
-    <p class="best cred">Modelos: <a href="https://sketchfab.com/3d-models/f-14-tomcat-fighter-jet-free-497f77c311b5411d9b567d8707a81c33">F-14</a>, <a href="https://sketchfab.com/3d-models/f-16-fighting-falcon-fighter-jet-free-f0b00989e5634764848ef2c235c64db5">F-16</a>, <a href="https://sketchfab.com/3d-models/mig-29-fighter-jet-free-0a21787096244220b246ec8747e7b09c">MiG-29</a> e <a href="https://sketchfab.com/3d-models/dassault-mirage-2000-fighter-jet-free-aca93654c4684c5282e723c5b2999f67">Mirage 2000</a> por bohmerang (CC BY-NC-SA 4.0; asas do F-14 separadas, texturas recomprimidas e cockpits adaptados nesta versão) · MiG-29 e Su-27 por <a href="https://github.com/zuujis-cc0/free-game-assets">Zuujis</a> (CC0) · F-15E, Rafale, Su-57, Gripen, Su-35 e Su-34 por <a href="https://sketchfab.com/bohmerang">bohmerang</a> (CC BY-NC-SA 4.0) · F-117, F-22 e F-16E/F por <a href="https://sketchfab.com/andertan">andertan</a> (CC BY 4.0) · A-10C e Su-30MKK por <a href="https://sketchfab.com/Jeyhun1985">Jeyhun1985</a> (CC BY 4.0) · Su-25 por <a href="https://sketchfab.com/Alexios_Apokaukos">Alexios_Apokaukos</a> (CC BY 4.0) · J-11 por <a href="https://sketchfab.com/Rhine_Lab_Muelsyse">Rhine_Lab_Muelsyse</a> (CC BY 4.0). Modelos genéricos reorientados, simplificados e com trem de pouso desenhado no jogo quando vinham recolhidos. Projeto pessoal, sem fins comerciais.</p>
+    <p class="best cred">Modelos: <a href="https://sketchfab.com/3d-models/f-14-tomcat-fighter-jet-free-497f77c311b5411d9b567d8707a81c33">F-14</a>, <a href="https://sketchfab.com/3d-models/f-16-fighting-falcon-fighter-jet-free-f0b00989e5634764848ef2c235c64db5">F-16</a>, <a href="https://sketchfab.com/3d-models/mig-29-fighter-jet-free-0a21787096244220b246ec8747e7b09c">MiG-29</a> e <a href="https://sketchfab.com/3d-models/dassault-mirage-2000-fighter-jet-free-aca93654c4684c5282e723c5b2999f67">Mirage 2000</a> por bohmerang (CC BY-NC-SA 4.0; asas do F-14 separadas, texturas recomprimidas e cockpits adaptados nesta versão) · MiG-29 e Su-27 por <a href="https://github.com/zuujis-cc0/free-game-assets">Zuujis</a> (CC0) · F-15E, Rafale, Su-57, Gripen, Su-35 e Su-34 por <a href="https://sketchfab.com/bohmerang">bohmerang</a> (CC BY-NC-SA 4.0) · F-117 e F-22 por <a href="https://sketchfab.com/andertan">andertan</a> (CC BY 4.0) · F-16F Block 60 por <a href="https://sketchfab.com/MirzaArrafiERV_45">MirzaArrafiERV_45</a> (CC BY 4.0) · A-10C por <a href="https://sketchfab.com/blarg1">blarg</a> (CC BY 4.0) · Su-30MKK por <a href="https://sketchfab.com/Jeyhun1985">Jeyhun1985</a> (CC BY 4.0) · Su-25 por <a href="https://sketchfab.com/Alexios_Apokaukos">Alexios_Apokaukos</a> (CC BY 4.0) · F/A-18E por <a href="https://sketchfab.com/Jeyhun1985">Jeyhun1985</a> (CC BY 4.0) · F-4E por <a href="https://sketchfab.com/Kenny3D89">Kenny3D89</a> (CC BY 4.0) · A-29 por <a href="https://sketchfab.com/ioai25312">KOG_THORNS</a> (CC BY 4.0) · J-11 por <a href="https://sketchfab.com/Rhine_Lab_Muelsyse">Rhine_Lab_Muelsyse</a> (CC BY 4.0). Modelos genéricos reorientados, simplificados e com trem de pouso desenhado no jogo quando vinham recolhidos. Projeto pessoal, sem fins comerciais.</p>
   </div>
   <div class="card keys" id="keys1"></div>
   <div id="hgStats" class="hgpanel"></div>
@@ -355,10 +359,33 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
 <div id="mpBoard" class="hide"><h3>Placar</h3><ol></ol><p class="note"></p></div>
 
 <div id="mlChip" class="hide" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:30;background:rgba(8,14,20,.78);color:#cfe;border:1px solid rgba(140,220,200,.35);border-radius:14px;padding:5px 12px;font:12px system-ui,sans-serif;pointer-events:none;white-space:nowrap"></div>
+<div id="cust" class="ov hide"><div class="card mpcard">
+  <div class="mph"><h2>Avião por link</h2><button class="x" id="custClose" aria-label="Fechar">✕</button></div>
+  <p class="sub">Cole o link de um modelo do <b>Sketchfab</b> (precisa ser baixável) ou de um arquivo <b>.glb</b>. Ele voa com a física, as armas e o assento do caça que você escolher como base.</p>
+  <div class="lbl">Link do modelo</div><input id="custUrl" class="pname" placeholder="https://sketchfab.com/3d-models/...  ou  https://.../aviao.glb" autocomplete="off">
+  <div class="lbl">ou um arquivo do seu aparelho</div><input id="custFile" type="file" accept=".glb,.zip,model/gltf-binary">
+  <div id="custTokBox"><div class="lbl">Token da API do Sketchfab (só para links do Sketchfab)</div><input id="custTok" class="pname" type="password" placeholder="Sketchfab → Settings → Password &amp; API → API token" autocomplete="off">
+  <p class="sub">O token fica só neste aparelho e só é enviado para o próprio Sketchfab.</p></div>
+  <div class="mprow"><label class="sub">Caça base <select id="custBase"></select></label><label class="sub">Comprimento real (m) <input id="custLen" type="number" min="4" max="80" step=".1" style="width:5.5em"></label></div>
+  <div class="mprow"><label class="sub">Nome <input id="custName" class="pname" maxlength="32" placeholder="Ex.: F-35C Lightning II"></label></div>
+  <div class="mprow"><label class="sub"><input type="checkbox" id="custGear"> o modelo veio sem trem de pouso (desenhar um)</label></div>
+  <div class="mprow"><button class="btn" id="custGo" type="button">Baixar e colocar no hangar</button></div>
+  <p class="sub" id="custMsg"></p>
+  <div id="custEdit" class="hide"><h3>Ajuste fino</h3>
+   <div class="mprow"><button class="btn alt" id="custRot" type="button">Girar 90°</button><button class="btn alt" id="custFlip" type="button">Inverter nariz</button></div>
+   <div class="mprow"><label class="sub">Olho: frente/trás (m) <input id="custEx" type="number" step=".05" style="width:5em"></label><label class="sub">altura (m) <input id="custEy" type="number" step=".05" style="width:5em"></label><button class="btn alt" id="custApply" type="button">Aplicar</button></div>
+  </div>
+  <h3>Seus aviões</h3><div id="custList" class="sub"></div>
+</div></div>
 <div id="pause" class="ov hide">
   <div class="card keys" id="keys2"></div>
   <div class="card main"><h1>PAUSA</h1><p class="sub">O RIO aproveitou para tomar um café kkk</p>
-    <div class="btns"><button class="btn" id="resume">Continuar</button><button class="btn alt" id="tomenu1">Menu</button></div><button class="btn alt ctlbtn" id="ctlOpen2" type="button">Controles · Joystick · VR</button></div>
+    <div class="btns"><button class="btn" id="resume">Continuar</button><button class="btn alt" id="tomenu1">Menu</button></div><button class="btn alt ctlbtn" id="ctlOpen2" type="button">Controles · Joystick · VR</button>
+    <div class="camed"><div class="lbl">Câmera do cockpit deste avião</div>
+     <div class="camgrid"><button class="btn alt" data-cam="0,0,0,1">⤒ Sobe</button><button class="btn alt" data-cam="1,0,0">▲ Frente</button><button class="btn alt" data-cam="0,0,0,-1">⤓ Desce</button>
+      <button class="btn alt" data-cam="0,0,-1">◀ Esq.</button><button class="btn alt" data-cam="-1,0,0">▼ Trás</button><button class="btn alt" data-cam="0,0,1">Dir. ▶</button></div>
+     <div class="mprow"><button class="btn alt" id="camReset" type="button">Voltar ao padrão</button><span class="sub" id="camInfo"></span></div>
+     <p class="sub">No PC, sem pausar: Ctrl+Shift+↑↓ frente/trás, Ctrl+Shift+PgUp/PgDn sobe/desce, Ctrl+Shift+←→ lado, Ctrl+Shift+Backspace volta ao padrão. Fica salvo para cada avião.</p></div></div>
 </div>
 
 <div id="over" class="ov hide">
@@ -799,7 +826,7 @@ function rearm(){P.fuel=A.fuel;P.gun=A.gun.n;P.flr=P.chf=30;P.hp=100;for(const k
 const K={},IN={pitch:0,roll:0,yaw:0};let fireHeld=false,gpPrev=[];
 let view='cock',headYaw=0,headPitch=0,lookYaw=0,lookPitch=0,dragging=false,fovT=65,extDist=34,extYaw=0,extPitch=-.12;
 const keyBlock=['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab','Digit1','Digit2','Digit3','Digit4','Digit5','Digit6'];
-addEventListener('keydown',e=>{if(JOY.cap&&e.code==='Escape'){JOY.cap=null;joyUI('Cancelado.');return}if(e.code==='KeyC'&&e.altKey&&!e.ctrlKey&&!e.metaKey){e.preventDefault();if(!e.repeat)mlToggle();return}if(e.code==='Escape'&&(ML.on||performance.now()-ML.off<400))return;/* Esc só solta o mouse, não pausa */if(G.kcam){G.kcam=null;return}if(e.code==='Tab'&&NET.match&&!(e.target&&e.target.tagName==='INPUT')){e.preventDefault();mpBoardShow(true);return}if(e.target&&e.target.id==='rin'){if(e.code==='Escape')radioOpen(false);return}if(e.code==='Enter'&&G.mode==='play'){e.preventDefault();radioOpen(true);return}if(G.mode==='play'&&keyBlock.includes(e.code))e.preventDefault();if(e.code==='KeyE'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(!e.repeat&&G.mode==='play'){initAudio();ejectPress()}return}if(e.code==='KeyE'&&(e.shiftKey||PB.on)&&G.mode==='play'){if(!e.repeat)pbAction();return}if(e.repeat)return;K[e.code]=true;initAudio();onKey(e.code)});
+addEventListener('keydown',e=>{if(JOY.cap&&e.code==='Escape'){JOY.cap=null;joyUI('Cancelado.');return}if(e.ctrlKey&&e.shiftKey&&G.mode==='play'){const M={ArrowUp:[1,0,0],ArrowDown:[-1,0,0],ArrowLeft:[0,0,-1],ArrowRight:[0,0,1],PageUp:[0,0,0,1],PageDown:[0,0,0,-1]}[e.code];if(M||e.code==='Backspace'){e.preventDefault();if(M)camOffMove(M);else camOffReset();return}}if(e.code==='KeyC'&&e.altKey&&!e.ctrlKey&&!e.metaKey){e.preventDefault();if(!e.repeat)mlToggle();return}if(e.code==='Escape'&&(ML.on||performance.now()-ML.off<400))return;/* Esc só solta o mouse, não pausa */if(G.kcam){G.kcam=null;return}if(e.code==='Tab'&&NET.match&&!(e.target&&e.target.tagName==='INPUT')){e.preventDefault();mpBoardShow(true);return}if(e.target&&e.target.id==='rin'){if(e.code==='Escape')radioOpen(false);return}if(e.code==='Enter'&&G.mode==='play'){e.preventDefault();radioOpen(true);return}if(G.mode==='play'&&keyBlock.includes(e.code))e.preventDefault();if(e.code==='KeyE'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(!e.repeat&&G.mode==='play'){initAudio();ejectPress()}return}if(e.code==='KeyE'&&(e.shiftKey||PB.on)&&G.mode==='play'){if(!e.repeat)pbAction();return}if(e.repeat)return;K[e.code]=true;initAudio();onKey(e.code)});
 addEventListener('keyup',e=>{if(e.code==='Tab')mpBoardShow(false);K[e.code]=false});
 addEventListener('blur',()=>{for(const k in K)K[k]=false;if(G.mode==='play'&&!G.paused)setPause(true)});
 let lpx=0,lpy=0;glc.addEventListener('pointerdown',e=>{if(e.button===1||ML.on)return;dragging=true;lpx=e.clientX;lpy=e.clientY;glc.setPointerCapture(e.pointerId);initAudio()});
@@ -967,7 +994,7 @@ const tracers=new THREE.LineSegments(trG,new THREE.LineBasicMaterial({vertexColo
 function shoot(o,v0,d,spd,owner,spr){const i=bi;bi=(bi+1)%BMAX;const dx=d.x+rnd(-spr,spr),dy=d.y+rnd(-spr,spr),dz=d.z+rnd(-spr,spr);bp[i*3]=o.x;bp[i*3+1]=o.y;bp[i*3+2]=o.z;bv[i*3]=v0.x+dx*spd;bv[i*3+1]=v0.y+dy*spd;bv[i*3+2]=v0.z+dz*spd;bl[i]=2.4;bo[i]=owner;
  const cc=owner===1?[1,.3,.2]:[1,.86,.55];for(let k=0;k<2;k++){trC[i*6+k*3]=cc[0];trC[i*6+k*3+1]=cc[1];trC[i*6+k*3+2]=cc[2]}trG.attributes.color.needsUpdate=true;
  if(Math.random()<.25)emit(FIR,o,v0.x,v0.y,v0.z,.05,1.2,2.6,1,.75,.35,1,0)}
-const MSZ={aim9:[2.9,.064],aim9x:[3,.064],r73:[2.9,.085],magic:[2.75,.08],eir:[2.9,.085],aim7:[3.66,.1],r27:[4,.115],s530:[3.8,.13],erad:[4,.115],aim120:[3.65,.09],aim54:[4,.19],agm:[2.5,.16],gsam:[5.8,.17]};
+const MSZ={maa1:[2.82,.09],agm65e:[2.5,.16],aim9:[2.9,.064],aim9x:[3,.064],r73:[2.9,.085],magic:[2.75,.08],eir:[2.9,.085],aim7:[3.66,.1],r27:[4,.115],s530:[3.8,.13],erad:[4,.115],aim120:[3.65,.09],aim54:[4,.19],agm:[2.5,.16],gsam:[5.8,.17]};
 const MMAT={w:mat(0xe9eae4,{roughness:.4,metalness:.15}),d:mat(0x3b3e41,{roughness:.6}),b:mat(0xc99a2a,{roughness:.6}),g:mat(0x8a958c,{roughness:.5})};
 const plumeMat=new THREE.MeshBasicMaterial({color:lc(0xffb066),transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}),plumeMat2=new THREE.MeshBasicMaterial({color:lc(0xfff4d8),transparent:true,opacity:.95,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
 const glowMat=new THREE.SpriteMaterial({map:softTex,color:0xffc88a,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}),MTPL={},ZN=new V3(0,0,-1);
@@ -981,6 +1008,9 @@ function missileModel(type){if(!MTPL[type]){const [L,r]=MSZ[type]||[3,.1],g=new 
 const MDEF={aim9:{burn:2.2,acc:330,dv:700,turn:35,life:22,prox:14,ir:1,voice:'Fox two',min:300,max:9000},aim7:{burn:3.5,acc:260,dv:900,turn:25,life:40,prox:18,semi:1,voice:'Fox one',min:1500,max:26000},
  aim54:{burn:6,acc:230,dv:1150,turn:16,life:80,prox:22,semi:1,voice:'Fox three',min:3500,max:75000},eir:{burn:2,acc:320,dv:650,turn:30,life:18,prox:14,ir:1},erad:{burn:3,acc:260,dv:800,turn:22,life:35,prox:18}};
 MDEF.aim54.arh=1;MDEF.aim54.pitbull=18000;
+Object.assign(MDEF,{maa1:{burn:2.2,acc:320,dv:680,turn:38,life:22,prox:14,ir:1,voice:'Fox two',min:300,max:8000},// MAA-1 Piranha (Brasil, IR)
+ mk84:{bomb:1,ag:1,kg:907,blast:48,dmg:4.5,cda:.09,voice:'Bombs away',min:0,max:9000},// Mk 84, 2000 lb
+ agm65e:{burn:5,acc:200,dv:520,turn:16,life:45,prox:10,ag:1,voice:'Rifle',min:900,max:16000}});// Maverick laser
 Object.assign(MDEF,{agm:{burn:5,acc:200,dv:520,turn:16,life:45,prox:10,ag:1,voice:'Rifle',min:900,max:15000},gsam:{burn:4,acc:320,dv:900,turn:24,life:35,prox:18}});
 Object.assign(MDEF,{aim9x:{burn:2.4,acc:340,dv:750,turn:45,life:24,prox:14,ir:1,voice:'Fox two',min:300,max:10000},
  aim120:{burn:4,acc:260,dv:1000,turn:30,life:60,prox:18,semi:1,arh:1,pitbull:15000,voice:'Fox three',min:1800,max:45000},
@@ -1038,11 +1068,14 @@ const LOAD={// [IR, radar, longo, ar-solo, bomba]
  su30:[WP('r73',2,105,'R-73','R73'),WP('r77',4,175,'R-77','R77'),null,WP('kh59',2,930,'Kh-59M','KH59'),WP('kab500',2,500,'KAB-500L','KAB')],
  f22:[WP('aim9x',2,85,'AIM-9X Sidewinder','9X'),null,WP('aim120d',6,161,'AIM-120D AMRAAM','AMD'),null,WP('gbu39',8,129,'GBU-39 SDB (interna)','SDB')],
  f16e:[WP('aim9',2,86,'AIM-9M Sidewinder','SW'),null,WP('aim120',4,161,'AIM-120C AMRAAM','AM'),WP('agm',4,210,'AGM-65D Maverick','AGM'),WP('gbu12',2,227,'GBU-12 Paveway II','GBU12')],
+ fa18e:[WP('aim9x',2,85,'AIM-9X Sidewinder','9X'),null,WP('aim120',4,161,'AIM-120C AMRAAM','AM'),WP('agm65e',2,293,'AGM-65E Maverick (laser)','AGM'),WP('gbu12',4,227,'GBU-12 Paveway II','GBU12')],
+ f4e:[WP('aim9',4,86,'AIM-9P Sidewinder','SW'),WP('aim7',4,231,'AIM-7F Sparrow','SP'),null,WP('agm',2,210,'AGM-65B Maverick','AGM'),WP('mk84',2,907,'Mk 84 (2000 lb)','MK84')],
+ a29:[WP('maa1',2,89,'MAA-1 Piranha','MAA1'),null,null,null,WP('mk82',4,227,'Mk 82 (bomba burra)','MK82')],
  su25:[WP('r60',2,44,'R-60 Aphid','R60'),null,null,WP('kh25',2,300,'Kh-25ML','KH25'),WP('fab500',4,500,'FAB-500','FAB')]};
 const GUNS={f14:{n:675,rate:100,v:1030,dmg:.075,name:'M61A1 20 mm'},f16:{n:511,rate:100,v:1030,dmg:.075,name:'M61A1 20 mm'},mig29:{n:150,rate:25,v:870,dmg:.22,name:'GSh-30-1 30 mm'},m2000:{n:250,rate:60,v:850,dmg:.2,name:'DEFA 554 30 mm'},
  f15e:{n:512,rate:100,v:1030,dmg:.075,name:'M61A1 20 mm'},rafale:{n:125,rate:41,v:1025,dmg:.22,name:'GIAT 30M791 30 mm'},su57:{n:150,rate:30,v:860,dmg:.22,name:'GSh-30-1 30 mm'},gripen:{n:120,rate:28,v:1025,dmg:.16,name:'BK-27 27 mm'},
  su35:{n:150,rate:25,v:860,dmg:.22,name:'GSh-30-1 30 mm'},su34:{n:180,rate:25,v:860,dmg:.22,name:'GSh-30-1 30 mm'},f117:{n:0,rate:1,v:1000,dmg:0,name:'sem canhão'},a10:{n:1174,rate:65,v:1010,dmg:.35,name:'GAU-8/A Avenger 30 mm'},
- su30:{n:150,rate:25,v:860,dmg:.22,name:'GSh-30-1 30 mm'},f22:{n:480,rate:100,v:1030,dmg:.075,name:'M61A2 20 mm'},su25:{n:250,rate:50,v:870,dmg:.22,name:'GSh-30-2 30 mm'},f16e:{n:511,rate:100,v:1030,dmg:.075,name:'M61A1 20 mm'}};
+ su30:{n:150,rate:25,v:860,dmg:.22,name:'GSh-30-1 30 mm'},f22:{n:480,rate:100,v:1030,dmg:.075,name:'M61A2 20 mm'},su25:{n:250,rate:50,v:870,dmg:.22,name:'GSh-30-2 30 mm'},f16e:{n:511,rate:100,v:1030,dmg:.075,name:'M61A1 20 mm'},fa18e:{n:412,rate:100,v:1030,dmg:.075,name:'M61A2 20 mm'},f4e:{n:639,rate:100,v:1030,dmg:.075,name:'M61A1 20 mm'},a29:{n:400,rate:37,v:890,dmg:.035,name:'2× FN M3P 12,7 mm'}};
 // caças que ainda esperam o modelo 3D: ficha e física prontas, aparecem como "chegando" até o .glb entrar em models/
 const NEWAC={f15e:{name:'F-15E Strike Eagle',vne:800,S:56.5,empty:14300,fuel:5950,mil:158000,ab:101000,CLa:4.0,aSt:.45,cd0:.022,k:.09,gLim:9,fbw:false,roll:3.5,wave:.1,ram:.454,cost:4000},
  rafale:{name:'Rafale M',vne:750,S:45.7,empty:10600,fuel:4700,mil:100000,ab:50000,CLa:3.6,aSt:.5,cd0:.018,k:.11,gLim:9,fbw:true,roll:4.2,naval:true,wave:.266,cost:4500},
@@ -1054,13 +1087,16 @@ const NEWAC={f15e:{name:'F-15E Strike Eagle',vne:800,S:56.5,empty:14300,fuel:595
  a10:{name:'A-10C Thunderbolt II',vne:450,S:47,empty:11321,fuel:4990,mil:80600,ab:0,CLa:5.2,aSt:.4,cd0:.032,k:.06,gLim:7.3,fbw:false,roll:2.6,wave:1,ram:-.935,cost:3000},
  su30:{name:'Su-30MKK Flanker-G',vne:760,S:62,empty:17700,fuel:9400,mil:153000,ab:92000,CLa:4.1,aSt:.55,cd0:.022,k:.09,gLim:9,fbw:true,roll:3.5,wave:.192,cost:6000},
  f22:{name:'F-22A Raptor',vne:800,S:78.04,empty:19700,fuel:8200,mil:232000,ab:80000,CLa:3.9,aSt:.6,cd0:.017,k:.1,gLim:9,fbw:true,roll:4.0,wave:.145,stealth:.1,cost:10000},
- f16e:{name:'F-16E Block 60 Desert Falcon',vne:800,S:27.87,empty:9980,fuel:4550,mil:84000,ab:60000,CLa:4.0,aSt:.44,cd0:.021,k:.1,gLim:9,fbw:true,roll:4.2,wave:.465,cost:2500},
+ fa18e:{name:'F/A-18E Super Hornet',vne:750,S:46.45,empty:14550,fuel:6780,mil:115600,ab:80400,CLa:4.2,aSt:.52,cd0:.024,k:.1,gLim:7.5,fbw:true,roll:3.3,wave:.6,naval:true,cost:3500},
+ f4e:{name:'F-4E Phantom II',vne:750,S:49.24,empty:13760,fuel:5950,mil:105600,ab:53600,CLa:3.6,aSt:.4,cd0:.022,k:.12,gLim:7.33,fbw:false,roll:2.6,wave:.1,ram:.6,cost:2200},
+ a29:{name:'A-29 Super Tucano',vne:320,S:19.4,empty:3200,fuel:550,mil:17000,ab:0,CLa:4.8,aSt:.28,cd0:.025,k:.06,gLim:7,fbw:false,roll:2.2,wave:0,ram:-1.2,prop:true,cost:1200},
+ f16e:{name:'F-16F Block 60 Desert Falcon',vne:800,S:27.87,empty:10250,fuel:4300,mil:84000,ab:60000,CLa:4.0,aSt:.44,cd0:.021,k:.1,gLim:9,fbw:true,roll:4.2,wave:.465,cost:2500},
  su25:{name:'Su-25 Frogfoot',vne:520,S:30.1,empty:9800,fuel:3000,mil:88000,ab:0,CLa:4.6,aSt:.4,cd0:.035,k:.07,gLim:6.5,fbw:false,roll:2.5,wave:1,ram:-.5,cost:2500}};
 for(const [id,d] of Object.entries(NEWAC))if(!ACFT[id])ACFT[id]=Object.assign({file:'models/'+id+'.glb',scale:1,eye:[6,1],gearH:2.8,sweep:false,naval:false,hudB:12,fl:[[0,0,10]],soon:true},d);
 // velocidades calibradas (ferramenta tools/velocidade.mjs): máxima real em altitude e limite estrutural ao nível do mar
 Object.assign(ACFT.f14,{wave:.239,vne:800});Object.assign(ACFT.f16,{wave:.465,vne:800});Object.assign(ACFT.mig29,{wave:.065,vne:810});Object.assign(ACFT.m2000,{wave:.1,ram:.846,vne:750});
 for(const [id,L] of Object.entries(LOAD))if(ACFT[id]){const a=ACFT[id];a.wpn={aim9:L[0],aim7:L[1],aim54:L[2],agm:L[3],bomb:L[4]};a.gun=GUNS[id]}
-setTimeout(()=>{SEATS.f15e='ACES II';SEATS.rafale='Martin-Baker Mk 16F';SEATS.su57='Zvezda K-36D-5';SEATS.gripen='Martin-Baker Mk 10LS';SEATS.su35=SEATS.su34=SEATS.su30='Zvezda K-36D-3.5';SEATS.f117='ACES II';SEATS.a10='ACES II';SEATS.f22='ACES II';SEATS.su25='Zvezda K-36L';SEATS.f16e='ACES II'},0);
+setTimeout(()=>{SEATS.f15e='ACES II';SEATS.rafale='Martin-Baker Mk 16F';SEATS.su57='Zvezda K-36D-5';SEATS.gripen='Martin-Baker Mk 10LS';SEATS.su35=SEATS.su34=SEATS.su30='Zvezda K-36D-3.5';SEATS.f117='ACES II';SEATS.a10='ACES II';SEATS.f22='ACES II';SEATS.su25='Zvezda K-36L';SEATS.f16e='ACES II';SEATS.fa18e='Martin-Baker SJU-17 (NACES)';SEATS.f4e='Martin-Baker Mk H7';SEATS.a29='Martin-Baker Mk 10LCX'},0);
 // modelos que já chegaram (medidos com tools/medir-modelo.mjs): escala pelo comprimento real, olho do piloto, altura do trem, bocais
 const MODELS={f15e:{scale:.1001,eye:[9.45,1.35],gearH:3.65,fl:[[-.72,-.7,16.8],[.72,-.7,16.8]],rio:true},
  rafale:{scale:.0978,eye:[6.43,.96],gearH:3.38,fl:[[-.55,-.55,13.2],[.55,-.55,13.2]]},
@@ -1071,11 +1107,14 @@ const MODELS={f15e:{scale:.1001,eye:[9.45,1.35],gearH:3.65,fl:[[-.72,-.7,16.8],[
 // modelos genéricos (normalizados por tools: nariz +X, Y pra cima). pgear = trem desenhado no jogo (o modelo veio com o trem recolhido): [x, z, topo, raio, largura, rodas]
 Object.assign(MODELS,{
  f117:{scale:.8155,eye:[4.15,1.45],gearH:3.16,fl:[[-1.3,-.5,15],[1.3,-.5,15]],pgear:{gy:-1.71,w:[[5.0,0,.05,.3,.18],[-1.6,-1.7,0,.42,.26],[-1.6,1.7,0,.42,.26]]}},
- f16e:{scale:.5612,eye:[1.45,1.15],gearH:2.55,fl:[[0,-.45,11.4]],gSeat:.6,pgear:{gy:-1.4,w:[[.3,0,-.45,.3,.18],[-3.7,-1.18,-.2,.38,.24],[-3.7,1.18,-.2,.38,.24]]}},
+ f16e:{scale:1.0736,eye:[3.95,2.74],gearH:2.74,fl:[[0,-1.14,11.2]],gSeat:.6,rio:true,gcut:{y:.66,b:[[-2.1,-.45,.5,1.65],[2.2,3.45,0,.5]]}},
  su30:{scale:.9707,eye:[7.55,1.1],gearH:3.71,fl:[[-1.45,-.8,16.4],[1.45,-.8,16.4]],rio:true,pgear:{gy:-2.61,w:[[5.4,0,-.5,.34,.2,2],[-.5,-2.17,-.7,.5,.3],[-.5,2.17,-.7,.5,.3]]}},
  f22:{scale:1.5457,eye:[-4.15,1.3],gearH:4.05,fl:[[-.75,-1.3,14.9],[.75,-1.3,14.9]],pgear:{gy:-2.75,w:[[-5.4,0,-.9,.3,.18],[-11.2,-1.6,-1.0,.4,.24],[-11.2,1.6,-1.0,.4,.24]]}},
- a10:{scale:1.0,eye:[4.5,.72],gearH:3.66,fl:[[-1.0,.3,9],[1.0,.3,9]],pgear:{gy:-2.94,w:[[5.8,.4,-1.2,.37,.24],[-.6,-2.6,-1.3,.45,.3],[-.6,2.6,-1.3,.45,.3]]}},
+ a10:{scale:.9635,eye:[4.6,3.15],gearH:3.3,fl:[[-1.55,.25,9.6],[1.55,.25,9.6]],gcut:{y:1.6,b:[[-2.2,0,2.0,3.5],[3.4,6.0,0,.6]]}},
  su25:{scale:1.3028,eye:[3.55,2.8],gearH:2.91,fl:[[-.9,-1.4,11],[.9,-1.4,11]]},
+ fa18e:{scale:.9957,eye:[4.5,1.35],gearH:3.23,fl:[[-.55,-.45,13.6],[.55,-.45,13.6]],pgear:{gy:-1.88,w:[[5.0,0,-.2,.3,.18,2],[-.6,-1.55,-.35,.42,.26],[-.6,1.55,-.35,.42,.26]]}},
+ f4e:{scale:.9567,eye:[4.7,3.4],gearH:3.4,fl:[[-.6,-1.8,10.2],[.6,-1.8,10.2]],rio:true,gcut:{y:1.15,b:[[-2.7,-.9,2.1,3.2],[4.5,6.1,0,.5]]}},
+ a29:{scale:1.1617,eye:[2.25,1.68],gearH:2.46,fl:[]},
  j11:{scale:.9545,eye:[3.3,0],gearH:3,fl:[[-1.45,-.2,10.8],[1.45,-.2,10.8]],enemyOnly:true,name:'J-11B Flanker',file:'models/j11.glb',sweep:false}});
 for(const [id,m] of Object.entries(MODELS))Object.assign(ACFT[id]||(ACFT[id]={}),m,{soon:false});
 const playable=()=>Object.keys(ACFT).filter(id=>!ACFT[id].soon&&!ACFT[id].enemyOnly);
@@ -1455,7 +1494,7 @@ function pbHUD(c){const b=PB.b;c.font='600 15px "Share Tech Mono",monospace';c.t
  L.forEach((t,i)=>t&&c.fillText(t,16,H-22-(L.length-1-i)*22));c.shadowBlur=0}
 
 /* ================= esquadrilha (6 alas do mesmo caça do jogador) ================= */
-const AL=[],FR=[],ALLY_CS={f14:'Felino',f16:'Víbora',mig29:'Falcão',m2000:'Mistral',f15e:'Águia',rafale:'Tufão',su57:'Fantasma',gripen:'Grifo',su35:'Urso',su34:'Pato',f117:'Sombra',a10:'Javali',su30:'Dragão',f22:'Raptor',su25:'Gralha',f16e:'Sabre'},FORM=[[1,0,1],[-1,0,1],[2,.15,2],[-2,.15,2],[3,-.15,3],[-3,-.15,3]],WCMD={cover:'COBRIR',attack:'ATACAR',disperse:'DISPERSAR'};
+const AL=[],FR=[],ALLY_CS={f14:'Felino',f16:'Víbora',mig29:'Falcão',m2000:'Mistral',f15e:'Águia',rafale:'Tufão',su57:'Fantasma',gripen:'Grifo',su35:'Urso',su34:'Pato',f117:'Sombra',a10:'Javali',su30:'Dragão',f22:'Raptor',su25:'Gralha',f16e:'Sabre',fa18e:'Vespa',f4e:'Rino',a29:'Tucano'},FORM=[[1,0,1],[-1,0,1],[2,.15,2],[-2,.15,2],[3,-.15,3],[-3,-.15,3]],WCMD={cover:'COBRIR',attack:'ATACAR',disperse:'DISPERSAR'};
 const allyDot=new THREE.SpriteMaterial({map:softTex,color:0x58c8ff,sizeAttenuation:false,transparent:true,depthWrite:false,opacity:.9});
 const ALLY_FL=new THREE.MeshBasicMaterial({color:lc(0xff9548),transparent:true,opacity:.8,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false});
 function allySay(a,txt,cls=''){if(a)say(a.cs+': '+txt,cls)}
@@ -1796,7 +1835,7 @@ const AC_COST={f14:0,f16:1500,m2000:3000,mig29:5000};for(const id in NEWAC)AC_CO
 const PROG={pm:0,owned:['f14']};
 try{const v=JSON.parse(localStorage.getItem('fcs-prog')||'null');if(v)Object.assign(PROG,v);else if(localStorage.getItem('tomcat-cfg'))PROG.owned=Object.keys(AC_COST)}catch(e){}// quem já jogava antes mantém os caças
 const saveProg=()=>{try{localStorage.setItem('fcs-prog',JSON.stringify(PROG))}catch(e){}};
-const acOwned=id=>S.freeHangar||PROG.owned.includes(id);
+const acOwned=id=>S.freeHangar||PROG.owned.includes(id)||!!(ACFT[id]&&ACFT[id].custom);
 const cleanName=t=>(t||'').replace(/[^\p{L}\p{N} _.-]/gu,'').trim().slice(0,16);
 function flashBtn(b){b.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:260})}
 function hangarUI(){{const sl=document.getElementById('soonLine');if(sl){const s2=Object.keys(ACFT).filter(id=>ACFT[id].soon&&!ACFT[id].enemyOnly).map(id=>ACFT[id].name.split(' ')[0]);sl.textContent=s2.length?'Chegando ao hangar (falta só o modelo 3D): '+s2.join(', ')+'.':''}}$('#pmv').textContent=PROG.pm.toLocaleString('pt-BR')+' PM';
@@ -1883,7 +1922,9 @@ function procGear(pg){const out=[],leg=new THREE.MeshStandardMaterial({color:0x8
   for(let i=0;i<n;i++){const dz=n>1?(i-.5)*(wd+.06):0,t=new THREE.CylinderGeometry(r,r,wd,20);t.rotateX(Math.PI/2);t.translate(x,y0,z+dz);out.push([t,tire]);const h=new THREE.CylinderGeometry(r*.55,r*.55,wd+.02,12);h.rotateX(Math.PI/2);h.translate(x,y0,z+dz);out.push([h,hub])}}
  return out}
 function prepHD(sc,id){const ac=ACFT[id],w=new THREE.Group();sc.scale.setScalar(ac.scale);w.add(sc);const R={id,body:[],wl:[],wr:[],gOn:[],gOff:[],cock:[],glass:[]};
- const pushBody=(g,m)=>R.body.push([g,m]);
+ // gcut: modelo com o trem baixado fundido na fuselagem; triângulos abaixo de y dentro das caixas [x0,x1,|z|min,|z|max] viram trem (recolhe em voo)
+ const gc=ac.gcut,inG=gc?(x,y,z)=>y<gc.y&&gc.b.some(([x0,x1,z0,z1])=>x>x0&&x<x1&&Math.abs(z)>=z0&&Math.abs(z)<z1)?1:0:null;
+ const pushBody=(g,m)=>{if(!gc){R.body.push([g,m]);return}const [b,t]=splitGeo(g,inG,2);R.body.push([b,m]);R.gOn.push([t,m])};
  for(const q of bake(w)){const nm=q.name;
   if(nm.includes('airframe')){if(ac.sweep){const [b,l,r]=splitGeo(q.g,(x,y,z)=>x>-1.9&&Math.abs(z)>3?(z<0?1:2):0,3);R.body.push([b,q.m]);R.wl.push([l,q.m]);R.wr.push([r,q.m])}else pushBody(q.g,q.m)}
   else if(nm.includes('gearOn')||nm.includes('landingOn'))R.gOn.push([q.g,q.m]);else if(nm.includes('gearOff')||nm.includes('landingOff'))R.gOff.push([q.g,q.m]);
@@ -1899,14 +1940,112 @@ function makeHD(R,withCock=true){const ac=ACFT[R.id],g=new THREE.Group(),m=new T
  return {g,m,sweep(a){const d=(a-20)*D2R;pr.rotation.y=-d;pl.rotation.y=d},gear(v){gOn.visible=v;gOff.visible=!v}}}
 const PAINT={mig29:{'#8a9790':['#7f8d84','#2c3038'],'#576b5b':['#55685a','#a3271c']},su27:{'#90a9b8':['#93abba','#2c3038'],'#567a9c':['#5a7ea0','#a3271c']}};
 function prepEnemy(sc,type){const o={};for(const [vi,vn] of[[0,'std'],[1,'ace']]){const c=sc.clone(true);c.traverse(n=>{if(n.name==='gear')n.visible=false;if(n.isMesh){n.material=n.material.clone();const k=(n.material.name||'').toLowerCase(),pp=PAINT[type][k];if(pp)n.material.color.copy(lc(pp[vi]));n.material.roughness=.6;n.material.metalness=.05;n.material.envMapIntensity=.6}});const g=new THREE.Group();g.add(c);o[vn]=g}return o}
-function loadAircraft(id){if(ACM[id]!==undefined)return Promise.resolve(ACM[id]);return loadQ(ACFT[id].file).then(sc=>{let R=null;try{if(sc)R=prepHD(sc,id)}catch(e){console.error('HD',id,e)}ACM[id]=R;return R})}
+// ===== Avião por link =====
+// Como o "importar modelo" de jogos com mods: o jogador cola um link do Sketchfab (API de download oficial, com o token dele)
+// ou de um .glb; o jogo baixa, guarda no IndexedDB (não precisa baixar de novo), descobre eixo/nariz/escala/olho
+// e o avião herda física, armas e assento de um caça base. No multiplayer os outros veem o caça base.
+const CUST={recs:{},db:null,cur:null};
+const escH=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const netAc=()=>ACFT[S.ac]&&ACFT[S.ac].custom?ACFT[S.ac].base:S.ac;
+function custDB(){return CUST.db||(CUST.db=new Promise((res,rej)=>{if(!window.indexedDB)return rej(new Error('sem IndexedDB'));const r=indexedDB.open('fcs-custom',1);r.onupgradeneeded=()=>r.result.createObjectStore('ac',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))}
+function custTx(mode,fn){return custDB().then(db=>new Promise((res,rej)=>{const t=db.transaction('ac',mode),st=t.objectStore('ac'),q=fn(st);t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)}))}
+const skfbUid=u=>{const m=String(u).match(/sketchfab\.com\/.*?([0-9a-f]{32})/i);return m&&m[1]};
+async function custFetch(link,file,tok,msg){
+ if(file){msg('Lendo o arquivo…');const buf=await file.arrayBuffer();return {buf,title:file.name.replace(/\.(glb|zip)$/i,''),credit:'arquivo local',src:file.name}}
+ const uid=skfbUid(link);
+ if(uid){if(!tok)throw new Error('Para links do Sketchfab, cole seu token da API (Sketchfab → Settings → Password & API).');
+  msg('Pedindo o download ao Sketchfab…');let info=null;try{info=await fetch('https://api.sketchfab.com/v3/models/'+uid).then(r=>r.ok?r.json():null)}catch(e){}
+  if(info&&info.isDownloadable===false)throw new Error('Esse modelo não está liberado para download pelo autor.');
+  let r;try{r=await fetch('https://api.sketchfab.com/v3/models/'+uid+'/download',{headers:{Authorization:'Token '+tok}})}catch(e){throw new Error('Não deu pra falar com o Sketchfab (rede ou bloqueio do navegador). Baixe o .glb no site e use "arquivo do seu aparelho".')}
+  if(r.status===401||r.status===403)throw new Error('O Sketchfab recusou o token. Confira se copiou o token inteiro.');
+  if(!r.ok)throw new Error('O Sketchfab respondeu '+r.status+(r.status===404?' (modelo não existe ou não é baixável).':'.'));
+  const d=await r.json(),pk=d.glb||d.gltf;if(!pk)throw new Error('Esse modelo não tem versão glTF para baixar.');
+  msg('Baixando '+(pk.size?(pk.size/1048576).toFixed(1)+' MB':'o modelo')+'…');
+  let buf;try{buf=await fetch(pk.url).then(x=>{if(!x.ok)throw new Error(x.status);return x.arrayBuffer()})}catch(e){throw new Error('O download foi bloqueado pelo navegador. Baixe o .glb no Sketchfab e use "arquivo do seu aparelho".')}
+  const lic=info&&info.license?(info.license.label||info.license.slug):'';const au=info&&info.user?(info.user.displayName||info.user.username):'';
+  return {buf,title:info?info.name:'Modelo do Sketchfab',credit:(au?au:'autor no Sketchfab')+(lic?' ('+lic+')':''),src:link}}
+ if(!/^https?:\/\//i.test(link))throw new Error('Cole um link https:// (Sketchfab ou .glb) ou escolha um arquivo.');
+ msg('Baixando o modelo…');let buf;try{buf=await fetch(link).then(x=>{if(!x.ok)throw new Error(x.status);return x.arrayBuffer()})}catch(e){throw new Error('Esse site não deixa outros sites baixarem o arquivo (CORS). Baixe o .glb e use "arquivo do seu aparelho".')}
+ return {buf,title:decodeURIComponent(link.split('/').pop().split('?')[0]).replace(/\.glb$/i,''),credit:new URL(link).hostname,src:link}}
+// abre GLB ou ZIP de glTF (scene.gltf + scene.bin + texturas) sem servidor: as texturas viram blob URLs
+async function custScene(buf){const u8=new Uint8Array(buf),dec=await MESHOPT.catch(()=>null);
+ const mk=M=>{const l=new THREE.GLTFLoader(M);if(dec)l.setMeshoptDecoder(dec);return l};
+ if(u8[0]===0x67&&u8[1]===0x6c&&u8[2]===0x54&&u8[3]===0x46)return new Promise((res,rej)=>mk().parse(buf,'',g=>res(g.scene),rej));
+ if(u8[0]!==0x50||u8[1]!==0x4b)throw new Error('Arquivo não é .glb nem .zip de glTF.');
+ const {unzipSync}=await import('https://cdn.jsdelivr.net/npm/fflate@0.8.2/esm/browser.js');const F=unzipSync(u8),urls={};for(const k in F)urls[k]=URL.createObjectURL(new Blob([F[k]]));
+ const keys=Object.keys(F),main=keys.find(k=>/\.glb$/i.test(k))||keys.find(k=>/\.gltf$/i.test(k));if(!main)throw new Error('O zip não tem .gltf nem .glb.');
+ if(/\.glb$/i.test(main))return custScene(F[main].buffer.slice(F[main].byteOffset,F[main].byteOffset+F[main].byteLength));
+ const base=main.includes('/')?main.slice(0,main.lastIndexOf('/')+1):'',M=new THREE.LoadingManager();
+ M.setURLModifier(u=>{if(/^(blob|data):/.test(u))return u;const k=decodeURIComponent(u.replace(/^\.\//,''));return urls[base+k]||urls[k]||u});
+ return new Promise((res,rej)=>mk(M).parse(new TextDecoder().decode(F[main]),'',g=>res(g.scene),rej))}
+// normaliza: nariz em +X, Y pra cima, centro lateral em 0, chão em y=0; separa trem/vidro pelos nomes
+function custNormalize(sc,o){const wrap=new THREE.Group();wrap.add(sc);wrap.updateMatrixWorld(true);let bb=new THREE.Box3().setFromObject(wrap);
+ const sz=bb.getSize(new V3()),c0=bb.getCenter(new V3());
+ // o ponto mais alto é a deriva: fica no meio da envergadura e na ponta de trás do comprimento (vale até p/ asa reta, onde envergadura > comprimento)
+ let top=-1e9;const T=new V3();wrap.traverse(n=>{if(!n.isMesh)return;const p=n.geometry.attributes.position,v=new V3();for(let i=0;i<p.count;i+=3){v.fromBufferAttribute(p,i).applyMatrix4(n.matrixWorld);if(v.y>top){top=v.y;T.copy(v)}}});T.sub(c0);
+ let ax=o.ax||(Math.abs(T.x)/(sz.x/2+1e-6)<Math.abs(T.z)/(sz.z/2+1e-6)?'z':'x'),nose=o.nose;if(!nose)nose=(ax==='x'?T.x:T.z)>0?-1:1;
+ wrap.rotation.y=ax==='x'?(nose>0?0:Math.PI):(nose>0?Math.PI/2:-Math.PI/2);wrap.updateMatrixWorld(true);bb=new THREE.Box3().setFromObject(wrap);const c=bb.getCenter(new V3());
+ wrap.position.set(-c.x,-bb.min.y,-c.z);const root=new THREE.Group();root.add(wrap);root.updateMatrixWorld(true);
+ const G={};const grp=k=>G[k]||(G[k]=Object.assign(new THREE.Group(),{name:'cx-'+k}));const meshes=[];wrap.traverse(n=>{if(n.isMesh)meshes.push(n)});
+ for(const n of meshes){let nm='';for(let q=n;q&&q!==wrap;q=q.parent)nm+=' '+(q.name||'');const mt=[].concat(n.material).map(m=>m&&m.name||'').join(' ');
+  const k=/gear|wheel|tire|tyre|roda|landing/i.test(nm+' '+mt)?'landingOn':/glass|canopy|window|vidro|windscreen/i.test(nm+' '+mt)&&[].concat(n.material).every(m=>m&&m.transparent)?'canopy':'airframe';
+  const g=grp(k);if(!g.parent)root.add(g);g.attach(n)}
+ root.updateMatrixWorld(true);const len=bb.max.x-bb.min.x;return {root,len,box:new THREE.Box3().setFromObject(root)}}
+// palpite do olho: ~30% do comprimento a partir do nariz, logo abaixo do topo do canopy naquela fatia
+function custGuess(root,scale,len){const bb=new THREE.Box3().setFromObject(root),nx=bb.max.x*scale,L=len*scale,ex=nx-.3*L;let top=-1e9;
+ root.traverse(n=>{if(!n.isMesh)return;const p=n.geometry.attributes.position,v=new V3();for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i).applyMatrix4(n.matrixWorld).multiplyScalar(scale);if(Math.abs(v.x-ex)<.6&&Math.abs(v.z)<.35&&v.y>top)top=v.y}});
+ if(top<-1e8)top=bb.max.y*scale*.45;return {eye:[+ex.toFixed(2),+(top-.4).toFixed(2)],tail:bb.min.x*scale,h:bb.max.y*scale}}
+function custRegister(r){const b=ACFT[r.base]||ACFT.f16,id=r.id;
+ ACFT[id]=Object.assign({},b,{name:r.name,custom:true,base:r.base,file:null,scale:r.scale,eye:r.eye,gearH:r.gearH,fl:r.fl,pgear:r.pgear||null,gcut:null,sweep:false,soon:false,enemyOnly:false,rio:false,credit:r.credit,wpn:Object.fromEntries(Object.entries(b.wpn||{}).map(([k,w])=>[k,w&&Object.assign({},w)]))});
+ if(SEATS[r.base])SEATS[id]=SEATS[r.base];ALLY_CS[id]=ALLY_CS[r.base]||'Convidado';
+ let btn=document.querySelector('[data-k=ac] button[data-v="'+id+'"]');if(!btn){btn=document.createElement('button');btn.dataset.v=id;document.querySelector('[data-k=ac]').appendChild(btn)}
+ btn.innerHTML='<b>'+escH(r.name)+'</b><span>Por link · base '+escH(b.name.split(' ').slice(0,2).join(' '))+'</span>'}
+function custLoad(id){const r=CUST.recs[id];if(!r)return Promise.resolve(null);loading++;
+ return (r.buf?Promise.resolve(r):custTx('readonly',st=>st.get(id)).then(x=>{if(!x)throw new Error('modelo sumiu do armazenamento');r.buf=x.buf;return r})).then(r=>custScene(r.buf)).then(sc=>{const N=custNormalize(sc,r.orient||{});return prepHD(N.root,id)}).catch(e=>{console.error('avião por link',e);return null}).finally(()=>loading--)}
+async function custBuild(r){// mede e preenche escala, olho, trem e chama
+ const sc=await custScene(r.buf),N=custNormalize(sc,r.orient||{}),scale=r.len/Math.max(.01,N.len),gs=custGuess(N.root,scale,N.len),b=ACFT[r.base];
+ r.scale=+scale.toPrecision(5);if(!r.eyeSet)r.eye=gs.eye;const lift=r.drawGear?1.35:0;r.pgear=r.drawGear?{gy:-lift,w:[[r.eye[0]-.05*r.len,0,.1,.3,.18],[r.eye[0]-.32*r.len,-1.3,.15,.4,.24],[r.eye[0]-.32*r.len,1.3,.15,.4,.24]]}:null;
+ r.gearH=+(r.eye[1]+lift).toFixed(2);r.fl=b&&b.prop?[]:[[0,+(gs.h*.35-r.eye[1]).toFixed(2),+(r.eye[0]-gs.tail+.3).toFixed(2)]];return r}
+const custMeta=()=>{try{return JSON.parse(localStorage.getItem('fcs-cust')||'[]')}catch(e){return[]}};
+const custMetaSave=()=>{try{localStorage.setItem('fcs-cust',JSON.stringify(Object.values(CUST.recs).map(r=>{const o=Object.assign({},r);delete o.buf;return o})))}catch(e){}};
+// registra na hora (síncrono) a partir do localStorage; o arquivo 3D vem do IndexedDB só quando o avião é carregado
+function custBoot(){for(const r of custMeta()){CUST.recs[r.id]=r;custRegister(r)}if(!ACFT[S.ac])S.ac='f14';custListUI()}
+function custListUI(){const L=document.getElementById('custList');if(!L)return;const ids=Object.keys(CUST.recs);L.textContent=ids.length?'':'Nenhum ainda.';
+ for(const id of ids){const r=CUST.recs[id],d=document.createElement('div');d.textContent=r.name+' · '+r.credit;const e=document.createElement('button');e.className='btn alt';e.textContent='Ajustar';e.onclick=()=>custEditOpen(id);
+  const x=document.createElement('button');x.className='btn alt';x.textContent='Apagar';x.onclick=async()=>{await custTx('readwrite',st=>st.delete(id)).catch(()=>{});delete CUST.recs[id];custMetaSave();delete ACFT[id];delete ACM[id];const b=document.querySelector('[data-k=ac] button[data-v="'+id+'"]');if(b)b.remove();if(S.ac===id){S.ac='f14';saveCfg()}custListUI();syncMenu()};d.append(e,x);L.appendChild(d)}}
+function custEditOpen(id){CUST.cur=id;const r=CUST.recs[id];document.getElementById('custEdit').classList.remove('hide');document.getElementById('custEx').value=r.eye[0];document.getElementById('custEy').value=r.eye[1];
+ const b=document.querySelector('[data-k=ac] button[data-v="'+id+'"]');if(b)b.click();if(typeof hgShow==='function')hgShow(id)}
+async function custSave(r){delete ACM[r.id];if(HG.models)delete HG.models[r.id];if(HG.prom)delete HG.prom[r.id];CUST.recs[r.id]=r;custRegister(r);await custTx('readwrite',st=>st.put(r));custMetaSave();custListUI();if(typeof hangarUI==='function')hangarUI()}
+(function custUI(){const $c=i=>document.getElementById(i),msg=t=>{$c('custMsg').textContent=t};if(!$c('cust'))return;
+ const sel=$c('custBase');for(const id of playable().filter(i=>!ACFT[i].custom)){const o=document.createElement('option');o.value=id;o.textContent=ACFT[id].name;sel.appendChild(o)}sel.value='f16';$c('custLen').value=15;
+ try{$c('custTok').value=localStorage.getItem('fcs-skfb')||''}catch(e){}
+ $c('custOpen').onclick=()=>{$c('cust').classList.remove('hide');custListUI()};$c('custClose').onclick=()=>$c('cust').classList.add('hide');
+ $c('custGo').onclick=async()=>{const go=$c('custGo');go.disabled=true;try{const tok=$c('custTok').value.trim();try{if(tok)localStorage.setItem('fcs-skfb',tok)}catch(e){}
+   const f=await custFetch($c('custUrl').value.trim(),$c('custFile').files[0],tok,msg);if(f.buf.byteLength>80*1048576)throw new Error('Modelo grande demais ('+(f.buf.byteLength/1048576|0)+' MB). Procure uma versão mais leve (até ~80 MB).');
+   msg('Ajustando o modelo…');const id='cx'+Date.now().toString(36);const r=await custBuild({id,name:($c('custName').value.trim()||f.title||'Avião').slice(0,32),credit:f.credit,src:f.src,base:sel.value,len:Math.max(4,+$c('custLen').value||15),drawGear:$c('custGear').checked,orient:{},buf:f.buf});
+   await custSave(r);msg('Pronto! "'+r.name+'" está no hangar. Se a cabine ficou torta, use o ajuste fino.');custEditOpen(id)}catch(e){console.warn(e);msg('⚠️ '+(e.message||e))}finally{go.disabled=false}};
+ const rebuild=async(fn)=>{const r=CUST.recs[CUST.cur];if(!r)return;if(!r.buf){const x=await custTx('readonly',st=>st.get(r.id)).catch(()=>null);if(!x)return msg('⚠️ O arquivo do modelo não está mais salvo neste aparelho.');r.buf=x.buf}fn(r);msg('Refazendo…');try{await custBuild(r);await custSave(r);msg('Ajuste aplicado.');custEditOpen(r.id)}catch(e){msg('⚠️ '+e.message)}};
+ $c('custRot').onclick=()=>rebuild(r=>{r.orient=Object.assign({},r.orient,{ax:(r.orient.ax||'x')==='x'?'z':'x',nose:r.orient.nose||1});r.eyeSet=false});
+ $c('custFlip').onclick=()=>rebuild(r=>{r.orient=Object.assign({},r.orient,{nose:-(r.orient.nose||1)});r.eyeSet=false});
+ $c('custApply').onclick=()=>rebuild(r=>{r.eye=[+$c('custEx').value,+$c('custEy').value];r.eyeSet=true});
+ custBoot()})();
+// Câmera do cockpit ajustável em qualquer avião (como o "mover a cabeça" do DCS / câmera customizada do MSFS):
+// só move a cabeça do piloto (o modelo de fora, a física e o trem não mudam). Passo de 2,5 cm; salvo por avião.
+const CAMO={id:null,v:(()=>{try{return JSON.parse(localStorage.getItem('fcs-camoff')||'{}')}catch(e){return{}}})()};
+function camOffApply(){if(!COCK.hd||!CAMO.id||!ACFT[CAMO.id])return;const a=ACFT[CAMO.id],o=CAMO.v[CAMO.id]||[0,0,0],m=COCK.hd.g.children[0];m.position.set(-((a.eye[2]||0)+o[2]),-(a.eye[1]+o[1]),a.eye[0]+o[0]);camOffInfo()}
+function camOffInfo(){const el=document.getElementById('camInfo');if(!el)return;const o=CAMO.v[CAMO.id]||[0,0,0],cm=v=>(v>=0?'+':'')+Math.round(v*100);el.textContent=CAMO.id?'frente '+cm(o[0])+' · altura '+cm(o[1])+' · lado '+cm(o[2])+' cm':''}
+function camOffSave(){try{localStorage.setItem('fcs-camoff',JSON.stringify(CAMO.v))}catch(e){}}
+function camOffMove([f,_,l,u]){if(!CAMO.id)return;const o=CAMO.v[CAMO.id]||(CAMO.v[CAMO.id]=[0,0,0]),st=.025;o[0]=clamp(o[0]+f*st,-2,2);o[1]=clamp(o[1]+(u||0)*st,-1.5,1.5);o[2]=clamp(o[2]+(l||0)*st,-1,1);camOffSave();camOffApply()}
+function camOffReset(){if(!CAMO.id)return;delete CAMO.v[CAMO.id];camOffSave();camOffApply()}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-cam]');if(b){camOffMove(b.dataset.cam.split(',').map(Number));return}if(e.target.id==='camReset')camOffReset()});
+function loadAircraft(id){if(ACM[id]!==undefined)return Promise.resolve(ACM[id]);if(ACFT[id]&&ACFT[id].custom)return custLoad(id).then(R=>(ACM[id]=R));return loadQ(ACFT[id].file).then(sc=>{let R=null;try{if(sc)R=prepHD(sc,id)}catch(e){console.error('HD',id,e)}ACM[id]=R;return R})}
 const cockExtra=[];
 function setupPlayer(id){A=ACFT[id];GEAR_H=A.gearH;const R=ACM[id];
  if(me.hd){me.g.remove(me.hd.g);me.hd=null}if(COCK.hd){cock.remove(COCK.hd.g);COCK.hd=null}for(const o of cockExtra)cock.remove(o);cockExtra.length=0;
  HD.ok=!!R;me.b.visible=!R;for(const c of cock.children)c.visible=!R;if(!R)return;
  me.hd=makeHD(R,true);me.g.add(me.hd.g);
  me.hdFl=A.fl.map(p=>{const f=new THREE.Mesh(new THREE.CylinderGeometry(.05,.55,4,12,1,true),flameMat);f.rotation.x=Math.PI/2;f.position.set(...p);me.hd.g.add(f);return f});
- COCK.hd=makeHD(R,true);cock.add(COCK.hd.g);
+ COCK.hd=makeHD(R,true);cock.add(COCK.hd.g);CAMO.id=id;camOffApply();
  if(A.panel){const cg=new THREE.Mesh(new THREE.PlaneGeometry(.17,.16),new THREE.MeshBasicMaterial({color:0x9fffc8,transparent:true,opacity:.05,depthWrite:false}));cg.position.set(0,-.02,-.468);cg.rotation.x=-.12;
   const pf=new THREE.Mesh(new THREE.PlaneGeometry(.58,.29),new THREE.MeshBasicMaterial({map:panelTex,toneMapped:false}));pf.position.set(0,-.285,-.535);pf.rotation.x=-.172;cock.add(cg,pf);cockExtra.push(cg,pf)}}
 let parkedDone=false;
@@ -1945,7 +2084,7 @@ HG.grp.position.copy(HG.pos);HG.grp.visible=false;scene.add(HG.grp);HG.grp.add(H
  })();
 function hgModel(id){if(HG.models[id])return Promise.resolve(HG.models[id]);HG.prom=HG.prom||{};if(HG.prom[id])return HG.prom[id];return HG.prom[id]=loadAircraft(id).then(R=>{if(!R)return null;const h=makeHD(R,false);h.gear(true);if(ACFT[id].sweep)h.sweep(20);
   h.g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});
-  const box=new THREE.Box3().setFromObject(h.g),c=box.getCenter(new V3()),sz=box.getSize(new V3());h.g.position.set(-c.x,-box.min.y+.35,-c.z);const holder=new THREE.Group();holder.add(h.g);holder.userData.size=Math.max(sz.x,sz.z);HG.models[id]=holder;return holder})}
+  const box=new THREE.Box3().setFromObject(h.g),c=box.getCenter(new V3()),sz=box.getSize(new V3());h.g.position.set(-c.x,-box.min.y+.35,-c.z);const holder=new THREE.Group();holder.add(h.g);holder.userData.size=Math.max(sz.x,sz.z);holder.userData.hd=h;HG.models[id]=holder;return holder})}
 function hgShow(id){if(!ACFT[id])return;HG.id=id;hgStats();hgModel(id).then(m=>{if(HG.id!==id)return;if(HG.cur&&HG.cur!==m)HG.tt.remove(HG.cur);HG.cur=m;if(m){HG.tt.add(m);HG.distT=clamp(m.userData.size*1.35,18,40)}})}
 function hgSet(on){if(HG.on===on)return;HG.on=on;HG.grp.visible=on;for(const l of HG.lights)l.intensity=on?l.userData.i:0;if(on){sun.intensity=0;hemi.intensity=0}else applyTOD();sea.visible=!on;me.g.visible=!on&&me.g.visible;carrier.visible=!on&&carrierOn();if(typeof WORLD!=='undefined'&&WORLD.grp)WORLD.grp.visible=!on;
  if(!on){camera.clearViewOffset();carrierVis()}else hgShow(HG.id||S.ac)}
@@ -1956,7 +2095,7 @@ function hgStats(){const el=document.getElementById('hgStats');if(!el)return;con
  const bar=(lbl,k)=>{const lo=Math.min(...all.map(o=>o[k])),hi=Math.max(...all.map(o=>o[k])),v=hi>lo?.25+.75*(n[k]-lo)/(hi-lo):.7;return'<div class="hgb"><span>'+lbl+'</span><i style="--v:'+v.toFixed(2)+'"></i></div>'};
  const W=Object.values(a.wpn).filter(Boolean).map(w=>w.n+'× '+w.name);
  el.innerHTML='<div class="hgt"><b>'+a.name+'</b>'+(acOwned(id)?'':'<em>🔒 '+AC_COST[id].toLocaleString('pt-BR')+' PM</em>')+'</div>'+bar('VELOCIDADE','vel')+bar('MANOBRA','mob')+bar('ESTABILIDADE','est')+bar('AR-AR','aa')+bar('AR-SOLO','ag')+bar('ALCANCE','alc')+
-  '<p>'+[a.gun.n?a.gun.name+' ('+a.gun.n+' tiros)':'sem canhão',...W].join(' · ')+'</p><p class="hgs">'+(SEATS[id]?'Assento '+SEATS[id]+' · ':'')+'limite '+a.gLim+' G'+(a.naval?' · pousa em porta-aviões':'')+(a.sweep?' · asa de geometria variável':'')+(a.fbw?' · fly-by-wire':'')+'</p>'}
+  '<p>'+[a.gun.n?a.gun.name+' ('+a.gun.n+' tiros)':'sem canhão',...W].join(' · ')+'</p><p class="hgs">'+(SEATS[id]?'Assento '+SEATS[id]+' · ':'')+'limite '+a.gLim+' G'+(a.naval?' · pousa em porta-aviões':'')+(a.sweep?' · asa de geometria variável':'')+(a.fbw?' · fly-by-wire':'')+(a.custom?'<br>Modelo: '+escH(a.credit||'importado por link')+' · base '+(ACFT[a.base]?ACFT[a.base].name:a.base):'')+'</p>'}
 function hgCamera(dt){if(!HG.id)hgShow(S.ac);if(HG.auto&&!HG.drag)HG.yaw+=dt*.12;HG.dist=lerp(HG.dist,HG.distT||28,1-Math.exp(-dt*3));
  const c=tA.copy(HG.pos).add(tB.set(0,2.6,0));camera.fov=45;camera.position.set(Math.sin(HG.yaw)*Math.cos(HG.pitch),-Math.sin(HG.pitch),Math.cos(HG.yaw)*Math.cos(HG.pitch)).multiplyScalar(HG.dist).add(c);camera.lookAt(c);
  // empurra o avião para a parte livre da tela (o menu ocupa a esquerda no PC)
@@ -2162,10 +2301,10 @@ async function mpJoin(code,asHost){code=(code||'').toUpperCase().replace(/[^A-Z0
 async function mpLeave(silent){if(!NET.on)return;mpSend('bye');clearInterval(NET.helloI);try{await NET.tr.leave()}catch(e){}NET.tr=null;NET.on=false;NET.match=false;
  for(const r of NET.R.values())mpRemoveRemote(r);NET.R.clear();NET.peers.clear();for(const a of NET.audio.values())a.remove();NET.audio.clear();if(NET.voice){for(const t of NET.voice.getTracks())t.stop();NET.voice=null}
  try{history.replaceState(null,'',location.pathname)}catch(e){}if(!silent)mpStatus('Você saiu da sala.');mpLobbyUI()}
-function mpHello(to){if(!NET.on)return;mpSend('hello',{pid:myPid(),name:mpName(),ac:S.ac,host:NET.host,mode:NET.mode,match:NET.match,cfg:NET.host?NET.cfg:undefined,teams:NET.host?Object.fromEntries(NET.teams):undefined},to)}
+function mpHello(to){if(!NET.on)return;mpSend('hello',{pid:myPid(),name:mpName(),ac:netAc(),host:NET.host,mode:NET.mode,match:NET.match,cfg:NET.host?NET.cfg:undefined,teams:NET.host?Object.fromEntries(NET.teams):undefined},to)}
 function mpStatus(t){const e=mpq('mpst');if(e)e.textContent=t}
 function mpLobbyUI(){const inRoom=NET.on;mpq('mpJoinBox').classList.toggle('hide',inRoom);mpq('mpRoom').classList.toggle('hide',!inRoom);if(!inRoom)return;
- mpq('mpCode').textContent=NET.code;const L=mpq('mpList');L.textContent='';const list=[{id:NET.me,name:mpName(),ac:S.ac,host:NET.host,me:true},...[...NET.peers.entries()].map(([id,p])=>Object.assign({id},p))];
+ mpq('mpCode').textContent=NET.code;const L=mpq('mpList');L.textContent='';const list=[{id:NET.me,name:mpName(),ac:netAc(),host:NET.host,me:true},...[...NET.peers.entries()].map(([id,p])=>Object.assign({id},p))];
  const pv=NET.mode==='pvp';if(pv)list.sort((a,b)=>teamOf(a.id).localeCompare(teamOf(b.id)));
  for(const p of list.slice(0,MP_MAX)){const li=document.createElement('li'),b=document.createElement('b'),s2=document.createElement('span');if(pv){const ti=document.createElement('i');ti.className=teamOf(p.id);ti.textContent=TEAMS[teamOf(p.id)].n.toUpperCase();b.appendChild(ti)}b.append(p.name+(p.me?' (você)':''));s2.textContent=(ACFT[p.ac]?ACFT[p.ac].name.split(' ')[0]:'?')+(p.host?' · anfitrião':'');li.append(b,s2);L.appendChild(li)}
  mpq('mpCount').textContent=list.length+'/'+MP_MAX;document.querySelectorAll('#mpMode button').forEach(b=>{b.classList.toggle('on',b.dataset.v===NET.mode);b.disabled=!NET.host});
@@ -2541,7 +2680,7 @@ function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.
 resetP();placeCat();applyTOD();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
 // PWA: instala como app e funciona offline (só em HTTPS ou localhost)
 if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
-window.__tomcat={ML,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={ML,netAc,CAMO,camOffMove,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>

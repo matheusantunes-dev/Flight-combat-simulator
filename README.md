@@ -8,6 +8,20 @@ No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inici
 
 Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
 
+## Câmera do cockpit ajustável (qualquer avião)
+
+Se a cabeça do piloto não ficou boa em algum avião, dá para ajustar a posição sem sair do voo. No PC, use **Ctrl+Shift+↑/↓** para frente e trás, **Ctrl+Shift+PgUp/PgDn** para subir e descer e **Ctrl+Shift+←/→** para o lado. **Ctrl+Shift+Backspace** volta ao padrão. No celular, use os botões da **pausa**. Cada toque move 2,5 cm e o ajuste fica salvo para cada avião. Só a câmera muda: o modelo visto de fora, a física e o trem continuam iguais.
+
+## Avião por link (Sketchfab ou .glb)
+
+No hangar, toque em **＋ Avião por link** e cole o link de um modelo do Sketchfab (precisa estar liberado para download) ou de um arquivo `.glb`. Também dá para escolher um `.glb` ou `.zip` de glTF do seu aparelho. Depois, escolha o **caça base**: o avião novo herda dele a física, as armas reais, o canhão e o assento ejetável. Informe também o **comprimento real**, que o jogo usa para acertar a escala.
+
+- **Sketchfab:** usa a API oficial de download, com o seu token (Sketchfab → Settings → Password & API). O token fica só neste aparelho e só é enviado ao próprio Sketchfab.
+- **O que o jogo ajusta sozinho:** descobre o eixo e o nariz (a deriva é o ponto mais alto e fica atrás), centraliza o avião, põe as rodas no chão e acha as peças de trem e de vidro pelos nomes. Também dá um palpite da posição do olho do piloto. Se algo sair torto, use **Girar 90°**, **Inverter nariz** e o ajuste do olho.
+- **Onde fica salvo:** o arquivo vai para o IndexedDB do navegador, então não precisa baixar de novo, e o avião continua no hangar depois de recarregar a página.
+- **Multiplayer:** os outros jogadores veem o caça base, porque eles não têm o seu arquivo.
+- **Limites:** se o site do link não liberar CORS, o navegador bloqueia o download. Nesse caso, baixe o arquivo e use a opção "arquivo do seu aparelho". Modelos acima de ~80 MB são recusados.
+
 ## Olhar livre com o mouse (só PC)
 
 Aperte **Alt+C** (o mesmo atalho do DCS) ou clique com o **botão do meio** (como no MSFS) para prender o cursor. A partir daí, é só mover o mouse para virar a cabeça do piloto, sem clicar. A cabeça fica onde você deixou, e o duplo clique centraliza. Para soltar, aperte **Alt+C** de novo, o botão do meio ou **Esc**; o Esc só solta o mouse e não pausa o jogo. Também funciona na câmera externa e no modo a pé. Usa a Pointer Lock API do navegador, e no celular fica desligado.
@@ -150,9 +164,10 @@ Observações honestas:
 - Modelos 3D dos caças F-14, F-16, MiG-29 e Mirage 2000: bohmerang, **CC BY-NC-SA** (uso não comercial, com atribuição e mesma licença).
 - MiG-29 e Su-27 simples: Zuujis, CC0.
 - F-15E, Rafale M, Su-57, Gripen, Su-35 e Su-34: bohmerang, **CC BY-NC-SA 4.0**.
-- F-117A, F-22A e F-16E/F Block 60: andertan, **CC BY 4.0**.
-- A-10C e Su-30MKK: Jeyhun1985, **CC BY 4.0**. Su-25: Alexios_Apokaukos, **CC BY 4.0**.
+- F-117A e F-22A: andertan, **CC BY 4.0**. F-16F Block 60: MirzaArrafiERV_45, **CC BY 4.0**.
+- A-10C: blarg, **CC BY 4.0** (bombas do modelo removidas). Su-30MKK: Jeyhun1985, **CC BY 4.0**. Su-25: Alexios_Apokaukos, **CC BY 4.0**.
+- F/A-18E Super Hornet: Jeyhun1985, **CC BY 4.0**. F-4E Phantom II: Kenny3D89, **CC BY 4.0** (canopis, que vieram abertos, removidos). A-29 Super Tucano: KOG_THORNS, **CC BY 4.0** (malha de colisão removida).
 - J-11B (usado como Flanker inimigo): Rhine_Lab_Muelsyse, **CC BY 4.0**.
-- Alterações nos modelos CC BY: reorientados (nariz em +X), simplificados, texturas recomprimidas; F-117, F-16E, F-22, A-10 e Su-30 ganham trem de pouso procedural no jogo (os modelos vieram com o trem recolhido).
+- Alterações nos modelos CC BY: reorientados (nariz em +X), simplificados, texturas recomprimidas; F-117, F-22 e Su-30 ganham trem de pouso procedural no jogo (os modelos vieram com o trem recolhido); no F-16F e no A-10 o trem, que veio fundido na fuselagem, é recortado para recolher em voo.
 
 Por causa da licença NC dos caças, este projeto **não pode ser vendido nem monetizado** sem trocar esses modelos.
