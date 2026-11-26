@@ -241,7 +241,7 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
       <button data-v="su34"><b>Su-34 Fullback</b><span>Bombardeiro, Kh-59M, KAB-250</span></button>
       <button data-v="su35"><b>Su-35S Flanker-E</b><span>Supermanobrável, R-37M</span></button>
       <button data-v="su57"><b>Su-57 Felon</b><span>Furtivo, R-74M, R-37M</span></button>
-      <button data-v="f16e"><b>F-16E Block 60</b><span>Desert Falcon, CFT, AMRAAM, 4 Maverick</span></button>
+      <button data-v="f16e"><b>F-16F Block 60</b><span>Dois lugares, CFT, AMRAAM, 4 Maverick</span></button>
       <button data-v="a10"><b>A-10C Warthog</b><span>GAU-8 de 30 mm, blindado, Maverick, SDB</span></button>
       <button data-v="su25"><b>Su-25 Frogfoot</b><span>Apoio aéreo, Kh-25ML, FAB-500</span></button>
       <button data-v="f117"><b>F-117A Nighthawk</b><span>Furtivo subsônico, 2 GBU-27</span></button>
@@ -298,7 +298,7 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
     </section>
     <div class="goBar"><p id="selLine"></p><div class="goRow"><button id="go" class="go">DECOLAR</button><button id="mpOpen" class="go mpgo" type="button">MULTIPLAYER<small>até 6 pilotos</small></button></div></div>
     <p class="best" id="loadst">Carregando modelos 3D...</p><p class="best">Recorde: <b id="bestv">0</b> pontos · toque, teclado ou gamepad · toque para ativar o som</p>
-    <p class="best cred">Modelos: <a href="https://sketchfab.com/3d-models/f-14-tomcat-fighter-jet-free-497f77c311b5411d9b567d8707a81c33">F-14</a>, <a href="https://sketchfab.com/3d-models/f-16-fighting-falcon-fighter-jet-free-f0b00989e5634764848ef2c235c64db5">F-16</a>, <a href="https://sketchfab.com/3d-models/mig-29-fighter-jet-free-0a21787096244220b246ec8747e7b09c">MiG-29</a> e <a href="https://sketchfab.com/3d-models/dassault-mirage-2000-fighter-jet-free-aca93654c4684c5282e723c5b2999f67">Mirage 2000</a> por bohmerang (CC BY-NC-SA 4.0; asas do F-14 separadas, texturas recomprimidas e cockpits adaptados nesta versão) · MiG-29 e Su-27 por <a href="https://github.com/zuujis-cc0/free-game-assets">Zuujis</a> (CC0) · F-15E, Rafale, Su-57, Gripen, Su-35 e Su-34 por <a href="https://sketchfab.com/bohmerang">bohmerang</a> (CC BY-NC-SA 4.0) · F-117, F-22 e F-16E/F por <a href="https://sketchfab.com/andertan">andertan</a> (CC BY 4.0) · A-10C e Su-30MKK por <a href="https://sketchfab.com/Jeyhun1985">Jeyhun1985</a> (CC BY 4.0) · Su-25 por <a href="https://sketchfab.com/Alexios_Apokaukos">Alexios_Apokaukos</a> (CC BY 4.0) · J-11 por <a href="https://sketchfab.com/Rhine_Lab_Muelsyse">Rhine_Lab_Muelsyse</a> (CC BY 4.0). Modelos genéricos reorientados, simplificados e com trem de pouso desenhado no jogo quando vinham recolhidos. Projeto pessoal, sem fins comerciais.</p>
+    <p class="best cred">Modelos: <a href="https://sketchfab.com/3d-models/f-14-tomcat-fighter-jet-free-497f77c311b5411d9b567d8707a81c33">F-14</a>, <a href="https://sketchfab.com/3d-models/f-16-fighting-falcon-fighter-jet-free-f0b00989e5634764848ef2c235c64db5">F-16</a>, <a href="https://sketchfab.com/3d-models/mig-29-fighter-jet-free-0a21787096244220b246ec8747e7b09c">MiG-29</a> e <a href="https://sketchfab.com/3d-models/dassault-mirage-2000-fighter-jet-free-aca93654c4684c5282e723c5b2999f67">Mirage 2000</a> por bohmerang (CC BY-NC-SA 4.0; asas do F-14 separadas, texturas recomprimidas e cockpits adaptados nesta versão) · MiG-29 e Su-27 por <a href="https://github.com/zuujis-cc0/free-game-assets">Zuujis</a> (CC0) · F-15E, Rafale, Su-57, Gripen, Su-35 e Su-34 por <a href="https://sketchfab.com/bohmerang">bohmerang</a> (CC BY-NC-SA 4.0) · F-117 e F-22 por <a href="https://sketchfab.com/andertan">andertan</a> (CC BY 4.0) · F-16F Block 60 por <a href="https://sketchfab.com/MirzaArrafiERV_45">MirzaArrafiERV_45</a> (CC BY 4.0) · A-10C e Su-30MKK por <a href="https://sketchfab.com/Jeyhun1985">Jeyhun1985</a> (CC BY 4.0) · Su-25 por <a href="https://sketchfab.com/Alexios_Apokaukos">Alexios_Apokaukos</a> (CC BY 4.0) · J-11 por <a href="https://sketchfab.com/Rhine_Lab_Muelsyse">Rhine_Lab_Muelsyse</a> (CC BY 4.0). Modelos genéricos reorientados, simplificados e com trem de pouso desenhado no jogo quando vinham recolhidos. Projeto pessoal, sem fins comerciais.</p>
   </div>
   <div class="card keys" id="keys1"></div>
   <div id="hgStats" class="hgpanel"></div>
@@ -1054,7 +1054,7 @@ const NEWAC={f15e:{name:'F-15E Strike Eagle',vne:800,S:56.5,empty:14300,fuel:595
  a10:{name:'A-10C Thunderbolt II',vne:450,S:47,empty:11321,fuel:4990,mil:80600,ab:0,CLa:5.2,aSt:.4,cd0:.032,k:.06,gLim:7.3,fbw:false,roll:2.6,wave:1,ram:-.935,cost:3000},
  su30:{name:'Su-30MKK Flanker-G',vne:760,S:62,empty:17700,fuel:9400,mil:153000,ab:92000,CLa:4.1,aSt:.55,cd0:.022,k:.09,gLim:9,fbw:true,roll:3.5,wave:.192,cost:6000},
  f22:{name:'F-22A Raptor',vne:800,S:78.04,empty:19700,fuel:8200,mil:232000,ab:80000,CLa:3.9,aSt:.6,cd0:.017,k:.1,gLim:9,fbw:true,roll:4.0,wave:.145,stealth:.1,cost:10000},
- f16e:{name:'F-16E Block 60 Desert Falcon',vne:800,S:27.87,empty:9980,fuel:4550,mil:84000,ab:60000,CLa:4.0,aSt:.44,cd0:.021,k:.1,gLim:9,fbw:true,roll:4.2,wave:.465,cost:2500},
+ f16e:{name:'F-16F Block 60 Desert Falcon',vne:800,S:27.87,empty:10250,fuel:4300,mil:84000,ab:60000,CLa:4.0,aSt:.44,cd0:.021,k:.1,gLim:9,fbw:true,roll:4.2,wave:.465,cost:2500},
  su25:{name:'Su-25 Frogfoot',vne:520,S:30.1,empty:9800,fuel:3000,mil:88000,ab:0,CLa:4.6,aSt:.4,cd0:.035,k:.07,gLim:6.5,fbw:false,roll:2.5,wave:1,ram:-.5,cost:2500}};
 for(const [id,d] of Object.entries(NEWAC))if(!ACFT[id])ACFT[id]=Object.assign({file:'models/'+id+'.glb',scale:1,eye:[6,1],gearH:2.8,sweep:false,naval:false,hudB:12,fl:[[0,0,10]],soon:true},d);
 // velocidades calibradas (ferramenta tools/velocidade.mjs): máxima real em altitude e limite estrutural ao nível do mar
@@ -1071,7 +1071,7 @@ const MODELS={f15e:{scale:.1001,eye:[9.45,1.35],gearH:3.65,fl:[[-.72,-.7,16.8],[
 // modelos genéricos (normalizados por tools: nariz +X, Y pra cima). pgear = trem desenhado no jogo (o modelo veio com o trem recolhido): [x, z, topo, raio, largura, rodas]
 Object.assign(MODELS,{
  f117:{scale:.8155,eye:[4.15,1.45],gearH:3.16,fl:[[-1.3,-.5,15],[1.3,-.5,15]],pgear:{gy:-1.71,w:[[5.0,0,.05,.3,.18],[-1.6,-1.7,0,.42,.26],[-1.6,1.7,0,.42,.26]]}},
- f16e:{scale:.5612,eye:[1.1,1.18],gearH:2.58,fl:[[0,-.48,11.1]],gSeat:.6,pgear:{gy:-1.4,w:[[.3,0,-.45,.3,.18],[-3.7,-1.18,-.2,.38,.24],[-3.7,1.18,-.2,.38,.24]]}},
+ f16e:{scale:1.0736,eye:[3.95,2.74],gearH:2.74,fl:[[0,-1.14,11.2]],gSeat:.6,rio:true,gcut:{y:.66,b:[[-2.1,-.45,.5,1.65],[2.2,3.45,0,.5]]}},
  su30:{scale:.9707,eye:[7.55,1.1],gearH:3.71,fl:[[-1.45,-.8,16.4],[1.45,-.8,16.4]],rio:true,pgear:{gy:-2.61,w:[[5.4,0,-.5,.34,.2,2],[-.5,-2.17,-.7,.5,.3],[-.5,2.17,-.7,.5,.3]]}},
  f22:{scale:1.5457,eye:[-4.15,1.3],gearH:4.05,fl:[[-.75,-1.3,14.9],[.75,-1.3,14.9]],pgear:{gy:-2.75,w:[[-5.4,0,-.9,.3,.18],[-11.2,-1.6,-1.0,.4,.24],[-11.2,1.6,-1.0,.4,.24]]}},
  a10:{scale:1.0,eye:[4.55,.45],gearH:3.39,fl:[[-1.0,.57,9.05],[1.0,.57,9.05]],pgear:{gy:-2.94,w:[[5.8,.4,-1.2,.37,.24],[-.6,-2.6,-1.3,.45,.3],[-.6,2.6,-1.3,.45,.3]]}},
@@ -1883,7 +1883,9 @@ function procGear(pg){const out=[],leg=new THREE.MeshStandardMaterial({color:0x8
   for(let i=0;i<n;i++){const dz=n>1?(i-.5)*(wd+.06):0,t=new THREE.CylinderGeometry(r,r,wd,20);t.rotateX(Math.PI/2);t.translate(x,y0,z+dz);out.push([t,tire]);const h=new THREE.CylinderGeometry(r*.55,r*.55,wd+.02,12);h.rotateX(Math.PI/2);h.translate(x,y0,z+dz);out.push([h,hub])}}
  return out}
 function prepHD(sc,id){const ac=ACFT[id],w=new THREE.Group();sc.scale.setScalar(ac.scale);w.add(sc);const R={id,body:[],wl:[],wr:[],gOn:[],gOff:[],cock:[],glass:[]};
- const pushBody=(g,m)=>R.body.push([g,m]);
+ // gcut: modelo com o trem baixado fundido na fuselagem; triângulos abaixo de y dentro das caixas [x0,x1,|z|min,|z|max] viram trem (recolhe em voo)
+ const gc=ac.gcut,inG=gc?(x,y,z)=>y<gc.y&&gc.b.some(([x0,x1,z0,z1])=>x>x0&&x<x1&&Math.abs(z)>=z0&&Math.abs(z)<z1)?1:0:null;
+ const pushBody=(g,m)=>{if(!gc){R.body.push([g,m]);return}const [b,t]=splitGeo(g,inG,2);R.body.push([b,m]);R.gOn.push([t,m])};
  for(const q of bake(w)){const nm=q.name;
   if(nm.includes('airframe')){if(ac.sweep){const [b,l,r]=splitGeo(q.g,(x,y,z)=>x>-1.9&&Math.abs(z)>3?(z<0?1:2):0,3);R.body.push([b,q.m]);R.wl.push([l,q.m]);R.wr.push([r,q.m])}else pushBody(q.g,q.m)}
   else if(nm.includes('gearOn')||nm.includes('landingOn'))R.gOn.push([q.g,q.m]);else if(nm.includes('gearOff')||nm.includes('landingOff'))R.gOff.push([q.g,q.m]);
