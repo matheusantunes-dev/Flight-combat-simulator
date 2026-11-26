@@ -513,24 +513,27 @@ const sea=new THREE.Mesh(new THREE.PlaneGeometry(200000,200000),new THREE.MeshSt
  · Fresnel: de raspão a água vira espelho do céu (por isso o mar longe tem a cor do horizonte)
  · sun glitter: o caminho de brilho do sol na água, que some à noite
  · LOD: cada oitava de onda desaparece com a distância, senão vira chuvisco piscando. */
-const WATER={sun:new THREE.Vector3(0,1,0),horiz:new THREE.Color(0x9fc4dd),u:null};
+const WATER={sun:new THREE.Vector3(0,1,0),horiz:new THREE.Color(0x9fc4dd),zen:new THREE.Color(0x3d6c9e),u:null};
 sea.material.normalMap=null;sea.material.roughness=.2;sea.material.needsUpdate=true;
 sea.material.onBeforeCompile=sh=>{
- sh.uniforms.uTime={value:0};sh.uniforms.uSun={value:WATER.sun};sh.uniforms.uHorizon={value:WATER.horiz};sh.uniforms.uGlit={value:1};WATER.u=sh.uniforms;
+ sh.uniforms.uTime={value:0};sh.uniforms.uSun={value:WATER.sun};sh.uniforms.uHorizon={value:WATER.horiz};sh.uniforms.uZenith={value:WATER.zen};sh.uniforms.uGlit={value:1};WATER.u=sh.uniforms;
  sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vWPos;')
   .replace('#include <worldpos_vertex>','#include <worldpos_vertex>\n vWPos=(modelMatrix*vec4(transformed,1.0)).xyz;');
  sh.fragmentShader=sh.fragmentShader.replace('#include <common>',`#include <common>
-varying vec3 vWPos;uniform float uTime;uniform vec3 uSun;uniform vec3 uHorizon;uniform float uGlit;
+varying vec3 vWPos;uniform float uTime;uniform vec3 uSun;uniform vec3 uHorizon;uniform vec3 uZenith;uniform float uGlit;
 vec3 gWN=vec3(0.0,1.0,0.0);
 vec2 waveGrad(vec2 p,float t,float dC){vec2 g=vec2(0.0);
  // "domain warp": dobra as cristas com um ruído lento. Sem isso as senoides viram listras de telha.
- p+=7.0*vec2(sin(p.y*0.0032+t*0.21),cos(p.x*0.0036-t*0.19));
- for(int i=0;i<7;i++){float fi=float(i);float sc=pow(2.35,fi);
+ p+=26.0*vec2(sin(p.y*0.0032+t*0.21),cos(p.x*0.0036-t*0.19))+6.0*vec2(sin(p.y*0.021-t*0.5),cos(p.x*0.019+t*0.45));
+ for(int i=0;i<9;i++){float fi=float(i);float sc=pow(2.35,fi);
   float ang=fi*2.3999+0.6;vec2 d=vec2(cos(ang),sin(ang));
-  float k=0.0075*sc,a=0.95/pow(sc,1.22);
+  float k=0.0075*sc,a=0.95/pow(sc,1.08);
   float lod=clamp(1.0-dC*k/900.0,0.0,1.0);lod*=lod;
   // dispersão de águas profundas: onda grande anda rápido, ondinha anda devagar (c = sqrt(g/k))
-  g+=d*(a*k*cos(k*(dot(d,p)-sqrt(9.81/k)*t))*lod);}
+  // e a crista é entortada por um termo transversal: sem isso as ondas viram xadrez visto de cima.
+  vec2 dp=vec2(-d.y,d.x);
+  float ph=k*(dot(d,p)-sqrt(9.81/k)*t)+2.2*sin(dot(dp,p)*k*0.31+t*0.4+fi);
+  g+=(d+dp*0.35*cos(dot(dp,p)*k*0.31+t*0.4+fi))*(a*k*cos(ph)*lod);}
  return g;}`)
   .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
  {float dC=length(vWPos.xz-cameraPosition.xz);
@@ -539,10 +542,14 @@ vec2 waveGrad(vec2 p,float t,float dC){vec2 g=vec2(0.0);
   normal=normalize((viewMatrix*vec4(gWN,0.0)).xyz);}`)
   .replace('gl_FragColor = vec4( outgoingLight, diffuseColor.a );',`
  {vec3 V=normalize(cameraPosition-vWPos);
-  float fres=pow(1.0-clamp(dot(gWN,V),0.0,1.0),5.0);
+  float fres=0.02+0.98*pow(1.0-clamp(dot(gWN,V),0.0,1.0),5.0);
   vec3 H=normalize(normalize(uSun)+V);
   float spec=pow(max(dot(gWN,H),0.0),260.0)+0.13*pow(max(dot(gWN,H),0.0),70.0);
-  outgoingLight=mix(outgoingLight,uHorizon,clamp(fres*0.75,0.0,0.8));
+  // reflexo do céu: cada face de onda reflete um pedaço diferente do céu (zênite escuro, horizonte claro).
+  // É isso que faz a água "mexer" de verdade no olho, mais até do que o relevo da onda.
+  vec3 R=reflect(-V,gWN);
+  vec3 skyR=mix(uZenith,uHorizon,pow(1.0-clamp(R.y,0.0,1.0),2.2));
+  outgoingLight=mix(outgoingLight,skyR,clamp(fres*0.8,0.0,0.85));
   outgoingLight+=vec3(1.0,0.95,0.84)*spec*1.35*uGlit;}
  gl_FragColor = vec4( outgoingLight, diffuseColor.a );`)};
 
@@ -2372,7 +2379,7 @@ function update(dt){
  if(run){G.t+=dt;readInput(dt);if(P.gph.loc>0&&P.state!=='dead'){IN.pitch=IN.roll=IN.yaw=0;fireHeld=false}const n=Math.ceil(dt/.008);for(let i=0;i<n&&P.state!=='dead'&&P.state!=='out';i++)stepPlayer(dt/n);axes();att();updGun(dt);radar();gPhys(dt);}
  else if(G.mode==='menu'){P.spool=.12}
  if(live&&G.mode!=='menu'){FR.length=0;if(P.state==='fly'||P.state==='deck')FR.push(P);for(const a of AL)if(a.alive&&!a.dying&&a.state!=='hold')FR.push(a);if(G.vip&&G.vip.alive&&!G.vip.dying)FR.push(G.vip);if(NET.match&&NET.mode==='coop')for(const r of NET.R.values())if(r.alive)FR.push(r);if(G.vip&&G.vip.alive)updVIP(G.vip,dt);for(const t of[...T]){if(!t.alive)continue;t.ghost?updGhost(t,dt):t.kind==='remote'?0:t.kind==='bandit'?updBandit(t,dt):t.kind==='ground'?updGround(t,dt):updVamp(t,dt)}updWrecks(dt);for(const a of[...AL])if(a.alive)updAlly(a,dt);updMissiles(dt);updBullets(dt);updFlares(dt);if(G.mode==='play')waves(dt)}
- if(live){updPS(SMK,dt);updPS(FIR,dt);updPS(SPK,dt);updFX(dt);flashL.intensity*=Math.exp(-dt*6);if(WATER.u){WATER.u.uTime.value+=dt;WATER.sun.copy(sunDirL);WATER.horiz.copy(scene.fog.color);WATER.u.uGlit.value=clamp((ATM.el+3)/10,0,1)}
+ if(live){updPS(SMK,dt);updPS(FIR,dt);updPS(SPK,dt);updFX(dt);flashL.intensity*=Math.exp(-dt*6);if(WATER.u){WATER.u.uTime.value+=dt;WATER.sun.copy(sunDirL);WATER.horiz.copy(scene.fog.color);WATER.zen.copy(scene.fog.color).multiplyScalar(.42).lerp(new THREE.Color(0x14325e),.45*clamp((ATM.el+4)/14,0,1));WATER.u.uGlit.value=clamp((ATM.el+3)/10,0,1)}
   if(G.carrierHp<75&&Math.random()<.5)emit(SMK,tA.set(rnd(-8,8),DECK+2,rnd(-60,40)),rnd(-2,2),rnd(8,14),rnd(-2,2),rnd(5,9),8,45,.12,.11,.1,.6,.3,1);
   if(P.state==='cat'&&Math.random()<.15)emit(SMK,tA.set(rnd(-.5,.5),DECK+.3,rnd(-150,CAT_Z)),0,rnd(1,3),0,2.5,2,8,.85,.87,.9,.25,.6)}
  if(G.mode!=='menu'&&!G.paused)pbStep(dt);mpTick(dt);worldTick(dt);worldShift();if(JOY.cap)joyCapPoll();if(!document.getElementById('ctl').classList.contains('hide'))joyBars();if(run&&WORLD.real&&P.state==='fly'&&hitBuilding(P.pos))crash('Você bateu num prédio do Rio!');

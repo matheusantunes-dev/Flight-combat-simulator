@@ -11,7 +11,8 @@ Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fc
 ## Água e terreno
 
 - **Água sem textura repetida:** o mar não usa mais uma imagem de ondas em mosaico (era ela que fazia aquele xadrez de moiré no horizonte). As ondas são somadas no shader — 7 tamanhos, em direções diferentes, cada uma andando na velocidade física certa (`c = √(g/k)`: onda grande corre, ondinha se arrasta), com as cristas dobradas por ruído para não virar listra de telha.
-- **Fresnel e brilho do sol:** de raspão o mar vira espelho do céu (por isso o horizonte some na cor do céu) e o caminho de brilho do sol aparece na água — e some à noite.
+- **Fresnel e reflexo do céu:** de raspão o mar vira espelho do céu, e cada face de onda reflete um pedaço diferente dele (zênite escuro, horizonte claro) — é isso que faz a água parecer que mexe de verdade. O caminho de brilho do sol aparece na água e some à noite.
+- **Cristas entortadas:** cada onda tem um termo transversal que curva a crista. Sem isso, visto de cima, o mar vira xadrez.
 - **Ondas somem com a distância** (LOD), senão o mar longe fica chuviscando.
 - **Terreno com textura procedural:** em vez de multiplicar a geometria (caro no celular), o relevo ganha ruído em três escalas no shader, e a faixa de areia do litoral agora é uma transição suave em vez de blocos.
 - **Bases escolhem o próprio sítio:** cada pista procura em volta o trecho mais plano e baixo que caiba nela inteira, com semente fixa (todo mundo da sala vê a base no mesmo lugar).
