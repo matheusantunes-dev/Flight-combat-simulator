@@ -8,6 +8,10 @@ No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inici
 
 Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
 
+## Câmera do cockpit ajustável (qualquer avião)
+
+Se a cabeça do piloto não ficou boa em algum avião, dá para ajustar a posição sem sair do voo. No PC, use **Ctrl+Shift+↑/↓** para frente e trás, **Ctrl+Shift+PgUp/PgDn** para subir e descer e **Ctrl+Shift+←/→** para o lado. **Ctrl+Shift+Backspace** volta ao padrão. No celular, use os botões da **pausa**. Cada toque move 2,5 cm e o ajuste fica salvo para cada avião. Só a câmera muda: o modelo visto de fora, a física e o trem continuam iguais.
+
 ## Avião por link (Sketchfab ou .glb)
 
 No hangar, toque em **＋ Avião por link** e cole o link de um modelo do Sketchfab (precisa estar liberado para download) ou de um arquivo `.glb`. Também dá para escolher um `.glb` ou `.zip` de glTF do seu aparelho. Depois, escolha o **caça base**: o avião novo herda dele a física, as armas reais, o canhão e o assento ejetável. Informe também o **comprimento real**, que o jogo usa para acertar a escala.

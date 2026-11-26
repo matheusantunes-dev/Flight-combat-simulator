@@ -47,3 +47,5 @@ jobs:
         run: node tests/olhar.mjs
       - name: Avião por link (importa .glb, herda física e armas)
         run: node tests/link.mjs
+      - name: Câmera do cockpit ajustável
+        run: node tests/camera.mjs

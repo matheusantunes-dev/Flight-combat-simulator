@@ -78,7 +78,7 @@ body.touch #radio{bottom:auto;top:40px;width:min(470px,60vw)}body.touch #rlog{ma
 .goBar{position:sticky;bottom:0;margin:12px -24px -22px;padding:12px 24px 14px;background:linear-gradient(180deg,rgba(14,20,22,0),rgba(14,20,22,.96) 30%);border-radius:0 0 14px 14px;z-index:2}.goBar .go{width:100%;margin:0}
 #pause{align-items:center}#pause .main{order:-1}#pause .keys{max-height:calc(100dvh - 40px);overflow:auto}
 #thrMil::after{right:auto;left:5px;top:-15px}
-#mp{background:rgba(5,8,10,.7);justify-content:center}#cust{background:rgba(5,8,10,.72);justify-content:center}#cust select,#cust input[type=number]{background:#0c1418;color:#cfe;border:1px solid #2a3a40;border-radius:8px;padding:4px 6px}#custOpen{margin-top:8px;width:100%}#custList button{margin-left:8px}.mpcard{width:min(480px,100%)}.mph{display:flex;align-items:center;justify-content:space-between}.mph h2{margin:0;font-size:28px}.mph .x{all:unset;cursor:pointer;font-size:20px;padding:4px 8px}
+#mp{background:rgba(5,8,10,.7);justify-content:center}#cust{background:rgba(5,8,10,.72);justify-content:center}.camed{margin-top:12px}.camgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.camgrid .btn{margin:0;padding:8px 4px;font-size:13px}#camReset{font-size:13px;padding:8px 10px;flex:0 0 auto}.camed .mprow{flex-wrap:wrap}.camed p.sub{font-size:12px}#cust select,#cust input[type=number]{background:#0c1418;color:#cfe;border:1px solid #2a3a40;border-radius:8px;padding:4px 6px}#custOpen{margin-top:8px;width:100%}#custList button{margin-left:8px}.mpcard{width:min(480px,100%)}.mph{display:flex;align-items:center;justify-content:space-between}.mph h2{margin:0;font-size:28px}.mph .x{all:unset;cursor:pointer;font-size:20px;padding:4px 8px}
 .mprow{display:flex;gap:8px;align-items:center}.mprow .btn{flex:1;margin-top:10px}.mpcode{text-transform:uppercase;letter-spacing:.2em;font-family:'Share Tech Mono',monospace;margin-top:10px}.mpcodebox{margin-top:12px;font-size:15px;color:var(--muted)}.mpcodebox b{font:700 30px 'Share Tech Mono',monospace;color:var(--hud);letter-spacing:.15em;flex:1}
 .mplist{margin:4px 0 0;padding:0;list-style:none}.mplist li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.mplist li span{color:var(--muted);font-size:13px}
 .mpgo{background:rgba(140,255,170,.12);color:var(--hud);border:1px solid rgba(140,255,170,.5);font-size:16px;margin-top:8px!important;padding:10px!important}#mpVoice.on{background:#c0392b;color:#fff}
@@ -380,7 +380,12 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
 <div id="pause" class="ov hide">
   <div class="card keys" id="keys2"></div>
   <div class="card main"><h1>PAUSA</h1><p class="sub">O RIO aproveitou para tomar um café kkk</p>
-    <div class="btns"><button class="btn" id="resume">Continuar</button><button class="btn alt" id="tomenu1">Menu</button></div><button class="btn alt ctlbtn" id="ctlOpen2" type="button">Controles · Joystick · VR</button></div>
+    <div class="btns"><button class="btn" id="resume">Continuar</button><button class="btn alt" id="tomenu1">Menu</button></div><button class="btn alt ctlbtn" id="ctlOpen2" type="button">Controles · Joystick · VR</button>
+    <div class="camed"><div class="lbl">Câmera do cockpit deste avião</div>
+     <div class="camgrid"><button class="btn alt" data-cam="0,0,0,1">⤒ Sobe</button><button class="btn alt" data-cam="1,0,0">▲ Frente</button><button class="btn alt" data-cam="0,0,0,-1">⤓ Desce</button>
+      <button class="btn alt" data-cam="0,0,-1">◀ Esq.</button><button class="btn alt" data-cam="-1,0,0">▼ Trás</button><button class="btn alt" data-cam="0,0,1">Dir. ▶</button></div>
+     <div class="mprow"><button class="btn alt" id="camReset" type="button">Voltar ao padrão</button><span class="sub" id="camInfo"></span></div>
+     <p class="sub">No PC, sem pausar: Ctrl+Shift+↑↓ frente/trás, Ctrl+Shift+PgUp/PgDn sobe/desce, Ctrl+Shift+←→ lado, Ctrl+Shift+Backspace volta ao padrão. Fica salvo para cada avião.</p></div></div>
 </div>
 
 <div id="over" class="ov hide">
@@ -821,7 +826,7 @@ function rearm(){P.fuel=A.fuel;P.gun=A.gun.n;P.flr=P.chf=30;P.hp=100;for(const k
 const K={},IN={pitch:0,roll:0,yaw:0};let fireHeld=false,gpPrev=[];
 let view='cock',headYaw=0,headPitch=0,lookYaw=0,lookPitch=0,dragging=false,fovT=65,extDist=34,extYaw=0,extPitch=-.12;
 const keyBlock=['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Tab','Digit1','Digit2','Digit3','Digit4','Digit5','Digit6'];
-addEventListener('keydown',e=>{if(JOY.cap&&e.code==='Escape'){JOY.cap=null;joyUI('Cancelado.');return}if(e.code==='KeyC'&&e.altKey&&!e.ctrlKey&&!e.metaKey){e.preventDefault();if(!e.repeat)mlToggle();return}if(e.code==='Escape'&&(ML.on||performance.now()-ML.off<400))return;/* Esc só solta o mouse, não pausa */if(G.kcam){G.kcam=null;return}if(e.code==='Tab'&&NET.match&&!(e.target&&e.target.tagName==='INPUT')){e.preventDefault();mpBoardShow(true);return}if(e.target&&e.target.id==='rin'){if(e.code==='Escape')radioOpen(false);return}if(e.code==='Enter'&&G.mode==='play'){e.preventDefault();radioOpen(true);return}if(G.mode==='play'&&keyBlock.includes(e.code))e.preventDefault();if(e.code==='KeyE'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(!e.repeat&&G.mode==='play'){initAudio();ejectPress()}return}if(e.code==='KeyE'&&(e.shiftKey||PB.on)&&G.mode==='play'){if(!e.repeat)pbAction();return}if(e.repeat)return;K[e.code]=true;initAudio();onKey(e.code)});
+addEventListener('keydown',e=>{if(JOY.cap&&e.code==='Escape'){JOY.cap=null;joyUI('Cancelado.');return}if(e.ctrlKey&&e.shiftKey&&G.mode==='play'){const M={ArrowUp:[1,0,0],ArrowDown:[-1,0,0],ArrowLeft:[0,0,-1],ArrowRight:[0,0,1],PageUp:[0,0,0,1],PageDown:[0,0,0,-1]}[e.code];if(M||e.code==='Backspace'){e.preventDefault();if(M)camOffMove(M);else camOffReset();return}}if(e.code==='KeyC'&&e.altKey&&!e.ctrlKey&&!e.metaKey){e.preventDefault();if(!e.repeat)mlToggle();return}if(e.code==='Escape'&&(ML.on||performance.now()-ML.off<400))return;/* Esc só solta o mouse, não pausa */if(G.kcam){G.kcam=null;return}if(e.code==='Tab'&&NET.match&&!(e.target&&e.target.tagName==='INPUT')){e.preventDefault();mpBoardShow(true);return}if(e.target&&e.target.id==='rin'){if(e.code==='Escape')radioOpen(false);return}if(e.code==='Enter'&&G.mode==='play'){e.preventDefault();radioOpen(true);return}if(G.mode==='play'&&keyBlock.includes(e.code))e.preventDefault();if(e.code==='KeyE'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(!e.repeat&&G.mode==='play'){initAudio();ejectPress()}return}if(e.code==='KeyE'&&(e.shiftKey||PB.on)&&G.mode==='play'){if(!e.repeat)pbAction();return}if(e.repeat)return;K[e.code]=true;initAudio();onKey(e.code)});
 addEventListener('keyup',e=>{if(e.code==='Tab')mpBoardShow(false);K[e.code]=false});
 addEventListener('blur',()=>{for(const k in K)K[k]=false;if(G.mode==='play'&&!G.paused)setPause(true)});
 let lpx=0,lpy=0;glc.addEventListener('pointerdown',e=>{if(e.button===1||ML.on)return;dragging=true;lpx=e.clientX;lpy=e.clientY;glc.setPointerCapture(e.pointerId);initAudio()});
@@ -2024,6 +2029,15 @@ async function custSave(r){delete ACM[r.id];if(HG.models)delete HG.models[r.id];
  $c('custFlip').onclick=()=>rebuild(r=>{r.orient=Object.assign({},r.orient,{nose:-(r.orient.nose||1)});r.eyeSet=false});
  $c('custApply').onclick=()=>rebuild(r=>{r.eye=[+$c('custEx').value,+$c('custEy').value];r.eyeSet=true});
  custBoot()})();
+// Câmera do cockpit ajustável em qualquer avião (como o "mover a cabeça" do DCS / câmera customizada do MSFS):
+// só move a cabeça do piloto (o modelo de fora, a física e o trem não mudam). Passo de 2,5 cm; salvo por avião.
+const CAMO={id:null,v:(()=>{try{return JSON.parse(localStorage.getItem('fcs-camoff')||'{}')}catch(e){return{}}})()};
+function camOffApply(){if(!COCK.hd||!CAMO.id||!ACFT[CAMO.id])return;const a=ACFT[CAMO.id],o=CAMO.v[CAMO.id]||[0,0,0],m=COCK.hd.g.children[0];m.position.set(-((a.eye[2]||0)+o[2]),-(a.eye[1]+o[1]),a.eye[0]+o[0]);camOffInfo()}
+function camOffInfo(){const el=document.getElementById('camInfo');if(!el)return;const o=CAMO.v[CAMO.id]||[0,0,0],cm=v=>(v>=0?'+':'')+Math.round(v*100);el.textContent=CAMO.id?'frente '+cm(o[0])+' · altura '+cm(o[1])+' · lado '+cm(o[2])+' cm':''}
+function camOffSave(){try{localStorage.setItem('fcs-camoff',JSON.stringify(CAMO.v))}catch(e){}}
+function camOffMove([f,_,l,u]){if(!CAMO.id)return;const o=CAMO.v[CAMO.id]||(CAMO.v[CAMO.id]=[0,0,0]),st=.025;o[0]=clamp(o[0]+f*st,-2,2);o[1]=clamp(o[1]+(u||0)*st,-1.5,1.5);o[2]=clamp(o[2]+(l||0)*st,-1,1);camOffSave();camOffApply()}
+function camOffReset(){if(!CAMO.id)return;delete CAMO.v[CAMO.id];camOffSave();camOffApply()}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-cam]');if(b){camOffMove(b.dataset.cam.split(',').map(Number));return}if(e.target.id==='camReset')camOffReset()});
 function loadAircraft(id){if(ACM[id]!==undefined)return Promise.resolve(ACM[id]);if(ACFT[id]&&ACFT[id].custom)return custLoad(id).then(R=>(ACM[id]=R));return loadQ(ACFT[id].file).then(sc=>{let R=null;try{if(sc)R=prepHD(sc,id)}catch(e){console.error('HD',id,e)}ACM[id]=R;return R})}
 const cockExtra=[];
 function setupPlayer(id){A=ACFT[id];GEAR_H=A.gearH;const R=ACM[id];
@@ -2031,7 +2045,7 @@ function setupPlayer(id){A=ACFT[id];GEAR_H=A.gearH;const R=ACM[id];
  HD.ok=!!R;me.b.visible=!R;for(const c of cock.children)c.visible=!R;if(!R)return;
  me.hd=makeHD(R,true);me.g.add(me.hd.g);
  me.hdFl=A.fl.map(p=>{const f=new THREE.Mesh(new THREE.CylinderGeometry(.05,.55,4,12,1,true),flameMat);f.rotation.x=Math.PI/2;f.position.set(...p);me.hd.g.add(f);return f});
- COCK.hd=makeHD(R,true);cock.add(COCK.hd.g);
+ COCK.hd=makeHD(R,true);cock.add(COCK.hd.g);CAMO.id=id;camOffApply();
  if(A.panel){const cg=new THREE.Mesh(new THREE.PlaneGeometry(.17,.16),new THREE.MeshBasicMaterial({color:0x9fffc8,transparent:true,opacity:.05,depthWrite:false}));cg.position.set(0,-.02,-.468);cg.rotation.x=-.12;
   const pf=new THREE.Mesh(new THREE.PlaneGeometry(.58,.29),new THREE.MeshBasicMaterial({map:panelTex,toneMapped:false}));pf.position.set(0,-.285,-.535);pf.rotation.x=-.172;cock.add(cg,pf);cockExtra.push(cg,pf)}}
 let parkedDone=false;
@@ -2666,7 +2680,7 @@ function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.
 resetP();placeCat();applyTOD();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
 // PWA: instala como app e funciona offline (só em HTTPS ou localhost)
 if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
-window.__tomcat={ML,netAc,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={ML,netAc,CAMO,camOffMove,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>
