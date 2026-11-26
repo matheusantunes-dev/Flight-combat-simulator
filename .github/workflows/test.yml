@@ -17,6 +17,13 @@ jobs:
         run: |
           npm i --no-save playwright@1 pngjs geojson-vt@3 vt-pbf
           npx playwright install --with-deps chromium
+      - name: Baixar as bibliotecas uma vez (sem CDN em cada aba)
+        run: |
+          mkdir -p "$RUNNER_TEMP/libs"
+          curl -sSfL -o "$RUNNER_TEMP/libs/three.min.js" https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js
+          curl -sSfL -o "$RUNNER_TEMP/libs/GLTFLoader.js" https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js
+          curl -sSfL -o "$RUNNER_TEMP/libs/meshopt_decoder.mjs" https://cdn.jsdelivr.net/npm/meshoptimizer@1.3.0/meshopt_decoder.mjs
+          echo "LIBS=$RUNNER_TEMP/libs" >> "$GITHUB_ENV"
       - name: Servir o jogo
         run: python3 -m http.server 8080 &
       - name: Teste de fumaça

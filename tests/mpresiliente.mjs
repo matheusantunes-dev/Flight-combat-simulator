@@ -16,7 +16,7 @@ if (process.env.LIBS) {
 }
 const errs = [];
 const ready = (p) => p.waitForFunction(() => window.__tomcat && !document.querySelector('#go').disabled, null, { timeout: 120000 });
-const open = async (n, q, pid) => { const p = await ctx.newPage(); await p.addInitScript((v) => { try { sessionStorage.setItem('fcs-pid', v); } catch (e) {} }, pid); p.on('pageerror', (e) => errs.push(n + ': ' + e)); await p.goto(BASE + q); await ready(p); return p; };
+const open = async (n, q, pid) => { const p = await ctx.newPage(); await p.addInitScript((v) => { try { sessionStorage.setItem('fcs-pid', v); } catch (e) {} }, pid); p.on('pageerror', (e) => errs.push(n + ': ' + e)); await p.goto(BASE + q, { timeout: 120000 }); await ready(p); return p; };
 const join = async (p, name, code) => { await p.evaluate((n) => { __tomcat.S.name = n; }, name); if (code) { await p.click('#mpEnter'); } await p.waitForTimeout(2500); };
 const ok = {};
 const nt = (p) => p.evaluate(() => Object.fromEntries(__tomcat.NET.teams));

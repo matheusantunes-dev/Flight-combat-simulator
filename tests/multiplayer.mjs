@@ -16,7 +16,7 @@ if (process.env.LIBS) {
 }
 const errs = [];
 const ready = (p) => p.waitForFunction(() => window.__tomcat && !document.querySelector('#go').disabled, null, { timeout: 120000 });
-const open = async (n, q) => { const p = await ctx.newPage(); p.on('pageerror', (e) => errs.push(n + ': ' + e)); await p.goto(BASE + q); await ready(p); return p; };
+const open = async (n, q) => { const p = await ctx.newPage(); p.on('pageerror', (e) => errs.push(n + ': ' + e)); await p.goto(BASE + q, { timeout: 120000 }); await ready(p); return p; };
 const ok = {};
 
 const A = await open('A', '?rede=local');
@@ -50,6 +50,8 @@ ok.ladosOpostos = (await A.evaluate(() => __tomcat.P.pos.z)) > (await B.evaluate
 await C.evaluate((a) => { __tomcat.NET.tr.send({ t: 'hit', k: 'msl', to: a }); }, await A.evaluate(() => __tomcat.NET.me));
 await A.waitForTimeout(800);
 ok.semFogoAmigo = await A.evaluate(() => __tomcat.P.hp === 100);
+// em máquina lenta (runner do CI) o avião do outro jogador pode demorar a aparecer na lista de alvos
+await A.waitForFunction((b) => __tomcat.T.some((t) => t.kind === 'remote' && t.id === b), idB, { timeout: 30000 });
 await A.evaluate((b) => { const r = __tomcat.T.find((t) => t.kind === 'remote' && t.id === b); for (let i = 0; i < 3; i++) __tomcat.damage(r, 1, 'aim9'); }, idB);
 await A.waitForTimeout(1500);
 ok.pvpKill = (await B.evaluate(() => __tomcat.P.state === 'dead')) && (await A.evaluate(() => __tomcat.G.kills === 1));
