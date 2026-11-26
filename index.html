@@ -279,7 +279,8 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
     </section>
     <section class="tab" data-tab="world">
     <div class="row2">
-      <div><div class="lbl">Horário</div><div class="opts seg" data-k="tod"><button data-v="day">Dia</button><button data-v="dusk">Pôr do sol</button></div></div>
+      <div><div class="lbl">Horário</div><div class="opts seg" data-k="tod"><button data-v="day">Dia</button><button data-v="dusk">Pôr do sol</button><button data-v="night">Noite</button><button data-v="live">Tempo real</button></div></div>
+      <div><div class="lbl">Clima</div><div class="opts seg" data-k="wx"><button data-v="clear">Limpo</button><button data-v="live">Ao vivo</button><button data-v="cloudy">Nublado</button><button data-v="rain">Chuva</button><button data-v="storm">Tempestade</button></div></div>
       <div><div class="lbl">Dificuldade</div><div class="opts seg" data-k="diff"><button data-v="easy">Recruta</button><button data-v="ace">Ás</button></div></div>
     </div>
     <div class="row2"><div><div class="lbl">Mundo</div><div class="opts seg" data-k="world"><button data-v="ilhas">Ilhas</button><button data-v="rio">Mundo real</button></div></div><div id="wqBox"><div class="lbl">Qualidade do mapa</div><div class="opts seg" data-k="wq"><button data-v="baixa">Baixa</button><button data-v="media">Média</button><button data-v="alta">Alta</button></div></div></div>
@@ -429,7 +430,7 @@ const mat=(h,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:lc(h),ro
 const pad=(n,l)=>String(Math.round(n)).padStart(l,'0');
 
 /* ================= configurações ================= */
-const S={world:'ilhas',mission:'c0',tod:'day',diff:'easy',invert:false,voice:true,sound:true,flight:'assist',ac:'f14'};
+const S={world:'ilhas',mission:'c0',tod:'day',wx:'clear',diff:'easy',invert:false,voice:true,sound:true,flight:'assist',ac:'f14'};
 try{Object.assign(S,JSON.parse(localStorage.getItem('tomcat-cfg')||'{}'))}catch(e){}
 const saveCfg=()=>{try{localStorage.setItem('tomcat-cfg',JSON.stringify(S))}catch(e){}};
 let best=0,unlocked=0,unlockedG=0;try{best=+(localStorage.getItem('tomcat-best')||0);unlocked=+(localStorage.getItem('tomcat-camp')||0);unlockedG=+(localStorage.getItem('fcs-campg')||0)}catch(e){}
@@ -460,10 +461,31 @@ const softTex=canvasTex(64,64,x=>{const g=x.createRadialGradient(32,32,0,32,32,3
 const TOD={
  day:{top:0x2b64b5,hor:0xbfd6ea,bot:0x2a4a62,sun:[.42,.6,-.68],sunC:0xfff1d8,li:2.6,hs:0xc8dcf2,hg:0x4f5d4c,hi:.55,sea:0x123a56,cloud:0xffffff,fog:.000029,exp:1},
  dusk:{top:0x1c2853,hor:0xf2a56e,bot:0x2a2236,sun:[-.72,.085,-.69],sunC:0xff9450,li:2.2,hs:0xf2b48a,hg:0x2c2433,hi:.45,sea:0x1c2542,cloud:0xffcfae,fog:.000033,exp:1.1}};
-const skyU={top:{value:new COL()},hor:{value:new COL()},bot:{value:new COL()},sunDir:{value:new V3(0,1,0)},sunCol:{value:new COL()}};
+// céu físico: modelo de Preetham (o THREE.Sky do three.js r128, espalhamento Rayleigh + Mie). Vai do azul ao laranja/roxo
+// sozinho conforme o Sol baixa. Adaptado para a esfera que segue a câmera (direção = posição - câmera).
+const skyU={turbidity:{value:2.5},rayleigh:{value:1.2},mieCoefficient:{value:.005},mieDirectionalG:{value:.8},sunPosition:{value:new V3(0,1,0)},up:{value:new V3(0,1,0)},gain:{value:.55},night:{value:new COL(0x02040a)}};
 const skyMat=new THREE.ShaderMaterial({uniforms:skyU,side:THREE.BackSide,depthWrite:false,depthTest:false,fog:false,
- vertexShader:'varying vec3 vD;void main(){vD=position;vec4 p=projectionMatrix*modelViewMatrix*vec4(position,1.);gl_Position=p.xyww;}',
- fragmentShader:'uniform vec3 top,hor,bot,sunDir,sunCol;varying vec3 vD;void main(){vec3 d=normalize(vD);float y=d.y;vec3 c=y>0.?mix(hor,top,pow(clamp(y,0.,1.),.45)):mix(hor,bot,clamp(-y*5.,0.,1.));float s=max(dot(d,sunDir),0.);c+=sunCol*(pow(s,1200.)*10.+pow(s,14.)*.28+pow(s,3.)*.07);gl_FragColor=vec4(c,1.);\n#include <tonemapping_fragment>\n#include <encodings_fragment>\n}'});
+ vertexShader:`uniform vec3 sunPosition;uniform float rayleigh,turbidity,mieCoefficient;uniform vec3 up;varying vec3 vWorldPosition,vSunDirection,vBetaR,vBetaM;varying float vSunfade,vSunE;
+ const float e=2.718281828459045;const vec3 totalRayleigh=vec3(5.804542996261093E-6,1.3562911419845635E-5,3.0265902468824876E-5);const vec3 MieConst=vec3(1.8399918514433978E14,2.7798023919660528E14,4.0790479543861094E14);
+ float sunIntensity(float z){z=clamp(z,-1.,1.);return 1000.*max(0.,1.-pow(e,-((1.6110731556870734-acos(z))/1.5)));}
+ void main(){vec4 wp=modelMatrix*vec4(position,1.);vWorldPosition=wp.xyz;vec4 p=projectionMatrix*modelViewMatrix*vec4(position,1.);gl_Position=p.xyww;
+ vSunDirection=normalize(sunPosition);vSunE=sunIntensity(dot(vSunDirection,up));vSunfade=1.-clamp(1.-exp(sunPosition.y/450000.),0.,1.);
+ vBetaR=totalRayleigh*(rayleigh-(1.-vSunfade));vBetaM=.434*(.2*turbidity*10E-18)*MieConst*mieCoefficient;}`,
+ fragmentShader:`varying vec3 vWorldPosition,vSunDirection,vBetaR,vBetaM;varying float vSunfade,vSunE;uniform float mieDirectionalG,gain;uniform vec3 up,night;
+ const float pi=3.141592653589793;
+ void main(){vec3 direction=normalize(vWorldPosition-cameraPosition);float dy=direction.y;direction.y=max(direction.y,0.);direction=normalize(direction);
+ float zenithAngle=acos(max(0.,dot(up,direction)));float inv=1./(cos(zenithAngle)+.15*pow(93.885-((zenithAngle*180.)/pi),-1.253));
+ vec3 Fex=exp(-(vBetaR*8.4E3*inv+vBetaM*1.25E3*inv));float cosTheta=dot(direction,vSunDirection);
+ float rPhase=.05968310365946075*(1.+pow(cosTheta*.5+.5,2.));vec3 betaRTheta=vBetaR*rPhase;
+ float g2=mieDirectionalG*mieDirectionalG;float mPhase=.07957747154594767*((1.-g2)/pow(1.-2.*mieDirectionalG*cosTheta+g2,1.5));vec3 betaMTheta=vBetaM*mPhase;
+ vec3 Lin=pow(vSunE*((betaRTheta+betaMTheta)/(vBetaR+vBetaM))*(1.-Fex),vec3(1.5));
+ Lin*=mix(vec3(1.),pow(vSunE*((betaRTheta+betaMTheta)/(vBetaR+vBetaM))*Fex,vec3(.5)),clamp(pow(1.-dot(up,vSunDirection),5.),0.,1.));
+ vec3 L0=vec3(.1)*Fex;float sundisk=smoothstep(.9999566769,.9999766769,cosTheta);L0+=(vSunE*19000.*Fex)*sundisk;
+ vec3 texColor=(Lin+L0)*.04+vec3(0.,.0003,.00075);vec3 retColor=pow(texColor,vec3(1./(1.2+(1.2*vSunfade))));
+ vec3 c=retColor*gain+night;if(dy<0.)c=mix(c,c*.55+night,clamp(-dy*4.,0.,1.));gl_FragColor=vec4(c,1.);
+ #include <tonemapping_fragment>
+ #include <encodings_fragment>
+ }`});
 const sky=new THREE.Mesh(new THREE.SphereGeometry(1000,32,16),skyMat);sky.renderOrder=-10;sky.frustumCulled=false;scene.add(sky);
 const envScene=new THREE.Scene();envScene.add(new THREE.Mesh(new THREE.SphereGeometry(10,32,16),skyMat));
 const pmrem=new THREE.PMREMGenerator(renderer);let envRT=null;
@@ -472,7 +494,7 @@ const sun=new THREE.DirectionalLight(0xffffff,2);scene.add(sun,sun.target);
 const flashL=new THREE.PointLight(0xffa050,0,4000,2);scene.add(flashL);
 scene.fog=new THREE.FogExp2(0xbfd6ea,.00003);
 const cHemi=new THREE.HemisphereLight(0xffffff,0x333333,.5),cSun=new THREE.DirectionalLight(0xffffff,1.6);cockScene.add(cHemi,cSun,cSun.target);
-const sunDir=new V3();
+const sunDir=new V3(),sunDirL=new V3(0,1,0);const smoothstep=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
 
 /* ================= mar ================= */
 const seaNorm=(()=>{const N=256,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d'),img=x.createImageData(N,N),h=new Float32Array(N*N);const wv=[];for(let i=0;i<16;i++)wv.push([Math.round(rnd(1,10))*(Math.random()<.5?-1:1),Math.round(rnd(1,10))*(Math.random()<.5?-1:1),Math.random()*6.283,1/(1+i*.45)]);
@@ -643,9 +665,15 @@ function worldShift(){if(!WORLD.real||G.mode!=='play'||G.mission!=='fly'||NET.ma
 const cloudTex=canvasTex(128,128,x=>{for(let i=0;i<30;i++){const px=rnd(28,100),py=rnd(42,92),r=rnd(12,34);const g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill()}});
 const cloudMat=new THREE.SpriteMaterial({map:cloudTex,transparent:true,depthWrite:false,opacity:.9});
 // nuvem: dentro dela míssil perde o alvo com mais facilidade (como no Ace Combat 7)
-const CLOUDS=[];function inCloud(p){for(const c of CLOUDS){const dx=p.x-c.x,dz=p.z-c.z;if(dx*dx+dz*dz<1.3e6&&Math.abs(p.y-c.y)<420)return true}return false}
-for(let i=0;i<(IS_TOUCH?50:85);i++){const cx=rnd(-48000,44000),cz=rnd(-55000,35000),cy=rnd(1900,3300);if(Math.hypot(cx,cz)<2500)continue;CLOUDS.push({x:cx,y:cy,z:cz});
- for(let j=0;j<6;j++){const s=new THREE.Sprite(cloudMat);const k=rnd(700,1500);s.scale.set(k*1.6,k,1);s.position.set(cx+rnd(-900,900),cy+rnd(-120,180),cz+rnd(-900,900));scene.add(s)}}
+const CLOUDS=[];function inCloud(p){return cloudDepth(p)>.15}
+// 0 = fora, 1 = no miolo da nuvem
+function cloudDepth(p){let best=0;for(const c of CLOUDS){const dx=p.x-c.x,dz=p.z-c.z,r2=dx*dx+dz*dz;if(r2>2.6e6)continue;const dy=Math.abs(p.y-c.y);if(dy>c.h)continue;best=Math.max(best,(1-Math.sqrt(r2)/1612)*(1-dy/c.h))}return clamp(best*1.8,0,1)}
+// nuvens: grupos de sprites com ruído; quantidade e altura da base vêm do clima (cobertura de nuvens do Open-Meteo no modo ao vivo)
+const cloudGrp=new THREE.Group();scene.add(cloudGrp);
+function cloudsBuild(cover=.35,base=1900){cloudGrp.clear();CLOUDS.length=0;const n=Math.round((IS_TOUCH?50:85)*clamp(cover/.35,0,2.6)),thick=300+900*cover;
+ for(let i=0;i<n;i++){const cx=rnd(-48000,44000),cz=rnd(-55000,35000),cy=base+rnd(0,thick*.8);if(Math.hypot(cx,cz)<2500&&cover<.6)continue;CLOUDS.push({x:cx,y:cy,z:cz,h:thick*.5+200});
+  for(let j=0;j<6;j++){const sp=new THREE.Sprite(cloudMat);const k=rnd(700,1500)*(1+cover*.6);sp.scale.set(k*1.6,k,1);sp.position.set(cx+rnd(-900,900),cy+rnd(-120,180)*(1+cover),cz+rnd(-900,900));cloudGrp.add(sp)}}}
+cloudsBuild();
 
 /* ================= partículas ================= */
 const PV='attribute float aS;attribute float aA;attribute vec3 aC;attribute float aR;attribute float aT;varying float vA;varying vec3 vC;varying float vR;varying float vT;uniform float scale;uniform float fogD;void main(){vC=aC;vR=aR;vT=aT;vec4 mv=modelViewMatrix*vec4(position,1.);float d=-mv.z;vA=aA*exp(-d*d*fogD*fogD);gl_PointSize=min(aS*scale/max(d,.1),720.);gl_Position=projectionMatrix*mv;}';
@@ -940,8 +968,10 @@ function stepPlayer(dt){
   if(v<.5){P.trapT+=dt;if(P.trapT>3)afterTrap()}return}
  axes();
  const h=Math.max(P.pos.y,0),rho=1.225*Math.exp(-h/8500),a=Math.max(295,340.3-.0039*h);
- const spd=P.vel.length(),qd=.5*rho*spd*spd;P.spd=spd;P.mach=spd/a;P.rho=rho;P.qd=qd;P.kias=spd*Math.sqrt(rho/1.225)*KT;
- const vf=P.vel.dot(P.fwd),vu=P.vel.dot(P.up),vr=P.vel.dot(P.right);
+ // aerodinâmica pela velocidade em relação ao AR (o vento move a massa de ar; a inércia continua no referencial do chão)
+ const VA=tW.copy(P.vel).sub(windAt(P.pos,tW2));P.gs=P.vel.length();
+ const spd=VA.length(),qd=.5*rho*spd*spd;P.spd=spd;P.mach=spd/a;P.rho=rho;P.qd=qd;P.kias=spd*Math.sqrt(rho/1.225)*KT;
+ const vf=VA.dot(P.fwd),vu=VA.dot(P.up),vr=VA.dot(P.right);
  const alpha=spd>2?Math.atan2(-vu,Math.max(vf,.1)):0,beta=spd>2?Math.atan2(vr,Math.max(vf,.1)):0;P.aoa=alpha;P.beta=beta;
  const sf=A.sweep?(P.sweep-20)/48:0,CLa=A.CLa-1.9*sf,aSt=A.aSt-.07*sf+.05*P.flapsPos;P.aSt=aSt;
  const aa=Math.abs(alpha);let CL=aa<aSt?CLa*alpha:Math.sign(alpha)*CLa*aSt*Math.max(.3,1-(aa-aSt)*2);
@@ -949,7 +979,7 @@ function stepPlayer(dt){
  const M=P.mach,wave=(M>.82?(M<1.05?(M-.82)/.23:Math.max(.5,1-(M-1.05)*.3)):0)*.042*(1.15-.6*sf)*(A.wave||1);
  const CD=A.cd0+.022*P.gearPos+.055*P.sbPos+.035*P.flapsPos+(M>1?.014:0)+wave+(A.k+.11*sf)*CL*CL+(aa>aSt?(aa-aSt)*.8:0)+(P.kias>(A.vne||800)?Math.pow((P.kias-(A.vne||800))/40,2)*.06:0);// acima da velocidade estrutural: arrasto e tremedeira
  const Sw=A.S,L=qd*Sw*CL,Dr=qd*Sw*CD;
- const vh=spd>1?tA.copy(P.vel).divideScalar(spd):tA.copy(P.fwd);
+ const vh=spd>1?tA.copy(VA).divideScalar(spd):tA.copy(P.fwd);
  const ld=tB.copy(P.up).addScaledVector(vh,-P.up.dot(vh));if(ld.lengthSq()<1e-6)ld.copy(P.up);ld.normalize();
  const dens=Math.pow(rho/1.225,.72)*(1+(A.ram??.32)*Math.min(M,2.2)),T=((.04+.96*Math.pow(P.spool,1.6))*A.mil+P.ab*A.ab)*dens*(.55+.45*P.hp/100)*(P.fuel>0?1:0);P.thrust=T;
  const m=massNow();P.mass=m;
@@ -1886,10 +1916,94 @@ function endGame(reason){if(G.mode!=='play')return;if(NET.match&&!NET.ending){if
   $('#ovs').innerHTML=[['Pontos',G.score],['Abates',G.kills],['Ases',G.aces],['Vampiros',G.vamps],['Pousos',G.traps],['Recorde',best]].map(([a,b])=>'<div><b>'+b+'</b><span>'+a+'</span></div>').join('');$('#over').classList.remove('hide')},2600)}
 function toMenu(){setTimeout(hangarUI,0);todOverride=null;applyTOD();syncMenu();G.mode='menu';G.paused=false;clearWorld();resetP();placeCat();me.g.visible=true;['#over','#pause','#top','#hint'].forEach(s=>$(s).classList.add('hide'));$('#menu').classList.remove('hide');$('#bestv').textContent=best}
 function setPause(v){if(G.mode!=='play')return;if(v)mlToggle(false);if(v&&typeof TOUCH!=='undefined')$('#keys2').innerHTML=TOUCH.ui?khT:kh;G.paused=v;$('#pause').classList.toggle('hide',!v)}
-function applyTOD(){const t=TOD[todOverride||S.tod];skyU.top.value.copy(lc(t.top));skyU.hor.value.copy(lc(t.hor));skyU.bot.value.copy(lc(t.bot));sunDir.set(...t.sun).normalize();skyU.sunDir.value.copy(sunDir);skyU.sunCol.value.copy(lc(t.sunC));
- scene.fog.color.copy(lc(t.hor));scene.fog.density=t.fog;sun.color.copy(lc(t.sunC));sun.intensity=t.li;hemi.color.copy(lc(t.hs));hemi.groundColor.copy(lc(t.hg));hemi.intensity=t.hi;sea.material.color.copy(lc(t.sea));cloudMat.color.copy(lc(t.cloud));
- cHemi.color.copy(lc(t.hs));cHemi.groundColor.copy(lc(0x2a2a2a));cSun.color.copy(lc(t.sunC));renderer.toneMappingExposure=t.exp;SMK.m.uniforms.fogD.value=FIR.m.uniforms.fogD.value=SPK.m.uniforms.fogD.value=t.fog;
- if(envRT)envRT.dispose();envRT=pmrem.fromScene(envScene);scene.environment=cockScene.environment=envRT.texture}
+/* ===== Sol, Lua, estrelas e clima =====
+ Posições de Sol e Lua pelos algoritmos do SunCalc (V. Agafonkin, BSD-2): no modo "Tempo real" usa o relógio do aparelho
+ e a latitude/longitude do teatro (Mundo real) ou do Rio (padrão). A luz, a névoa, o mar e as nuvens seguem a altura do Sol. */
+const AST=(()=>{const rad=Math.PI/180,J1970=2440588,J2000=2451545,ob=rad*23.4397,toDays=d=>d.valueOf()/864e5-.5+J1970-J2000;
+ const ra=(l,b)=>Math.atan2(Math.sin(l)*Math.cos(ob)-Math.tan(b)*Math.sin(ob),Math.cos(l)),dec=(l,b)=>Math.asin(Math.sin(b)*Math.cos(ob)+Math.cos(b)*Math.sin(ob)*Math.sin(l));
+ const sid=(d,lw)=>rad*(280.16+360.9856235*d)-lw,sunC=d=>{const M=rad*(357.5291+.98560028*d),L=M+rad*(1.9148*Math.sin(M)+.02*Math.sin(2*M)+.0003*Math.sin(3*M))+rad*102.9372+Math.PI;return {dec:dec(L,0),ra:ra(L,0)}};
+ const moonC=d=>{const L=rad*(218.316+13.176396*d),M=rad*(134.963+13.064993*d),F=rad*(93.272+13.22935*d),l=L+rad*6.289*Math.sin(M),b=rad*5.128*Math.sin(F);return {ra:ra(l,b),dec:dec(l,b),dist:385001-20905*Math.cos(M)}};
+ const pos=(t,la,lo,c)=>{const lw=rad*-lo,phi=rad*la,d=toDays(t),C=c(d),H=sid(d,lw)-C.ra;return {az:Math.atan2(Math.sin(H),Math.cos(H)*Math.sin(phi)-Math.tan(C.dec)*Math.cos(phi)),alt:Math.asin(Math.sin(phi)*Math.sin(C.dec)+Math.cos(phi)*Math.cos(C.dec)*Math.cos(H))}};
+ return {sun:(t,la,lo)=>pos(t,la,lo,sunC),moon:(t,la,lo)=>pos(t,la,lo,moonC),
+  lit:t=>{const d=toDays(t),S0=sunC(d),m=moonC(d),sd=149598000,phi=Math.acos(Math.sin(S0.dec)*Math.sin(m.dec)+Math.cos(S0.dec)*Math.cos(m.dec)*Math.cos(S0.ra-m.ra)),inc=Math.atan2(sd*Math.sin(phi),m.dist-sd*Math.cos(phi));return (1+Math.cos(inc))/2}}})();
+// azimute do SunCalc (a partir do sul, positivo para oeste) -> vetor do jogo (x = leste, -z = norte)
+const azel=(az,alt,v=new V3())=>v.set(-Math.sin(az)*Math.cos(alt),Math.sin(alt),Math.cos(az)*Math.cos(alt));
+let SKYG=.45,RAYL=2;const TODP={day:{sun:[.42,.6,-.68]},dusk:{sun:[-.72,.085,-.69]},night:{sun:[.35,-.42,-.84],moon:[-.25,.55,-.8],lit:.95}};
+const ATM={el:40,moon:new V3(0,-1,0),lit:.5,live:false,envKey:'',t:0,cover:.35,rain:0,wind:new V3(),gust:0,inCloud:0};
+const starGeo=new THREE.BufferGeometry();{const n=1800,pa=new Float32Array(n*3);for(let i=0;i<n;i++){const u=Math.random()*2-1,a=Math.random()*Math.PI*2,r=Math.sqrt(1-u*u);pa.set([r*Math.cos(a)*900,Math.abs(u)*900*(u<-.2?-1:1),r*Math.sin(a)*900],i*3)}starGeo.setAttribute('position',new THREE.BufferAttribute(pa,3))}
+const starMat=new THREE.PointsMaterial({color:0xdfe8ff,size:1.6,sizeAttenuation:false,transparent:true,opacity:0,depthWrite:false,fog:false});
+const stars=new THREE.Points(starGeo,starMat);stars.renderOrder=-9;stars.frustumCulled=false;scene.add(stars);
+const moonCv=document.createElement('canvas');moonCv.width=moonCv.height=128;const moonTex=new THREE.CanvasTexture(moonCv);
+const moonSpr=new THREE.Sprite(new THREE.SpriteMaterial({map:moonTex,transparent:true,depthWrite:false,fog:false}));moonSpr.scale.set(36,36,1);moonSpr.renderOrder=-8;scene.add(moonSpr);
+function drawMoon(lit){const x=moonCv.getContext('2d');x.clearRect(0,0,128,128);x.fillStyle='#1a1d24';x.beginPath();x.arc(64,64,52,0,7);x.fill();// lado escuro (luz cinérea)
+ x.save();x.beginPath();x.arc(64,64,52,0,7);x.clip();x.fillStyle='#f2f0e4';x.beginPath();const k=1-2*lit;x.arc(64,64,52,-Math.PI/2,Math.PI/2);x.ellipse(64,64,Math.abs(k)*52,52,0,Math.PI/2,-Math.PI/2,k>0);x.fill();
+ x.fillStyle='rgba(120,120,110,.35)';for(const [a,b,r] of[[50,44,9],[78,70,12],[58,84,7],[80,40,6]]){x.beginPath();x.arc(a,b,r,0,7);x.fill()}x.restore();moonTex.needsUpdate=true}
+const mixC=(a,b,t)=>lc(a).lerp(lc(b),clamp(t,0,1));
+function skyNow(){const mode=todOverride||S.tod;ATM.live=mode==='live';
+ if(ATM.live){const d=new Date(),la=WORLD.lat0,lo=WORLD.lon0,sp=AST.sun(d,la,lo),mp=AST.moon(d,la,lo);azel(sp.az,sp.alt,sunDir);azel(mp.az,mp.alt,ATM.moon);ATM.lit=AST.lit(d)}
+ else{const t=TODP[mode]||TODP.day;sunDir.set(...t.sun).normalize();if(t.moon)ATM.moon.set(...t.moon).normalize();else ATM.moon.set(0,-1,0);ATM.lit=t.lit??.5}
+ ATM.el=Math.asin(clamp(sunDir.y,-1,1))/D2R}
+// --- clima: presets ou Open-Meteo ao vivo (grátis, sem chave). Vento entra como movimento da massa de ar (não "empurra" a velocidade):
+// a sustentação e o arrasto usam a velocidade relativa ao ar; a velocidade no solo muda com o vento (como na vida real).
+const tW=new V3(),tW2=new V3();
+const WXP={clear:{cover:.15,rain:0,ws:3,wd:120,gust:1},cloudy:{cover:.75,rain:0,ws:7,wd:160,gust:3},rain:{cover:.92,rain:.6,ws:9,wd:200,gust:5},storm:{cover:1,rain:1,ws:17,wd:230,gust:11}};
+function wxSet(o,src){ATM.cover=clamp(o.cover,0,1);ATM.rain=clamp(o.rain,0,1);const wd=o.wd*D2R;ATM.wind.set(-Math.sin(wd)*o.ws,0,Math.cos(wd)*o.ws);ATM.gust=Math.max(0,o.gust||0);ATM.wxSrc=src||'';
+ cloudsBuild(.12+ATM.cover*.95,ATM.cover>.8?900:ATM.cover>.5?1400:1900);applyTOD()}
+let wxReq=0;async function wxFetch(){const id=++wxReq,la=WORLD.lat0,lo=WORLD.lon0;
+ try{const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude='+la.toFixed(3)+'&longitude='+lo.toFixed(3)+'&current=temperature_2m,precipitation,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=ms');if(!r.ok)throw new Error(r.status);
+  const c=(await r.json()).current;if(id!==wxReq||S.wx!=='live')return;ATM.temp=c.temperature_2m;
+  wxSet({cover:c.cloud_cover/100,rain:clamp(c.precipitation/4,0,1),ws:c.wind_speed_10m,wd:c.wind_direction_10m,gust:Math.max(0,(c.wind_gusts_10m||0)-c.wind_speed_10m)},'ao vivo');
+  say('Clima ao vivo (Open-Meteo): '+Math.round(c.temperature_2m)+' °C, vento '+Math.round(c.wind_speed_10m*1.944)+' kt de '+String(Math.round(c.wind_direction_10m)).padStart(3,'0')+'°, '+Math.round(c.cloud_cover)+'% de nuvens'+(c.precipitation>0?', chovendo':'')+'.','')}
+ catch(e){if(id===wxReq){wxSet(WXP.clear,'');say('Não deu para buscar o clima ao vivo agora; voando com céu limpo.','a')}}}
+function wxApply(){if(S.wx==='live'){wxFetch();return}wxSet(WXP[S.wx]||WXP.clear,S.wx)}
+// vento na posição p: cresce com a altura (lei de potência ~1/7, até ~2,6x), rajadas suaves e turbulência dentro das nuvens
+function windAt(p,out){const h=Math.max(p.y,10),k=Math.min(2.6,Math.pow(h/10,.143)),t=G.t||0;out.copy(ATM.wind).multiplyScalar(k);
+ if(ATM.gust>0){const g=ATM.gust*(.5+.5*Math.sin(t*.7+Math.sin(t*.23)*3))*Math.max(0,Math.sin(t*.31));out.addScaledVector(ATM.wind.lengthSq()>.01?tA2.copy(ATM.wind).normalize():tA2.set(1,0,0),g)}
+ const cd=ATM.turb;if(cd>0)out.add(tA2.set(Math.sin(t*7.3)*1.3+Math.sin(t*13.1),Math.sin(t*9.7)*1.6+Math.sin(t*17.3)*.8,Math.sin(t*8.1+1)*1.2).multiplyScalar(cd*(2+ATM.cover*3)));
+ return out}
+const tA2=new V3();
+// chuva: riscos em volta da câmera, inclinados pela velocidade relativa; no cockpit, gotas no canopi que o vento arrasta pra trás
+const RAIN_N=IS_TOUCH?700:1600,rainPos=new Float32Array(RAIN_N*6),rainGeo=new THREE.BufferGeometry();rainGeo.setAttribute('position',new THREE.BufferAttribute(rainPos,3));
+const rainLines=new THREE.LineSegments(rainGeo,new THREE.LineBasicMaterial({color:0xaab4c0,transparent:true,opacity:0,depthWrite:false,fog:false}));rainLines.frustumCulled=false;scene.add(rainLines);
+const rainP=[];for(let i=0;i<RAIN_N;i++)rainP.push(new V3(rnd(-60,60),rnd(-40,40),rnd(-60,60)));
+const glassCv=document.createElement('canvas');glassCv.id='rainGlass';glassCv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:3;display:none';document.body.appendChild(glassCv);
+const drops=[];let glassT=0;
+function glassStep(dt,on){if(!on){if(glassCv.style.display!=='none'){glassCv.style.display='none';drops.length=0}return}
+ if(glassCv.style.display==='none'){glassCv.style.display='block';glassCv.width=innerWidth/2|0;glassCv.height=innerHeight/2|0}
+ glassT+=dt;if(glassT<.033)return;const st=glassT;glassT=0;const W=glassCv.width,H=glassCv.height,x=glassCv.getContext('2d'),sp=P.spd||0,cx=W/2,cy=H*.62;
+ for(let i=0;i<Math.round(ATM.rain*st*(40+sp*.4));i++)drops.push({x:Math.random()*W,y:Math.random()*H*.85,r:1+Math.random()*2.6,l:0,a:.5+Math.random()*.4});
+ x.clearRect(0,0,W,H);for(let i=drops.length-1;i>=0;i--){const d=drops[i],dx=d.x-cx,dy=d.y-cy,n=Math.hypot(dx,dy)||1,v=sp>35?(sp-35)*.9:0;
+  d.x+=dx/n*v*st*.6;d.y+=(dy/n*v*.6-(v>0?v*.5:-18))*st;d.l=Math.min(14,v*.06);d.a-=st*.25;
+  if(d.a<=0||d.x<-20||d.x>W+20||d.y<-30||d.y>H+20){drops.splice(i,1);continue}
+  x.strokeStyle='rgba(210,225,240,'+(d.a*.55).toFixed(2)+')';x.lineWidth=d.r;x.lineCap='round';x.beginPath();x.moveTo(d.x,d.y);x.lineTo(d.x-dx/n*d.l,d.y-(dy/n*d.l-(v>0?-d.l:0)));x.stroke();
+  x.fillStyle='rgba(255,255,255,'+(d.a*.35).toFixed(2)+')';x.beginPath();x.arc(d.x-d.r*.3,d.y-d.r*.3,d.r*.45,0,7);x.fill()}
+ if(drops.length>500)drops.splice(0,drops.length-500)}
+// por quadro: Sol ao vivo, neblina dentro da nuvem, turbulência, chuva, spray do voo rasante sobre a água
+function atmoTick(dt){ATM.t+=dt;if(ATM.live&&ATM.t>20){ATM.t=0;applyTOD()}if(S.wx==='live'&&G.mode==='play'&&(ATM.wxT=(ATM.wxT||0)+dt)>900){ATM.wxT=0;wxFetch()}
+ const cd=cloudDepth(camera.position);ATM.inCloud=cd;ATM.turb=G.mode==='play'?cloudDepth(P.pos):0;
+ if(cd>0){scene.fog.density=SMK.m.uniforms.fogD.value+cd*.0018;scene.fog.color.lerp(cloudMat.color,cd*.15)}else if(ATM.fogDirty){applyTOD()}ATM.fogDirty=cd>0;
+ const r=ATM.rain;rainLines.visible=r>0&&G.mode!=='menu';if(rainLines.visible){rainLines.material.opacity=.18+.3*r;const rel=tA2.copy(ATM.wind).setY(-9-3*r).sub(G.mode==='play'?P.vel:tA2.set(0,0,0)),L=clamp(rel.length()*.012,.4,6);tB2.copy(rel).normalize().multiplyScalar(L);
+  const n=Math.round(RAIN_N*(.35+.65*r));for(let i=0;i<RAIN_N;i++){const q=rainP[i];q.addScaledVector(rel,dt);for(const k of['x','y','z']){const lim=k==='y'?40:60;if(q[k]>lim)q[k]-=2*lim;else if(q[k]<-lim)q[k]+=2*lim}
+   const o=i*6,vis=i<n?1:0;rainPos[o]=q.x;rainPos[o+1]=q.y;rainPos[o+2]=q.z;rainPos[o+3]=q.x-tB2.x*vis;rainPos[o+4]=q.y-tB2.y*vis;rainPos[o+5]=q.z-tB2.z*vis}
+  rainGeo.attributes.position.needsUpdate=true;rainLines.position.copy(camera.position)}
+ glassStep(dt,r>0&&G.mode==='play'&&view==='cock'&&P.state!=='dead'&&!VR.on);
+ if(G.mode==='play'&&P.state==='fly'&&P.spd>40&&P.pos.y<15&&terrainH(P.pos.x,P.pos.z)<=.5){const k=(15-P.pos.y)/15;for(let i=0;i<1+k*3;i++)emit(SMK,tA2.set(P.pos.x,.6,P.pos.z).addScaledVector(P.fwd,-rnd(4,14)).addScaledVector(P.right,rnd(-5,5)),rnd(-3,3),rnd(3,9)*k,rnd(-3,3),1.6,2+k*3,6+k*8,.92,.94,.97,.45*k)}}
+const tB2=new V3();
+function applyTOD(){skyNow();const e=ATM.el,day=smoothstep(-6,14,e),gold=clamp(1-Math.abs(e-2)/12,0,1)*smoothstep(-8,-1,e),night=1-smoothstep(-14,-3,e),cov=ATM.cover;
+ skyU.sunPosition.value.copy(sunDir).multiplyScalar(450000);skyU.turbidity.value=2.5+5*gold+8*cov+(ATM.rain?4:0);skyU.rayleigh.value=RAYL;skyU.gain.value=SKYG*(1-.45*cov);
+ skyU.night.value.copy(lc(0x02050d)).multiplyScalar(1+ATM.lit*.6*night);
+ const moonUp=ATM.moon.y>-.03,ml=moonUp?ATM.lit*smoothstep(-.03,.25,ATM.moon.y):0;
+ const sunC=mixC(0xff7a35,0xfff1d8,smoothstep(0,25,e));sun.color.copy(night>.6?lc(0x9fb4ff):sunC);sun.intensity=Math.max(2.6*smoothstep(-2,8,e)*(1-.55*cov),.32*ml*night);
+ if(night>.6&&moonUp)sunDirL.copy(ATM.moon);else sunDirL.copy(sunDir);
+ const hor=lc(0x0a1222).lerp(lc(0x8a6a72),smoothstep(-10,0,e)).lerp(lc(0xc98d6e),gold*.5).lerp(lc(0xbfd6ea),smoothstep(4,18,e)).lerp(lc(0x9aa3ab),cov*.7);
+ scene.fog.color.copy(hor);scene.fog.density=(.000029+.00009*cov+(ATM.rain?.00012:0))*(1+.2*gold);
+ hemi.color.copy(mixC(0x101a33,0xf2b48a,smoothstep(-10,0,e)).lerp(lc(0xc8dcf2),smoothstep(5,20,e)));hemi.groundColor.copy(mixC(0x0a0c12,0x4f5d4c,day));hemi.intensity=.1+.45*day+.1*ml*night;
+ sea.material.envMapIntensity=.22+.78*smoothstep(3,22,e);sea.material.color.copy(mixC(0x040a14,0x141b30,smoothstep(-10,0,e)).lerp(lc(0x123a56),smoothstep(4,18,e)));cloudMat.color.copy(mixC(0x1e2430,0xffb98e,smoothstep(-8,1,e)).lerp(lc(0xffffff),smoothstep(6,22,e)).lerp(lc(0x8a9098),cov*.55));
+ cHemi.color.copy(hemi.color);cHemi.groundColor.copy(lc(0x2a2a2a));cSun.color.copy(sun.color);renderer.toneMappingExposure=1+.1*gold+.35*night;
+ SMK.m.uniforms.fogD.value=FIR.m.uniforms.fogD.value=SPK.m.uniforms.fogD.value=scene.fog.density;
+ starMat.opacity=night*(1-cov)*(1-.5*ml);drawMoon(ATM.lit);moonSpr.material.opacity=moonUp?clamp(1-day*.75,0,1)*(1-cov*.8):0;
+ const key=Math.round(e*2)+'|'+Math.round(cov*10)+'|'+(ATM.rain?1:0);if(key!==ATM.envKey){ATM.envKey=key;if(envRT)envRT.dispose();envRT=pmrem.fromScene(envScene);scene.environment=cockScene.environment=envRT.texture}}
+
 
 /* ================= UI ================= */
 const KEYS=[['S / ↓','Puxar o nariz (W/↑ empurra)'],['A D / ← →','Rolagem'],['Q / E','Leme'],['R / F','Manete. No 100%, solte e segure R: pós-combustor'],['Espaço','Disparar arma selecionada'],['1 2 3 4 5 6','Canhão · míssil IR · radar · longo alcance · míssil ar-solo · BOMBAS'],['T / Y','Travar ou alternar alvo / soltar trava'],['X / Z','Flares (IR) / Chaff (radar)'],['V','Ordem à esquadrilha: Cobrir · Atacar meu alvo · Dispersar'],['Enter','Rádio: converse com o copiloto (IA). Ele também executa ordens'],['G H K B','Trem · gancho · flaps · freio aerodinâmico'],['L','Disparar a catapulta'],['Ctrl+E ×3','EJETAR (como no DCS). Fora do avião: W/A/S/D anda, Shift corre, Espaço pula, C 1ª/3ª pessoa'],['Shift+E','Sair do avião parado no convés · entrar de novo · chamar resgate'],['J','Voo livre: chama um alvo de treino'],['I O U','Asas: frente · trás · AUTO'],['C','Cockpit ou câmera externa'],['Mouse','Arraste para olhar, roda = zoom, duplo clique centraliza'],['Alt+C · botão do meio','Olhar livre: o mouse vira a cabeça sem clicar (só PC). Esc ou Alt+C de novo solta'],['P / Esc','Pausa · N voz · M som']];KEYS.splice(13,0,['Modo Realista','Sem anti-estol: em alto AoA o manche faz o nariz guinar ao contrário. Role com o pedal (Q/E), como no F-14 real']);
@@ -1898,7 +2012,7 @@ $('#keys1').innerHTML=$('#keys2').innerHTML=kh;
 const KEYS_T=[['MANCHE','Toque e arraste em qualquer lugar da metade esquerda: ele aparece sob o seu polegar'],['MANETE','Arraste a barra da direita. Acima da linha MIL entra o pós-combustor (AB)'],['FOGO','Canhão: segure. Míssil de radar sem trava: o 1º toque trava, o 2º dispara'],['ARMA / TRAVA','Troca a arma / trava e alterna alvos'],['FLARE / CHAFF','Solta as duas contramedidas de uma vez'],['ALA','Ordem aos 6 alas: Cobrir · Atacar seu alvo · Dispersar'],['RÁDIO','Converse com o copiloto (IA) por texto ou voz'],['SISTEMAS','Trem, flaps, freio aerodinâmico, gancho e asas'],['LEME','Botões ◀ ▶ embaixo, para alinhar no pouso'],['OLHAR','Arraste o centro da tela; solte e a cabeça volta'],['CÂMERA','Cockpit ou câmera externa']];
 const khT='<h2>Controles de toque</h2><table>'+KEYS_T.map(([a,b])=>'<tr><td>'+a+'</td><td>'+b+'</td></tr>').join('')+'</table><p class="tip">Dica: na final do pouso, mexa pouco no manche e acerte a descida com a manete.</p>';
 document.querySelectorAll('.opts').forEach(g=>{const k=g.dataset.k;const sync=()=>{document.querySelectorAll('.opts[data-k="'+k+'"] button').forEach(b=>b.classList.toggle('on',b.dataset.v===S[k]));selLine()};sync();
- g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled||k==='ac')return;S[k]=b.dataset.v;saveCfg();sync();initAudio();click();if(k==='tod')applyTOD();if(k==='world'||k==='wq')worldApply(k==='wq')})});
+ g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled||k==='ac')return;S[k]=b.dataset.v;saveCfg();sync();initAudio();click();if(k==='tod')applyTOD();if(k==='wx')wxApply();if(k==='world'||k==='wq')worldApply(k==='wq')})});
 function worldApply(rebuild){if(!S.wq)S.wq=IS_TOUCH?'baixa':'media';document.getElementById('wqBox').style.visibility=S.world==='rio'?'visible':'hidden';document.getElementById('wPlace').classList.toggle('hide',S.world!=='rio');
  if(rebuild){for(const n of WORLD.nodes.values())if(n.mesh){WORLD.grp.remove(n.mesh);n.mesh.geometry.dispose();if(n.mesh.material!==wFallMat)n.mesh.material.dispose();n.mesh=null}WORLD.shown.clear()}worldSet(S.world==='rio')}
 document.querySelectorAll('[data-k=wq] button').forEach(b=>b.classList.toggle('on',b.dataset.v===(S.wq||(IS_TOUCH?'baixa':'media'))));worldApply(false);
@@ -1992,8 +2106,8 @@ function update(dt){
 function frame(now){if(RS.role==='view')return;if(!XR.s)requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.05);last=now;const run=update(dt);
  updCamera(dt);syncModel(dt);touchFrame();
  sky.position.copy(camera.position);sea.position.set(Math.round(camera.position.x/125)*125,0,Math.round(camera.position.z/125)*125);
- sun.position.copy(camera.position).addScaledVector(sunDir,5000);sun.target.position.copy(camera.position);
- tA.copy(sunDir).applyQuaternion(tQ.copy(P.q).invert());cSun.position.copy(tA).multiplyScalar(5);cSun.target.position.set(0,0,0);
+ sun.position.copy(camera.position).addScaledVector(sunDirL,5000);sun.target.position.copy(camera.position);stars.position.copy(camera.position);moonSpr.position.copy(camera.position).addScaledVector(ATM.moon,880);atmoTick(dt);
+ tA.copy(sunDirL).applyQuaternion(tQ.copy(P.q).invert());cSun.position.copy(tA).multiplyScalar(5);cSun.target.position.set(0,0,0);
  const scl=renderer.getPixelRatio()*H/(2*Math.tan(camera.fov*D2R/2));SMK.m.uniforms.scale.value=FIR.m.uniforms.scale.value=SPK.m.uniforms.scale.value=scl;
  const gv=$('#gv');if(G.mode==='play'&&P.state!=='dead'){const h=P.gph,tun=clamp(h.dv/1.6,0,1),blk=h.loc>0?1:clamp((.4-h.res)/.4,0,1),red=clamp(h.neg,0,1);gv.style.opacity=Math.max(tun,blk,red*.9);gv.style.background=red>Math.max(tun,blk)?'radial-gradient(ellipse at center,rgba(150,0,0,.25) 0%,rgba(150,0,0,.95) 75%)':'radial-gradient(ellipse at center,rgba(8,8,8,'+blk.toFixed(3)+') 0%,rgba(8,8,8,'+blk.toFixed(3)+') '+(68-tun*48)+'%,rgba(0,0,0,1) '+(100-tun*40)+'%)'}else gv.style.opacity=0;
  const vrOn=VR.on&&!XR.s,showC=view==='cock'&&G.mode==='play'&&P.state!=='dead'&&P.state!=='out'&&!G.kcam,warn=run?warnings():[];
@@ -2463,8 +2577,8 @@ function mpWO(){if(!NET.host||NET.mode!=='pvp'||!NET.match)return;let empty='';f
  if(NET.woTeam!==empty){NET.woTeam=empty;NET.woT=performance.now();const m='O time '+TEAMS[empty].n+' ficou sem pilotos. Se ninguém voltar em 15 s, o time '+TEAMS[empty==='az'?'vm':'az'].n+' vence por W.O.';say(m,'a');mpSend('chat',{text:m})}
  else if(performance.now()-NET.woT>15000){NET.woTeam='';mpHostEnd('Time '+TEAMS[empty==='az'?'vm':'az'].n+' venceu por W.O. (o time '+TEAMS[empty].n+' saiu da partida).')}}
 /* ---- início da partida ---- */
-function mpHostStart(){if(!NET.host)return;NET.cfg={world:{real:S.world==='rio',lat0:WORLD.lat0,lon0:WORLD.lon0,nc:WORLD.noCarrier,name:WORLD.placeName},mode:NET.mode,tod:S.tod,diff:S.diff,seed:Math.floor(Math.random()*1e9),t0:Date.now(),teams:Object.fromEntries(NET.teams)};mpSend('start',{cfg:NET.cfg});mpStartMatch(NET.cfg)}
-function mpStartMatch(cfg){NET.match=true;NET.mode=cfg.mode;NET.woTeam='';NET.gone.clear();if(cfg.teams)NET.teams=new Map(Object.entries(cfg.teams));NET.endT=0;mpq('mp').classList.add('hide');S.tod=cfg.tod||S.tod;
+function mpHostStart(){if(!NET.host)return;NET.cfg={world:{real:S.world==='rio',lat0:WORLD.lat0,lon0:WORLD.lon0,nc:WORLD.noCarrier,name:WORLD.placeName},mode:NET.mode,tod:S.tod,wx:S.wx,wxD:S.wx==='live'?{cover:ATM.cover,rain:ATM.rain,ws:Math.hypot(ATM.wind.x,ATM.wind.z),wd:(Math.atan2(-ATM.wind.x,ATM.wind.z)/D2R+360)%360,gust:ATM.gust}:null,diff:S.diff,seed:Math.floor(Math.random()*1e9),t0:Date.now(),teams:Object.fromEntries(NET.teams)};mpSend('start',{cfg:NET.cfg});mpStartMatch(NET.cfg)}
+function mpStartMatch(cfg){NET.match=true;NET.mode=cfg.mode;NET.woTeam='';NET.gone.clear();if(cfg.teams)NET.teams=new Map(Object.entries(cfg.teams));NET.endT=0;mpq('mp').classList.add('hide');S.tod=cfg.tod||S.tod;if(cfg.wx){S.wx=cfg.wx;if(cfg.wxD)wxSet(cfg.wxD,'do anfitrião');else wxApply()}/* todos voam no mesmo clima do anfitrião */
  for(const id of [NET.me,...NET.peers.keys()])if(!NET.board.has(id))NET.board.set(id,{k:0,d:0});
  if(cfg.world&&!NET.host){S.world=cfg.world.real?'rio':'ilhas';if(cfg.world.real&&(Math.abs(cfg.world.lat0-WORLD.lat0)>1e-6||Math.abs(cfg.world.lon0-WORLD.lon0)>1e-6))worldReorigin(cfg.world.lat0,cfg.world.lon0);WORLD.noCarrier=!!cfg.world.nc;WORLD.placeName=cfg.world.name||WORLD.placeName;worldSet(cfg.world.real);if(cfg.world.real)say('Mapa da sala: '+WORLD.placeName+'.','a')}
  S.mission=cfg.mode==='pvp'?'pvp':NET.host?'free':'coopc';goFull();startGame();
@@ -2788,10 +2902,10 @@ function touchFrame(){const show=TOUCH.ui&&G.mode==='play'&&!G.paused&&P.state!=
  if(show)thrVis()}
 $('#tch').checked=TOUCH.ui;$('#tch').onchange=e=>{TOUCH.ui=e.target.checked;try{localStorage.setItem('tomcat-touch',TOUCH.ui?'1':'0')}catch(_){}};
 function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.requestFullscreen||d.webkitRequestFullscreen;if(rq&&!document.fullscreenElement){const p=rq.call(d,{navigationUI:'hide'});if(p&&p.then)p.then(()=>{try{screen.orientation.lock('landscape').catch(()=>{})}catch(_){}}).catch(()=>{})}}catch(_){}}
-resetP();placeCat();applyTOD();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
+resetP();placeCat();wxApply();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
 // PWA: instala como app e funciona offline (só em HTTPS ou localhost)
 if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
-window.__tomcat={sndRender,engSynth,engProfile,SNDC,SPV,ENGV,ML,netAc,propOf:()=>me.hd&&me.hd.prop,CAMO,camOffMove,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={ATM,AST,CLOUDS,cloudDepth,fog:()=>scene.fog.density,starOp:()=>starMat.opacity,smkN:()=>{let n=0;for(let i=0;i<SMK.max;i++)if(SMK.life[i]>0)n++;return n},hideCock:v=>{cockScene.visible=!v},skyG:(v,r)=>{SKYG=v;if(r)RAYL=r;applyTOD()},applyTOD2:()=>applyTOD(),wxApply2:()=>wxApply(),atm:()=>({el:+ATM.el.toFixed(1),cover:ATM.cover,rain:ATM.rain,wind:ATM.wind.toArray().map(v=>+v.toFixed(1)),spd:+P.spd.toFixed(1),gs:+(P.gs||0).toFixed(1),inCloud:+ATM.inCloud.toFixed(2)}),sndRender,engSynth,engProfile,SNDC,SPV,ENGV,ML,netAc,propOf:()=>me.hd&&me.hd.prop,CAMO,camOffMove,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>

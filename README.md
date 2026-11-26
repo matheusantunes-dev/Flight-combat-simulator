@@ -8,6 +8,17 @@ No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inici
 
 Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
 
+## Céu, Sol, Lua e clima
+
+- **Céu físico:** modelo de Preetham, o mesmo do `THREE.Sky`, com espalhamento Rayleigh e Mie. Fica azul de dia e vai para laranja e roxo quando o Sol baixa, sem cores pintadas à mão. Luz, névoa, mar e nuvens seguem a altura do Sol.
+- **Horário:** Dia, Pôr do sol, Noite ou **Tempo real**. No tempo real, Sol e Lua (com a fase certa) são calculados pelo relógio do aparelho e pela latitude e longitude do teatro, usando os algoritmos do SunCalc. À noite aparecem estrelas, e a Lua cheia ilumina a cena.
+- **Clima:** Limpo, Nublado, Chuva, Tempestade ou **Ao vivo**, que usa a API Open-Meteo (grátis e sem chave) com os dados de agora do lugar do teatro: temperatura, nuvens, chuva, vento e rajadas. No multiplayer, todos voam no clima do anfitrião.
+- **Vento de verdade:** o vento move a massa de ar, ou seja, a sustentação e o arrasto usam a velocidade em relação ao ar. Por isso o avião aproa contra o vento (caranguejo), e a velocidade no ar e a velocidade no solo ficam diferentes. O vento aumenta com a altura e tem rajadas.
+- **Nuvens atravessáveis:** dentro da nuvem a névoa fecha, o que esconde o avião no PvP, e há turbulência. A quantidade e a altura das nuvens vêm do clima.
+- **Chuva:** a chuva cai em riscos inclinados pela velocidade. No cockpit, as gotas no canopi são empurradas para trás pelo vento.
+- **Voo rasante:** abaixo de 15 m sobre a água, o avião levanta spray.
+- **Ainda não incluído:** o shader `THREE.Water` com reflexo em tempo real. Ele desenha a cena duas vezes por quadro e derrubaria o desempenho no celular. O mar atual já reflete o céu pelo mapa de ambiente.
+
 ## Sons dos motores
 
 O som de cada motor é feito em camadas que seguem a rotação e a potência, do mesmo jeito que os simuladores (MSFS e X-Plane com FMOD, DCS). Sem gravações, as camadas são calculadas a partir da física do motor:
