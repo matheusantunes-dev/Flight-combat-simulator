@@ -53,3 +53,5 @@ jobs:
         run: node tests/helice.mjs
       - name: Sons dos motores (jato, turboélice, pistão e gravação própria)
         run: node tests/sons.mjs
+      - name: Atmosfera (Sol/Lua, clima ao vivo, vento, nuvens, chuva)
+        run: node tests/atmosfera.mjs
