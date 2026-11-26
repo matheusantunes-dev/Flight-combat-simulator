@@ -304,7 +304,7 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
     </section>
     <div class="goBar"><p id="selLine"></p><div class="goRow"><button id="go" class="go">DECOLAR</button><button id="mpOpen" class="go mpgo" type="button">MULTIPLAYER<small>até 6 pilotos</small></button></div></div>
     <p class="best" id="loadst">Carregando modelos 3D...</p><p class="best">Recorde: <b id="bestv">0</b> pontos · toque, teclado ou gamepad · toque para ativar o som</p>
-    <p class="best cred">Modelos: <a href="https://sketchfab.com/3d-models/f-14-tomcat-fighter-jet-free-497f77c311b5411d9b567d8707a81c33">F-14</a>, <a href="https://sketchfab.com/3d-models/f-16-fighting-falcon-fighter-jet-free-f0b00989e5634764848ef2c235c64db5">F-16</a>, <a href="https://sketchfab.com/3d-models/mig-29-fighter-jet-free-0a21787096244220b246ec8747e7b09c">MiG-29</a> e <a href="https://sketchfab.com/3d-models/dassault-mirage-2000-fighter-jet-free-aca93654c4684c5282e723c5b2999f67">Mirage 2000</a> por bohmerang (CC BY-NC-SA 4.0; asas do F-14 separadas, texturas recomprimidas e cockpits adaptados nesta versão) · MiG-29 e Su-27 por <a href="https://github.com/zuujis-cc0/free-game-assets">Zuujis</a> (CC0) · F-15E, Rafale, Su-57, Gripen, Su-35 e Su-34 por <a href="https://sketchfab.com/bohmerang">bohmerang</a> (CC BY-NC-SA 4.0) · F-117 e F-22 por <a href="https://sketchfab.com/andertan">andertan</a> (CC BY 4.0) · F-16F Block 60 por <a href="https://sketchfab.com/MirzaArrafiERV_45">MirzaArrafiERV_45</a> (CC BY 4.0) · A-10C por <a href="https://sketchfab.com/blarg1">blarg</a> (CC BY 4.0) · Su-30MKK por <a href="https://sketchfab.com/Jeyhun1985">Jeyhun1985</a> (CC BY 4.0) · Su-25 por <a href="https://sketchfab.com/Alexios_Apokaukos">Alexios_Apokaukos</a> (CC BY 4.0) · F/A-18E por <a href="https://sketchfab.com/Jeyhun1985">Jeyhun1985</a> (CC BY 4.0) · F-4E por <a href="https://sketchfab.com/Kenny3D89">Kenny3D89</a> (CC BY 4.0) · A-29 por <a href="https://sketchfab.com/ioai25312">KOG_THORNS</a> (CC BY 4.0) · J-11 por <a href="https://sketchfab.com/Rhine_Lab_Muelsyse">Rhine_Lab_Muelsyse</a> (CC BY 4.0). Modelos genéricos reorientados, simplificados e com trem de pouso desenhado no jogo quando vinham recolhidos. Projeto pessoal, sem fins comerciais.</p>
+    <p class="best cred">Modelos: <a href="https://sketchfab.com/3d-models/f-14-tomcat-fighter-jet-free-497f77c311b5411d9b567d8707a81c33">F-14</a>, <a href="https://sketchfab.com/3d-models/f-16-fighting-falcon-fighter-jet-free-f0b00989e5634764848ef2c235c64db5">F-16</a>, <a href="https://sketchfab.com/3d-models/mig-29-fighter-jet-free-0a21787096244220b246ec8747e7b09c">MiG-29</a> e <a href="https://sketchfab.com/3d-models/dassault-mirage-2000-fighter-jet-free-aca93654c4684c5282e723c5b2999f67">Mirage 2000</a> por bohmerang (CC BY-NC-SA 4.0; asas do F-14 separadas, texturas recomprimidas e cockpits adaptados nesta versão) · MiG-29 e Su-27 por <a href="https://github.com/zuujis-cc0/free-game-assets">Zuujis</a> (CC0) · F-15E, Rafale, Su-57, Gripen, Su-35 e Su-34 por <a href="https://sketchfab.com/bohmerang">bohmerang</a> (CC BY-NC-SA 4.0) · F-117 e F-22 por <a href="https://sketchfab.com/andertan">andertan</a> (CC BY 4.0) · F-16F Block 60 por <a href="https://sketchfab.com/MirzaArrafiERV_45">MirzaArrafiERV_45</a> (CC BY 4.0) · A-10C por <a href="https://sketchfab.com/blarg1">blarg</a> (CC BY 4.0) · Su-30MKK por <a href="https://sketchfab.com/Jeyhun1985">Jeyhun1985</a> (CC BY 4.0) · Su-25 por <a href="https://sketchfab.com/Alexios_Apokaukos">Alexios_Apokaukos</a> (CC BY 4.0) · F/A-18E por <a href="https://sketchfab.com/Jeyhun1985">Jeyhun1985</a> (CC BY 4.0) · F-4E por <a href="https://sketchfab.com/Kenny3D89">Kenny3D89</a> (CC BY 4.0) · A-29 por <a href="https://sketchfab.com/ioai25312">KOG_THORNS</a> (CC BY 4.0) · J-11 por <a href="https://sketchfab.com/Rhine_Lab_Muelsyse">Rhine_Lab_Muelsyse</a> (CC BY 4.0). Modelos genéricos reorientados, simplificados e com trem de pouso desenhado no jogo quando vinham recolhidos. Sons: gravações de jerry.berumen, jarekgie e Fight2FlyPhoto (CC BY, via ROPlanes+), smidoid (CC BY 4.0), m_cel e qubodup (CC0), no Freesound. Projeto pessoal, sem fins comerciais.</p>
   </div>
   <div class="card keys" id="keys1"></div>
   <div id="hgStats" class="hgpanel"></div>
@@ -1649,6 +1649,8 @@ function initAudio(){if(AC)return;try{AC=new(window.AudioContext||window.webkitA
  const loop=b=>{const s=AC.createBufferSource();s.buffer=b;s.loop=true;s.start();return s};
  const chain=(src,type,f,q)=>{const fl=AC.createBiquadFilter();fl.type=type;fl.frequency.value=f;if(q)fl.Q.value=q;const g=AC.createGain();g.gain.value=0;src.connect(fl).connect(g).connect(M);return[fl,g]};
  [SND.wiF,SND.wiG]=chain(loop(SND.white),'bandpass',900,.7);
+ // gravações reais do canhão (GAU-8 do A-10, reamostrado pela cadência de cada arma) e do ar passando por um caça
+ const ctx=AC;for(const [k,n] of[['gun','gau8'],['air','airflow']])recBuf(n).then(b=>{if(!b)return;const x=ctx.createBufferSource();x.buffer=b;x.loop=true;x.start();const g=ctx.createGain();g.gain.value=0;const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=9000;x.connect(lp).connect(g).connect(M);SND[k+'S']=x;SND[k+'R']=g;SND[k+'LP']=lp});
  // motor: barramento próprio (abafado no cockpit) onde entra a voz do motor (sintetizada por tipo ou gravação do jogador)
  SND.engLP=AC.createBiquadFilter();SND.engLP.type='lowpass';SND.engLP.frequency.value=18000;SND.engBus=AC.createGain();SND.engBus.connect(SND.engLP).connect(M);SND.loop=loop;SND.chain=chain;
  const gn=loop(SND.white),ga=AC.createGain();ga.gain.value=.5;const mod=AC.createOscillator();mod.type='square';mod.frequency.value=100;SND.gunMod=mod;const mg=AC.createGain();mg.gain.value=.5;mod.connect(mg).connect(ga.gain);mod.start();
@@ -1664,11 +1666,18 @@ function initAudio(){if(AC)return;try{AC=new(window.AudioContext||window.webkitA
    assobio agudo do compressor (o "chiado" típico de turboélice) e ronco do escape. A hélice tem governador: a rotação quase não muda, o que muda é a carga.
  · pistão: pulsos de ignição (rpm/60 × cilindros/2, com irregularidade) + rotação do eixo + hélice.
  O jogador pode trocar o tipo de motor e carregar gravações próprias (arquivo do aparelho ou link) para o motor e o pós-combustor de cada avião. */
+// "voz" de cada motor real: p = tom geral (rotação), wh = quanto de assobio (fan/compressor), ro = quanto de ronco, n1 = rpm do eixo de baixa, fan = pás do fan
+const ENGS={f14:{n:'P&W TF30-P-414A',p:.86,wh:.75,ro:1.2,n1:6900,fan:24},f16:{n:'GE F110-GE-129',p:1,wh:1,ro:1,n1:7400,fan:24},mig29:{n:'Klimov RD-33',p:1.06,wh:1.1,ro:.95,n1:8300,fan:22},
+ m2000:{n:'SNECMA M53-P2',p:1.1,wh:1.25,ro:.9,n1:10600,fan:18},f15e:{n:'P&W F100-PW-229',p:.98,wh:.95,ro:1.05,n1:10400,fan:22},rafale:{n:'Safran M88-2',p:1.14,wh:1.2,ro:.9,n1:10800,fan:20},
+ su57:{n:'Saturn AL-41F1',p:.95,wh:1,ro:1.1,n1:6500,fan:26},gripen:{n:'Volvo RM12',p:1.1,wh:1.15,ro:.9,n1:9200,fan:22},su35:{n:'Saturn AL-41F1S',p:.95,wh:1,ro:1.1,n1:6500,fan:26},
+ su34:{n:'Saturn AL-31F',p:.93,wh:.95,ro:1.15,n1:6200,fan:26},f117:{n:'GE F404-F1D2 (sem pós)',p:1.1,wh:1.2,ro:.8,n1:9000,fan:22},a10:{n:'GE TF34-GE-100A (alto bypass)',p:1.18,wh:1.9,ro:.55,n1:7300,fan:28},
+ su30:{n:'Saturn AL-31FN',p:.93,wh:.95,ro:1.15,n1:6200,fan:26},f22:{n:'P&W F119-PW-100',p:.97,wh:1,ro:1.1,n1:7000,fan:24},su25:{n:'Tumansky R-195 (turbojato)',p:.9,wh:.6,ro:1.3,n1:9500,fan:18},
+ f16e:{n:'GE F110-GE-132',p:1,wh:1,ro:1.05,n1:7400,fan:24},fa18e:{n:'GE F414-GE-400',p:1.07,wh:1.1,ro:.95,n1:8700,fan:22},f4e:{n:'GE J79-GE-17 (turbojato)',p:.84,wh:.55,ro:1.35,n1:7460,fan:17}};
 const ENG_DEF={jet:{n1:7400,fan:24},turboprop:{blades:5,rpm:2000,rpmIdle:1700},piston:{blades:3,rpm:2600,rpmIdle:900,cyl:9}};
 const SPV={on:false,thr:.6,ab:0};// prévia de som no hangar
 const SNDC=(()=>{try{return JSON.parse(localStorage.getItem('fcs-snd')||'{}')}catch(e){return{}}})();
 const sndSave=()=>{try{localStorage.setItem('fcs-snd',JSON.stringify(SNDC))}catch(e){}};
-function engProfile(id){const a=ACFT[id]||{},c=SNDC[id]||{},type=c.type||a.eng||(a.prop?'turboprop':'jet');return Object.assign({type},ENG_DEF[type],type===(a.eng||(a.prop?'turboprop':'jet'))?a.engP||{}:{})}
+function engProfile(id){const a=ACFT[id]||{},c=SNDC[id]||{},type=c.type||a.eng||(a.prop?'turboprop':'jet');return Object.assign({type,p:1,wh:1,ro:1},ENG_DEF[type],type==='jet'?ENGS[a.custom?a.base:id]||{}:{},type===(a.eng||(a.prop?'turboprop':'jet'))?a.engP||{}:{})}
 function harm(n,decay,odd=1){const re=new Float32Array(n+1),im=new Float32Array(n+1);for(let k=1;k<=n;k++)im[k]=Math.pow(k,-decay)*(k%2?1:odd);return AC.createPeriodicWave(re,im)}
 function crackleBuf(){const b=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate),d=b.getChannelData(0);let e=0;for(let i=0;i<d.length;i++){if(Math.random()<.0009)e=.6+Math.random()*.8;e*=.992;d[i]=(Math.random()*2-1)*e+(Math.random()*2-1)*.12}return b}
 function engSynth(pf){const out=AC.createGain(),L=[],nodes=[];const g=v=>{const x=AC.createGain();x.gain.value=v;return x};
@@ -1708,6 +1717,19 @@ function engSample(buf,c,abBuf){const out=AC.createGain(),nodes=[];const s=AC.cr
  const r0=c.r0??.7,r1=c.r1??1.3,vol=c.vol??1;
  return {out,nodes,up:(t,pw,abv,inC,set)=>{set(s.playbackRate,r0+(r1-r0)*pw);set(sg.gain,(.18+.5*pw)*vol*(inC?.7:1));if(abg)set(abg.gain,.6*abv*vol*(inC?.7:1))}}}
 let AID=null;const ENGV={key:null,v:null,syn:null,bufs:{}};
+// gravações reais (CC0 / CC BY, créditos no README): carregadas sob demanda e reaproveitadas
+const REC={};function recBuf(n){if(!AC)return Promise.resolve(null);if(!REC[n])REC[n]=fetch('sounds/'+n+'.wav').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>AC.decodeAudioData(b)).catch(()=>null);return REC[n]}
+// motor com gravações: cada camada é um loop com tom (playbackRate) e volume seguindo a potência, como o FMOD faz nos simuladores
+function engReal(pf,B){const out=AC.createGain(),nodes=[],L={};const lay=(k,b)=>{if(!b)return;const s=AC.createBufferSource();s.buffer=b;s.loop=true;s.loopStart=Math.random()*b.duration*.5;s.start(0,s.loopStart);nodes.push(s);const g=AC.createGain();g.gain.value=0;s.connect(g).connect(out);L[k]={s,g}};
+ for(const k in B)lay(k,B[k]);const V={out,nodes};
+ if(pf.type==='jet')V.up=(t,pw,ab,inC,set)=>{const n1=.2+.8*pw;if(L.core){set(L.core.s.playbackRate,pf.p*(.62+.5*n1));set(L.core.g.gain,(.12+.55*pw)*pf.ro*(inC?.8:1))}
+   if(L.whine){set(L.whine.s.playbackRate,pf.p*(.7+.55*n1));set(L.whine.g.gain,(.06+.16*pw)*pf.wh*(inC?.45:1))}if(L.ab){set(L.ab.s.playbackRate,.85+.15*ab);set(L.ab.g.gain,.75*ab*(inC?.65:1))}};
+ else if(pf.type==='turboprop')V.up=(t,pw,ab,inC,set)=>{const gov=Math.min(1,pw*1.6);if(L.whine){set(L.whine.s.playbackRate,.88+.22*pw);set(L.whine.g.gain,(.2-.08*pw)*(inC?.6:1))}
+   if(L.roar){set(L.roar.s.playbackRate,.92+.12*pw);set(L.roar.g.gain,(.08+.45*pw)*(inC?.8:1))}if(L.prop){set(L.prop.s.playbackRate,.9+.1*gov);set(L.prop.g.gain,(.08+.7*pw)*(inC?.75:1))}};
+ else V.up=(t,pw,ab,inC,set)=>{const w=[clamp(1-pw*2.2,0,1),clamp(1-Math.abs(pw-.5)*2.4,0,1),clamp((pw-.55)*2.4,0,1)];const r=.75+.5*pw;
+   ['idle','mid','high'].forEach((k,i)=>{if(L[k]){set(L[k].s.playbackRate,r*(i===0?1.15:i===1?1:.92));set(L[k].g.gain,w[i]*.6*(inC?.85:1))}});if(L.prop){set(L.prop.s.playbackRate,.7+.35*pw);set(L.prop.g.gain,.05+.25*pw)}};
+ return V}
+const REC_SET={jet:{core:'jet-core',whine:'jet-whine',ab:'afterburner'},turboprop:{whine:'pt6-whine',roar:'pt6-roar',prop:'prop-loop'},piston:{idle:'radial-idle',mid:'radial-mid',high:'radial-high'}};
 function sndDB(){return custDB().then(db=>db)}
 function sndGet(k){return custTx('readonly',st=>st.get('snd:'+k)).then(r=>r&&r.buf).catch(()=>null)}
 function sndPut(k,buf){return custTx('readwrite',st=>st.put({id:'snd:'+k,buf}))}
@@ -1717,12 +1739,14 @@ function engKill(v){if(!v)return;try{v.out.disconnect()}catch(e){}for(const n of
 function engBuild(id){if(!AC)return;const c=SNDC[id]||{},key=id+'|'+JSON.stringify(c);if(ENGV.key===key)return;ENGV.key=key;engKill(ENGV.v);engKill(ENGV.syn);ENGV.v=ENGV.syn=null;
  const syn=engSynth(engProfile(id));syn.out.connect(SND.engBus);ENGV.syn=syn;
  if(c.motor){Promise.all([sndBuf(id+':motor'),c.pos?sndBuf(id+':pos'):null]).then(([b,ab])=>{if(ENGV.key!==key||!b)return;const v=engSample(b,c,ab);v.out.connect(SND.engBus);ENGV.v=v;syn.out.gain.value=c.mix??0})}
+ else{const pf=engProfile(id),set=REC_SET[pf.type],ks=Object.keys(set);Promise.all(ks.map(k=>recBuf(set[k]))).then(bs=>{if(SNDR){if(ENGV.key===key)ENGV.key=null;return}if(ENGV.key!==key||!bs.some(Boolean))return;const B={};ks.forEach((k,i)=>B[k]=bs[i]);const v=engReal(pf,B);v.out.connect(SND.engBus);ENGV.v=v;syn.out.gain.setTargetAtTime(pf.type==='jet'?.35:0,AC.currentTime,.3)})}
  const gr=(ACFT[id]&&ACFT[id].gun&&ACFT[id].gun.rate)||100;if(SND.gunMod)SND.gunMod.frequency.value=Math.min(gr,110)}
 // renderiza offline o som de um motor (testes e exportar amostra): marcha lenta → máximo (+pós-combustor nos jatos) → reduz
-let SNDR=0;async function sndRender(id,type,dur=9){initAudio();if(!AC)return null;const real=AC,sr=44100;SNDR=1;AC=new OfflineAudioContext(1,sr*dur,sr);try{const pf=engProfile(id);if(type)pf.type=type;Object.assign(pf,ENG_DEF[pf.type],pf.type===((ACFT[id]||{}).eng||((ACFT[id]||{}).prop?'turboprop':'jet'))?(ACFT[id]||{}).engP||{}:{});
- const V=engSynth(pf),bus=AC.createGain();bus.gain.value=1.6;V.out.connect(bus).connect(AC.destination);
- for(let i=0;i<=180;i++){const tt=i/180*dur,pw=tt<2?0:tt<5?(tt-2)/3:tt<7?1:1-(tt-7)/2*.8,ab=pf.type==='jet'&&tt>5.5&&tt<7?1:0;V.up(tt,pw,ab,false,(par,v)=>par.setTargetAtTime(v,tt,.05))}
- const b=await AC.startRendering();return {type:pf.type,data:b.getChannelData(0),sr}}finally{AC=real;SNDR=0}}
+let SNDR=0;async function sndRender(id,type,dur=9,synthOnly=false){initAudio();if(!AC)return null;const real=AC,sr=44100;const pf0=engProfile(id);if(type)pf0.type=type;const set=REC_SET[pf0.type],ks=Object.keys(set),bs=synthOnly?[]:await Promise.all(ks.map(k=>recBuf(set[k])));SNDR=1;AC=new OfflineAudioContext(1,sr*dur,sr);try{const pf=engProfile(id);if(type)pf.type=type;Object.assign(pf,ENG_DEF[pf.type],pf.type===((ACFT[id]||{}).eng||((ACFT[id]||{}).prop?'turboprop':'jet'))?(ACFT[id]||{}).engP||{}:{});
+ const V=engSynth(pf),bus=AC.createGain();bus.gain.value=1.6;V.out.connect(bus).connect(AC.destination);let R=null;
+ if(bs.some(Boolean)){const B={};ks.forEach((k,i)=>B[k]=bs[i]);R=engReal(pf,B);R.out.connect(bus);V.out.gain.value=pf.type==='jet'?.35:0}
+ for(let i=0;i<=180;i++){const tt=i/180*dur,pw=tt<2?0:tt<5?(tt-2)/3:tt<7?1:1-(tt-7)/2*.8,ab=pf.type==='jet'&&tt>5.5&&tt<7?1:0,st=(par,v)=>par.setTargetAtTime(v,tt,.05);V.up(tt,pw,ab,false,st);if(R)R.up(tt,pw,ab,false,st)}
+ const b=await AC.startRendering();return {type:pf.type,real:!!R,data:b.getChannelData(0),sr}}finally{AC=real;SNDR=0}}
 function engAudio(t,on,inC){if(SNDR)return;const id=SPV.on?SPV.id:(G.mode==='play'&&AID)||S.ac;engBuild(id);const set=(p,v)=>p.setTargetAtTime(v,t,.08);
  const pw=SPV.on?SPV.thr:P.spool||0,ab=SPV.on?SPV.ab:P.ab||0,dead=!SPV.on&&G.mode==='play'&&P.fuel<=0;
  set(SND.engBus.gain,dead?0:on);set(SND.engLP.frequency,inC?2600:18000);for(const v of[ENGV.syn,ENGV.v])if(v)v.up(t,pw,ab,inC,set)}
@@ -1748,7 +1772,7 @@ function blip(f,d,v){if(!AC)return;const t=AC.currentTime,o=AC.createOscillator(
 const click=()=>blip(900,.03,.08);
 function updAudio(warn){if(!AC)return;const t=AC.currentTime,inC=view==='cock'&&!SPV.on,on=SPV.on?1:G.mode==='play'&&!G.paused&&P.state!=='dead'?1:G.mode==='menu'?.3:0,set=(p,v)=>p.setTargetAtTime(v,t,.08);
  engAudio(t,on,inC);
- set(SND.wiG.gain,clamp(P.qd/55000,0,1)*.22*on);set(SND.wiF.frequency,400+P.spd*1.4);set(SND.gunG.gain,firing&&on?.38:0);
+ set(SND.wiG.gain,clamp(P.qd/55000,0,1)*(SND.airR?.08:.22)*on);if(SND.airR){set(SND.airR.gain,clamp(P.qd/45000,0,1.2)*.5*on*(inC?.55:1));set(SND.airS.playbackRate,.8+clamp(P.spd/400,0,.6));set(SND.airLP.frequency,inC?2500:9000)}set(SND.wiF.frequency,400+P.spd*1.4);if(SND.gunR){set(SND.gunG.gain,0);SND.gunR.gain.setTargetAtTime(firing&&on?.6:0,t,.02);SND.gunS.playbackRate.value=clamp(((A&&A.gun&&A.gun.rate)||100)/65,.55,1.6);SND.gunLP.frequency.value=inC?3000:9000}else set(SND.gunG.gain,firing&&on?.38:0);
  const tone=on&&P.wpn===2&&P.state==='fly'&&P.stores.aim9.some(s=>s.loaded);set(SND.toneG.gain,tone?(P.seekLock?.05:.025):0);set(SND.tone.frequency,P.seekLock?1150:380+40*Math.sin(t*22));
  const rw=P.rwr===2?(t*9%1<.5):P.rwr===1?(t%1.2<.12):0;SND.rwrG.gain.setTargetAtTime(rw&&on?.045:0,t,.005);
  set(SND.warnG.gain,warn&&on?.035:0);SND.warn.frequency.setValueAtTime(t*3%1<.5?700:880,t)}

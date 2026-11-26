@@ -21,15 +21,25 @@ Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fc
 
 ## Sons dos motores
 
-O som de cada motor é feito em camadas que seguem a rotação e a potência, do mesmo jeito que os simuladores (MSFS e X-Plane com FMOD, DCS). Sem gravações, as camadas são calculadas a partir da física do motor:
+O som de cada motor é montado com **gravações reais** em loop. O tom e o volume de cada camada seguem a rotação e a potência, como o FMOD faz no MSFS e no X-Plane:
 
-- **Jato/turbofan:** ronco grave, tom do fan (número de pás × N1, que sobe de ~600 Hz em marcha lenta para ~3 kHz no máximo) e "buzzsaw" em alta potência. Tem também o assobio do núcleo e, no pós-combustor, rugido com estalos.
-- **Turboélice (A-29, PT6A-68):** zumbido da hélice na frequência de passagem das pás (5 pás × 2000 rpm ÷ 60 ≈ 167 Hz, com harmônicos e um leve batimento). Por cima vêm o assobio agudo do compressor, que domina em marcha lenta, e o ronco do escape. A hélice tem governador, então a rotação quase não muda; o que muda é a carga.
-- **Hélice a pistão:** pulsos de ignição (rpm ÷ 60 × cilindros ÷ 2, com irregularidade), mais a rotação do eixo e a hélice.
+- **Jato:** um motor a jato de verdade gravado em bancada, mais o assobio de um turbofan e o pós-combustor. Cada caça tem a sua "voz", com tom, assobio e ronco do motor real: TF30 do F-14, F110 do F-16, RD-33 do MiG-29, M53 do Mirage, J79 do F-4 (turbojato, mais rouco), TF34 do A-10 (alto bypass, mais assobio) e assim por diante. Por cima vai uma camada sintetizada do tom do fan, com o número de pás × N1 de cada motor.
+- **Turboélice (A-29, PT6A-68):** gravação de um PT6 de verdade. Em marcha lenta domina o chiado do compressor; com potência, entram o ronco do escape e a hélice, cuja rotação quase não muda por causa do governador.
+- **Hélice a pistão:** gravações de motor radial em marcha lenta, média e alta, misturadas pela rotação.
+- **Canhão:** gravação real do GAU-8 do A-10, reamostrada pela cadência de cada arma (M61, .50 do A-29 etc.).
+- **Vento:** ruído de ar de um avião militar em voo, que cresce com a pressão dinâmica.
 
-No cockpit o som fica abafado. O canhão acompanha a cadência real de cada arma: GAU-8 do A-10, M61, as duas .50 do A-29.
+No cockpit, tudo fica abafado.
 
-**Trocar sons:** no hangar, toque em **🔊 Sons do avião selecionado**. Lá dá para mudar o tipo de motor e carregar gravações em loop do motor e do pós-combustor, de um arquivo do aparelho ou de um link. Também dá para ajustar o tom na marcha lenta e no máximo, o volume e a mistura com o som sintetizado, e ouvir antes com uma manete de teste. Tudo fica salvo para cada avião, no IndexedDB. A janela tem links para gravações CC0 no Freesound e no BigSoundBank.
+**Trocar sons:** no hangar, toque em **🔊 Sons do avião selecionado**. Dá para mudar o tipo de motor e carregar gravações próprias em loop do motor e do pós-combustor, por arquivo ou link. Também dá para ajustar o tom, o volume e a mistura, e ouvir antes de salvar. Tudo fica salvo por avião.
+
+**Gravações usadas** (editadas: cortadas, em loop, com o nível ajustado):
+- PT6 e hélice: "seaplane takeoff/start" por jerry.berumen (Freesound 772822 e 772823, **CC BY 4.0**), processadas por ROPlanes+ (fakekerman).
+- Radial: "PZL 104 Wilga start engine" por jarekgie (Freesound 140436, **CC BY 3.0**) e "P-47 Flyby" por Fight2FlyPhoto (Freesound 143560, **CC BY 3.0**), processadas por ROPlanes+.
+- Jato: "Jet Engine" por m_cel (Freesound 534856, **CC0**) e "jetengine loop.aif" por smidoid (Freesound 128614, **CC BY 4.0**).
+- Pós-combustor: "Rocket Boost Engine Loop" por qubodup (Freesound 146770, **CC0**).
+- Ar: "Plane Loop" por qubodup (Freesound 184723, **CC0**).
+- GAU-8: "A-10 Warthog flyby and shooting" por qubodup (Freesound 205582, **CC0**), recortado pelo projeto WARTHOG.
 
 ## Câmera do cockpit ajustável (qualquer avião)
 

@@ -1,6 +1,7 @@
 // Service worker do FCS: deixa o jogo instalável e jogável offline depois da 1ª visita.
-// Troque a versão a cada deploy que mude modelos ou bibliotecas.
-const VERSION = 'fcs-v1';
+// Modelos e sons usam "stale-while-revalidate": abre do cache na hora e baixa a versão nova em segundo plano,
+// então um modelo trocado no repositório chega na próxima abertura (antes ficava preso no cache para sempre).
+const VERSION = 'fcs-v2';
 const CORE = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -16,7 +17,7 @@ self.addEventListener('activate', (e) => {
 });
 
 const isAsset = (u) =>
-  /\/models\/.+\.glb$|\/icons\//.test(u.pathname) ||
+  /\/models\/.+\.glb$|\/sounds\/.+\.wav$|\/icons\//.test(u.pathname) ||
   /cdnjs\.cloudflare\.com|cdn\.jsdelivr\.net|fonts\.(googleapis|gstatic)\.com/.test(u.host);
 
 self.addEventListener('fetch', (e) => {
@@ -32,14 +33,14 @@ self.addEventListener('fetch', (e) => {
     );
     return;
   }
-  // Modelos, ícones e bibliotecas: cache primeiro (são grandes e quase não mudam)
+  // Modelos, sons, ícones e bibliotecas: responde do cache (rápido, funciona offline) e atualiza o cache pela rede
   if (isAsset(u)) {
-    e.respondWith(
-      caches.match(req).then((hit) => hit || fetch(req).then((r) => {
-        if (r.ok || r.type === 'opaque') { const c = r.clone(); caches.open(VERSION).then((x) => x.put(req, c)); }
-        return r;
-      }))
-    );
+    const net = fetch(req).then((r) => {
+      if (r.ok || r.type === 'opaque') { const c = r.clone(); caches.open(VERSION).then((x) => x.put(req, c)); }
+      return r;
+    });
+    e.respondWith(caches.match(req).then((hit) => hit || net));
+    e.waitUntil(net.then(() => {}, () => {}));
   }
   // Todo o resto (IA local, multiplayer, ranking) vai direto para a rede
 });
