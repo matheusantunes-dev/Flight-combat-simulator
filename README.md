@@ -8,9 +8,18 @@ No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inici
 
 Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
 
+## Água e terreno
+
+- **Água sem textura repetida:** o mar não usa mais uma imagem de ondas em mosaico (era ela que fazia aquele xadrez de moiré no horizonte). As ondas são somadas no shader — 7 tamanhos, em direções diferentes, cada uma andando na velocidade física certa (`c = √(g/k)`: onda grande corre, ondinha se arrasta), com as cristas dobradas por ruído para não virar listra de telha.
+- **Fresnel e reflexo do céu:** de raspão o mar vira espelho do céu, e cada face de onda reflete um pedaço diferente dele (zênite escuro, horizonte claro) — é isso que faz a água parecer que mexe de verdade. O caminho de brilho do sol aparece na água e some à noite.
+- **Cristas entortadas:** cada onda tem um termo transversal que curva a crista. Sem isso, visto de cima, o mar vira xadrez.
+- **Ondas somem com a distância** (LOD), senão o mar longe fica chuviscando.
+- **Terreno com textura procedural:** em vez de multiplicar a geometria (caro no celular), o relevo ganha ruído em três escalas no shader, e a faixa de areia do litoral agora é uma transição suave em vez de blocos.
+- **Bases escolhem o próprio sítio:** cada pista procura em volta o trecho mais plano e baixo que caiba nela inteira, com semente fixa (todo mundo da sala vê a base no mesmo lugar).
+
 ## Bases em terra, pouso na pista e teleporte
 
-- **Duas bases aéreas** nas ilhas (SBIG e SBNO). A pista é um platô plano na **cota natural do morro** (a borda é misturada com o terreno, sem penhasco), com eixo tracejado, cabeceiras pintadas e luzes de borda.
+- **Duas bases aéreas** nas ilhas (SBIG e SBNO), com sítio escolhido automaticamente no terreno mais plano. A pista é um platô plano na **cota natural do terreno** (a borda é misturada com o terreno, sem penhasco), com eixo tracejado, cabeceiras pintadas e luzes de borda.
 - **PAPI de verdade:** 4 caixas ao lado da zona de toque, com os ângulos oficiais (2°30′, 2°50′, 3°10′, 3°30′). Na rampa certa você vê **duas brancas perto da pista e duas vermelhas**; tudo branco = alto, tudo vermelho = baixo (*"red over red, you're dead"*).
 - **Pouso em terra:** trem baixado, menos de 9,5 m/s de razão de descida, asas niveladas e alinhado com a pista (até 35° de desalinhamento). Depois é corrida na pista: manete em idle e **B** para frear.
 - **Rearme e reabastecimento:** pare na pista (ou no convés) abaixo de **15 kt** e espere **5 s** — a equipe reabastece, rearma e conserta. Se você sair andando, o serviço é cancelado.
@@ -19,7 +28,7 @@ Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fc
 
 ## Câmeras de cinema, replay e som de fora
 
-Teclas: **F2** fly-by · **F6** câmera do míssil · **F3** replay (F é manete, como antes).
+Teclas: **F2** fly-by · **F6** câmera do míssil · **F3** replay (F é manete, como antes). No **celular**, o botão **CINE** (ao lado de CAM) abre a linha com FLY-BY · MÍSSIL · REPLAY.
 
 - **Fly-by (F2):** a câmera para no ar ~320 m à frente e o avião passa raspando por ela, como o F4 do DCS. Quando você se afasta muito ela se reposiciona sozinha pra te dar outra passagem.
 - **Doppler de verdade:** nas câmeras externas o som usa `f' = f·c/(c+vr)` — agudo quando o avião vem, grave quando passa — e o volume cai com a distância. Vale para o motor sintetizado e para as camadas de vento.

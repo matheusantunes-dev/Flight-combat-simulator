@@ -49,6 +49,11 @@ await p.evaluate(()=>__tomcat.worldGo('Rio de Janeiro',-22.97,-43.18));await p.w
 const rio=await p.evaluate(()=>({nc:__tomcat.WORLD.noCarrier,lat:__tomcat.WORLD.lat0}));
 // voo sem fim: no Voo livre, passar de 60 km recentraliza o mundo
 const shift=await p.evaluate(()=>{const t=__tomcat;t.S.mission='fly';t.startGame();const lat0=t.WORLD.lat0;t.P.pos.set(0,3000,-61000);t.sim(.1);return {moved:Math.abs(t.WORLD.lat0-lat0)>.4,near:Math.hypot(t.P.pos.x,t.P.pos.z)<2000,state:t.P.state}});
-const ok={terreno:st.shown>8,alturaTerra:st.land>20,alturaMar:st.sea<0,predios:st.bt>0,colisao:crash==='dead',semMar:ny.nc===true&&ny.lat>40,comMar:rio.nc===false&&rio.lat<-22.98,vooSemFim:shift.moved&&shift.near&&shift.state==='fly'};console.log(JSON.stringify(ok,null,2));
+// piloto ejetado no Mundo Real: sem o bloco de altitude baixado, o chão é DESCONHECIDO.
+// Antes isso virava "água no nível do mar" e o boneco atravessava o morro (bug de Hong Kong).
+const solo=await p.evaluate(()=>{const t=__tomcat;t.worldSet(true);t.WORLD.HC.clear();const g=t.pbGround(0,0);
+ t.worldSet(false);const g2=t.pbGround(t.BASES[0].x,t.BASES[0].z);
+ return {pend:!!g.pending,agua:!!g.water,ilha:g2.y>10&&!g2.pending}});
+const ok={soloDesconhecidoNaoViraMar:solo.pend&&!solo.agua,soloDaIlha:solo.ilha,terreno:st.shown>8,alturaTerra:st.land>20,alturaMar:st.sea<0,predios:st.bt>0,colisao:crash==='dead',semMar:ny.nc===true&&ny.lat>40,comMar:rio.nc===false&&rio.lat<-22.98,vooSemFim:shift.moved&&shift.near&&shift.state==='fly'};console.log(JSON.stringify(ok,null,2));
 const bad=errs.filter(e=>!/GL Driver|GPU stall/.test(e));await b.close();const failed=Object.entries(ok).filter(([,v])=>!v).map(([k])=>k);
 if(bad.length)console.error(bad.join('\n'));if(failed.length||bad.length){console.error('FALHOU: '+failed.join(', '));process.exit(1)}console.log('OK: mundo real passou');
