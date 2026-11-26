@@ -8,6 +8,14 @@ No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inici
 
 Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
 
+## Aerodinâmica de verdade
+
+- **Estol com quebra de nariz:** passou do ângulo de ataque crítico, a sustentação cai e o nariz despenca. O aviso de estol toca antes.
+- **Parafuso:** estolado, abaixo de ~230 kt, com pedal ou glissada, o avião entra em autorrotação (gira, afunda e perde o controle normal). Só acontece no modo **Real** ou em aviões sem fly-by-wire. O F-16, o F-22 e outros FBW protegem você, como na vida real.
+- **Saída do parafuso (PARE):** manete em idle, **pedal contrário** ao giro e **manche à frente**. Segure até a rotação parar e depois puxe com calma.
+- **Efeito solo:** a menos de uma envergadura do chão, o arrasto induzido cai e o avião "flutua" no pouso (fórmula de McCormick).
+- **Inércia da cabeça:** em G alto e em turbulência, a câmera do cockpit balança como a cabeça do piloto. Isso fica desligado no VR para não enjoar.
+
 ## Mísseis e contramedidas realistas
 
 - **Três fases de voo:** boost (aceleração forte e fumaça densa), sustentação e planeio. A sustentação existe nos motores de dois estágios: AIM-7, AIM-54, AIM-120, R-27, R-77 e o Meteor, que é ramjet e sustenta quase o voo todo. Nela, o empuxo baixo só compensa o arrasto e a fumaça fica fina. No planeio o motor apaga, não sai fumaça e o míssil só perde velocidade.

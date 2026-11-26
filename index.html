@@ -851,7 +851,7 @@ const ACFT={
 ACFT.f16.gSeat=.6;// assento reclinado a 30°
 let A=ACFT.f14;const SLOT=['','','aim9','aim7','aim54','agm','bomb'];
 function nextWpn(){let n=P.wpn;for(let i=0;i<6;i++){n=n%6+1;if(n===1||A.wpn[SLOT[n]])break}P.wpn=n}
-function resetP(){if(typeof pbOff==='function')pbOff();Object.assign(P,{abandoned:false,wreck:false,parked:false,noCanopy:false,prevState:'',mpDown:false,thr:0,spool:0,ab:0,abLit:0,detent:false,gear:1,gearPos:1,flaps:1,flapsPos:1,sb:0,sbPos:0,hook:0,hookPos:0,sweep:20,sweepAuto:true,sweepMan:20,
+function resetP(){if(typeof pbOff==='function')pbOff();Object.assign(P,{spin:0,spinRec:0,spinT:0,stall:false,ge:0,abandoned:false,wreck:false,parked:false,noCanopy:false,prevState:'',mpDown:false,thr:0,spool:0,ab:0,abLit:0,detent:false,gear:1,gearPos:1,flaps:1,flapsPos:1,sb:0,sbPos:0,hook:0,hookPos:0,sweep:20,sweepAuto:true,sweepMan:20,
  fuel:A.fuel,hp:100,g:1,gmax:1,aoa:0,beta:0,mach:0,kias:0,spd:0,qd:0,state:'cat',prevWh:0,gun:A.gun.n,flr:30,chf:30,wpn:2,lock:null,seek:null,seekLock:false,gload:0,gph:{rfx:0,dv:0,res:1,loc:0,neg:0,warnT:0},trapT:0,launchV:0,alive:true,rwr:0,aSt:.42,bingo:false,flameout:false,mass:28000,thrust:0,rho:1.225,shake:0,smokeT:0});
  P.w.set(0,0,0);P.vel.set(0,0,0);P.stores={};for(const k of['aim9','aim7','aim54','agm','bomb']){const w=A.wpn[k];P.stores[k]=w?[...Array(w.n)].map((_,i)=>{const mesh=A===ACFT.f14?(me.stores[k]||[])[i]:null;if(mesh)mesh.visible=true;return{loaded:true,mesh,i}}):[]}}
 function axes(){P.fwd.set(0,0,-1).applyQuaternion(P.q);P.up.set(0,1,0).applyQuaternion(P.q);P.right.set(1,0,0).applyQuaternion(P.q)}
@@ -974,10 +974,12 @@ function stepPlayer(dt){
  const vf=VA.dot(P.fwd),vu=VA.dot(P.up),vr=VA.dot(P.right);
  const alpha=spd>2?Math.atan2(-vu,Math.max(vf,.1)):0,beta=spd>2?Math.atan2(vr,Math.max(vf,.1)):0;P.aoa=alpha;P.beta=beta;
  const sf=A.sweep?(P.sweep-20)/48:0,CLa=A.CLa-1.9*sf,aSt=A.aSt-.07*sf+.05*P.flapsPos;P.aSt=aSt;
- const aa=Math.abs(alpha);let CL=aa<aSt?CLa*alpha:Math.sign(alpha)*CLa*aSt*Math.max(.3,1-(aa-aSt)*2);
+ // efeito solo (McCormick, φ = 33(h/b)^1,5 / (1+33(h/b)^1,5)): abaixo de ~1 envergadura do chão/mar/convés, o arrasto induzido cai e a sustentação sobe um pouco
+ const span=A.span||Math.sqrt(A.S*3.3),gnd=Math.max(terrainH(P.pos.x,P.pos.z),0,(Math.abs(P.pos.x)<DECK_HW&&P.pos.z>BOW_Z&&P.pos.z<STERN_Z)?DECK:0),hAGL=Math.max(.3,P.pos.y-GEAR_H*.6-gnd),xb=33*Math.pow(hAGL/span,1.5),phiGE=xb/(1+xb);P.ge=1-phiGE;
+ const aa=Math.abs(alpha);let CL=(aa<aSt?CLa*alpha:Math.sign(alpha)*CLa*aSt*Math.max(.3,1-(aa-aSt)*2))*(1+.12*P.ge);
  if(alpha>-.05)CL+=.42*P.flapsPos*(aa<aSt?1:.6);
  const M=P.mach,wave=(M>.82?(M<1.05?(M-.82)/.23:Math.max(.5,1-(M-1.05)*.3)):0)*.042*(1.15-.6*sf)*(A.wave||1);
- const CD=A.cd0+.022*P.gearPos+.055*P.sbPos+.035*P.flapsPos+(M>1?.014:0)+wave+(A.k+.11*sf)*CL*CL+(aa>aSt?(aa-aSt)*.8:0)+(P.kias>(A.vne||800)?Math.pow((P.kias-(A.vne||800))/40,2)*.06:0);// acima da velocidade estrutural: arrasto e tremedeira
+ const CD=A.cd0+.022*P.gearPos+.055*P.sbPos+.035*P.flapsPos+(M>1?.014:0)+wave+(A.k+.11*sf)*CL*CL*phiGE+(aa>aSt?(aa-aSt)*.8:0)+(P.kias>(A.vne||800)?Math.pow((P.kias-(A.vne||800))/40,2)*.06:0);// acima da velocidade estrutural: arrasto e tremedeira
  const Sw=A.S,L=qd*Sw*CL,Dr=qd*Sw*CD;
  const vh=spd>1?tA.copy(VA).divideScalar(spd):tA.copy(P.fwd);
  const ld=tB.copy(P.up).addScaledVector(vh,-P.up.dot(vh));if(ld.lengthSq()<1e-6)ld.copy(P.up);ld.normalize();
@@ -997,6 +999,15 @@ function stepPlayer(dt){
  let tq=wPath+clamp((aCmd-alpha)*4,-1.3*eff,1.3*eff),tr=ground?0:IN.roll*A.roll*eff*(1-.3*sf),ty=(IN.yaw*.3+(ground?0:beta*1.8))*eff;
  if(S.flight==='real'&&!ground&&!A.fbw){// sem FBW: manche comanda razão de arfagem; compensador só para 1 G; guinada adversa em alto AoA (o F-14 pede pedal)
   const a1=clamp((m*G0/qS-.42*P.flapsPos)/CLa,aMin*.5,aSt);tq=wPath*.5+(pc*.75-(alpha-a1)*1.3)*eff;ty-=IN.roll*Math.max(0,alpha-.2)*1.8*eff;tr*=1-clamp((alpha-.3)*1.5,0,.6)}
+ // estol e parafuso (como em DCS/IL-2): passou do AoA crítico, o nariz cai sozinho e uma asa estola antes (queda de asa).
+ // Com pedal pró-parafuso (ou derrapagem) e baixa velocidade, entra em parafuso: autorrotação, nariz baixo, afundando.
+ // Saída: pedal contrário à rotação + manche à frente. Aviões com FBW e AoA limitado (modo assistido) quase não entram.
+ const stall=!ground&&aa>aSt,canSpin=S.flight==='real'||!A.fbw;P.stall=stall;
+ if(stall&&!P.spin)tq-=(aa-aSt)*1.4*Math.sign(alpha)*clamp(eff*1.5,.3,1);
+ if(!P.spin&&stall&&canSpin&&P.kias<230&&(Math.abs(IN.yaw)>.55||Math.abs(beta)>.14)&&alpha>0){P.spin=Math.sign(IN.yaw||beta||1);P.spinT=0;say('PARAFUSO! Pedal contrário, manche à frente, manete reduzida!','w','Spin, spin')}
+ if(P.spin){P.spinT+=dt;const anti=IN.yaw*P.spin<-.35&&IN.pitch<.15;P.spinRec=appr(P.spinRec||0,anti?1:0,dt/2.2);
+  const keep=1-P.spinRec;tq=lerp(tq,(aSt*1.35-alpha)*2.5,keep);tr=lerp(tr,P.spin*2.1,keep);ty=lerp(ty,P.spin*1.15,keep);
+  if(P.spinRec>.98||(aa<aSt*.75&&P.spinT>1.5)){P.spin=0;P.spinRec=0;say('Saiu do parafuso. Recupere a velocidade antes de puxar.','')}}
  const k=1-Math.exp(-dt*9);P.w.x=lerp(P.w.x,tq,k);P.w.y=lerp(P.w.y,ty,k);P.w.z=lerp(P.w.z,tr,1-Math.exp(-dt*4));
  if(aa>aSt&&!ground){const wr=S.flight==='real'?34:12;P.w.z+=(Math.random()-.5)*dt*wr*(aa-aSt);P.w.y+=(Math.random()-.5)*dt*wr*.5*(aa-aSt)}
  tC.set(P.w.x,-P.w.y,-P.w.z);const ang=tC.length();if(ang>1e-7){tQ.setFromAxisAngle(tC.divideScalar(ang),ang*dt);P.q.multiply(tQ).normalize()}
@@ -2121,7 +2132,13 @@ function updCamera(dt){
  if(ML.on&&(G.mode!=='play'||G.paused))mlToggle(false);if(view==='cock'){const back=!dragging&&!ML.on;headYaw=lerp(headYaw,back?lookYaw*.0:lookYaw,1-Math.exp(-dt*(back?3:14)));headPitch=lerp(headPitch,back?-.06:lookPitch,1-Math.exp(-dt*(back?3:14)));if(back){lookYaw=headYaw;lookPitch=headPitch}
   const buf=P.state==='fly'&&P.aoa>P.aSt*.78?(P.aoa/P.aSt-.78)*1.2:0,sh=(P.shake+buf+(P.state==='launch'?.6:0)+P.ab*clamp(1-P.pos.y/3000,0,1)*.15)*.006;P.shake=Math.max(0,P.shake-dt*1.6);
   headQ.setFromEuler(tE.set(headPitch+rnd(-sh,sh),headYaw+rnd(-sh,sh),rnd(-sh,sh)*.5,'YXZ'));if(VR.gyro)headQ.premultiply(VR.rel);cockCam.quaternion.copy(headQ);
-  const hs=clamp(-headYaw/1.5,-1,1);cockCam.position.set(hs*.14,-clamp((P.g-1)*.006,-.02,.045)+Math.max(0,headPitch)*.03,(P.state==='launch'?.05:0)-Math.abs(hs)*.05);eye.copy(cockCam.position).applyQuaternion(P.q).add(P.pos);camera.position.copy(eye);camera.quaternion.copy(P.q).multiply(headQ)}
+  // cabeça com inércia: o corpo é jogado contra a aceleração (G empurra para baixo, acelerar empurra para trás, guinar empurra para o lado),
+  // com retorno elástico (mola + amortecedor). Desligado no VR para não enjoar.
+  const vrH=VR.on||!!XR.s,HDI=updCamera.h||(updCamera.h={p:new V3(),v:new V3(),ps:P.spd||0,ax:0});
+  if(!vrH&&P.state!=='deck'){const dtt=Math.max(dt,1e-3);HDI.ax=lerp(HDI.ax,clamp((P.spd-HDI.ps)/dtt,-60,60),1-Math.exp(-dt*6));HDI.ps=P.spd;
+   const tgt=tD.set(clamp(-(P.w.y||0)*(P.spd||0)*.0009,-.045,.045),clamp(-((P.g||1)-1)*.0105,-.075,.035),clamp(HDI.ax*.0016,-.05,.05));
+   HDI.v.addScaledVector(tD.sub(HDI.p),70*dt).multiplyScalar(Math.exp(-dt*11));HDI.p.addScaledVector(HDI.v,dt)}else{HDI.p.multiplyScalar(Math.exp(-dt*6));HDI.ps=P.spd||0}
+  const hs=clamp(-headYaw/1.5,-1,1);cockCam.position.set(hs*.14+HDI.p.x,HDI.p.y+Math.max(0,headPitch)*.03,(P.state==='launch'?.05:0)-Math.abs(hs)*.05+HDI.p.z);eye.copy(cockCam.position).applyQuaternion(P.q).add(P.pos);camera.position.copy(eye);camera.quaternion.copy(P.q).multiply(headQ)}
  else{orbQ.setFromEuler(tE.set(extPitch,extYaw,0,'YXZ'));camQ.slerp(tQ.copy(P.q).multiply(orbQ),1-Math.exp(-dt*4));camera.position.set(0,3,extDist).applyQuaternion(camQ).add(P.pos);camera.quaternion.copy(camQ);if(VR.gyro)camera.quaternion.multiply(VR.rel)}}
 function syncModel(dt){propStep(dt);me.g.position.copy(P.pos);me.g.quaternion.copy(P.q);me.sweep(P.sweep);if(HD.ok){for(const h of[me.hd,COCK.hd]){h.sweep(P.sweep);h.gear(P.gearPos>.5)}for(const f of me.hdFl)f.scale.y=.4+P.ab*.9+Math.random()*.15}for(const g of me.gear){g.visible=P.gearPos>.05;g.scale.y=P.gearPos}me.hook.rotation.x=P.hookPos*.5;
  flameMat.opacity=P.ab*.85;for(const f of me.flames)f.scale.y=.4+P.ab*.9+Math.random()*.15;me.g.visible=P.state!=='dead'&&!P.wreck&&(G.mode!=='play'||view==='ext'||P.state==='out');
@@ -2941,7 +2958,7 @@ function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.
 resetP();placeCat();wxApply();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
 // PWA: instala como app e funciona offline (só em HTTPS ou localhost)
 if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
-window.__tomcat={cmChance,updMissiles,ATM,AST,CLOUDS,cloudDepth,fog:()=>scene.fog.density,starOp:()=>starMat.opacity,smkN:()=>{let n=0;for(let i=0;i<SMK.max;i++)if(SMK.life[i]>0)n++;return n},hideCock:v=>{cockScene.visible=!v},skyG:(v,r)=>{SKYG=v;if(r)RAYL=r;applyTOD()},applyTOD2:()=>applyTOD(),wxApply2:()=>wxApply(),atm:()=>({el:+ATM.el.toFixed(1),cover:ATM.cover,rain:ATM.rain,wind:ATM.wind.toArray().map(v=>+v.toFixed(1)),spd:+P.spd.toFixed(1),gs:+(P.gs||0).toFixed(1),inCloud:+ATM.inCloud.toFixed(2)}),sndRender,engSynth,engProfile,SNDC,SPV,ENGV,ML,netAc,propOf:()=>me.hd&&me.hd.prop,CAMO,camOffMove,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={K,cockCam,VR,cmChance,updMissiles,ATM,AST,CLOUDS,cloudDepth,fog:()=>scene.fog.density,starOp:()=>starMat.opacity,smkN:()=>{let n=0;for(let i=0;i<SMK.max;i++)if(SMK.life[i]>0)n++;return n},hideCock:v=>{cockScene.visible=!v},skyG:(v,r)=>{SKYG=v;if(r)RAYL=r;applyTOD()},applyTOD2:()=>applyTOD(),wxApply2:()=>wxApply(),atm:()=>({el:+ATM.el.toFixed(1),cover:ATM.cover,rain:ATM.rain,wind:ATM.wind.toArray().map(v=>+v.toFixed(1)),spd:+P.spd.toFixed(1),gs:+(P.gs||0).toFixed(1),inCloud:+ATM.inCloud.toFixed(2)}),sndRender,engSynth,engProfile,SNDC,SPV,ENGV,ML,netAc,propOf:()=>me.hd&&me.hd.prop,CAMO,camOffMove,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>

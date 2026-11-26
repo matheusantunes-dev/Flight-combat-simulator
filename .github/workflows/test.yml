@@ -57,3 +57,5 @@ jobs:
         run: node tests/atmosfera.mjs
       - name: Combate (energia dos mísseis, flare e chaff)
         run: node tests/combate.mjs
+      - name: Aerodinâmica (estol, parafuso, efeito solo, inércia da cabeça)
+        run: node tests/aerodinamica.mjs
