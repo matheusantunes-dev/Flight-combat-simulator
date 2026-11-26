@@ -45,3 +45,5 @@ jobs:
         run: node tests/cacas.mjs
       - name: Olhar livre com o mouse (Alt+C, Pointer Lock)
         run: node tests/olhar.mjs
+      - name: Avião por link (importa .glb, herda física e armas)
+        run: node tests/link.mjs

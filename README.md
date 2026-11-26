@@ -8,6 +8,16 @@ No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inici
 
 Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
 
+## Avião por link (Sketchfab ou .glb)
+
+No hangar, toque em **＋ Avião por link** e cole o link de um modelo do Sketchfab (precisa estar liberado para download) ou de um arquivo `.glb`. Também dá para escolher um `.glb` ou `.zip` de glTF do seu aparelho. Depois, escolha o **caça base**: o avião novo herda dele a física, as armas reais, o canhão e o assento ejetável. Informe também o **comprimento real**, que o jogo usa para acertar a escala.
+
+- **Sketchfab:** usa a API oficial de download, com o seu token (Sketchfab → Settings → Password & API). O token fica só neste aparelho e só é enviado ao próprio Sketchfab.
+- **O que o jogo ajusta sozinho:** descobre o eixo e o nariz (a deriva é o ponto mais alto e fica atrás), centraliza o avião, põe as rodas no chão e acha as peças de trem e de vidro pelos nomes. Também dá um palpite da posição do olho do piloto. Se algo sair torto, use **Girar 90°**, **Inverter nariz** e o ajuste do olho.
+- **Onde fica salvo:** o arquivo vai para o IndexedDB do navegador, então não precisa baixar de novo, e o avião continua no hangar depois de recarregar a página.
+- **Multiplayer:** os outros jogadores veem o caça base, porque eles não têm o seu arquivo.
+- **Limites:** se o site do link não liberar CORS, o navegador bloqueia o download. Nesse caso, baixe o arquivo e use a opção "arquivo do seu aparelho". Modelos acima de ~80 MB são recusados.
+
 ## Olhar livre com o mouse (só PC)
 
 Aperte **Alt+C** (o mesmo atalho do DCS) ou clique com o **botão do meio** (como no MSFS) para prender o cursor. A partir daí, é só mover o mouse para virar a cabeça do piloto, sem clicar. A cabeça fica onde você deixou, e o duplo clique centraliza. Para soltar, aperte **Alt+C** de novo, o botão do meio ou **Esc**; o Esc só solta o mouse e não pausa o jogo. Também funciona na câmera externa e no modo a pé. Usa a Pointer Lock API do navegador, e no celular fica desligado.

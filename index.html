@@ -78,7 +78,7 @@ body.touch #radio{bottom:auto;top:40px;width:min(470px,60vw)}body.touch #rlog{ma
 .goBar{position:sticky;bottom:0;margin:12px -24px -22px;padding:12px 24px 14px;background:linear-gradient(180deg,rgba(14,20,22,0),rgba(14,20,22,.96) 30%);border-radius:0 0 14px 14px;z-index:2}.goBar .go{width:100%;margin:0}
 #pause{align-items:center}#pause .main{order:-1}#pause .keys{max-height:calc(100dvh - 40px);overflow:auto}
 #thrMil::after{right:auto;left:5px;top:-15px}
-#mp{background:rgba(5,8,10,.7);justify-content:center}.mpcard{width:min(480px,100%)}.mph{display:flex;align-items:center;justify-content:space-between}.mph h2{margin:0;font-size:28px}.mph .x{all:unset;cursor:pointer;font-size:20px;padding:4px 8px}
+#mp{background:rgba(5,8,10,.7);justify-content:center}#cust{background:rgba(5,8,10,.72);justify-content:center}#cust select,#cust input[type=number]{background:#0c1418;color:#cfe;border:1px solid #2a3a40;border-radius:8px;padding:4px 6px}#custOpen{margin-top:8px;width:100%}#custList button{margin-left:8px}.mpcard{width:min(480px,100%)}.mph{display:flex;align-items:center;justify-content:space-between}.mph h2{margin:0;font-size:28px}.mph .x{all:unset;cursor:pointer;font-size:20px;padding:4px 8px}
 .mprow{display:flex;gap:8px;align-items:center}.mprow .btn{flex:1;margin-top:10px}.mpcode{text-transform:uppercase;letter-spacing:.2em;font-family:'Share Tech Mono',monospace;margin-top:10px}.mpcodebox{margin-top:12px;font-size:15px;color:var(--muted)}.mpcodebox b{font:700 30px 'Share Tech Mono',monospace;color:var(--hud);letter-spacing:.15em;flex:1}
 .mplist{margin:4px 0 0;padding:0;list-style:none}.mplist li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.mplist li span{color:var(--muted);font-size:13px}
 .mpgo{background:rgba(140,255,170,.12);color:var(--hud);border:1px solid rgba(140,255,170,.5);font-size:16px;margin-top:8px!important;padding:10px!important}#mpVoice.on{background:#c0392b;color:#fff}
@@ -251,6 +251,7 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
       <button data-v="f4e"><b>F-4E Phantom II</b><span>Clássico Mach 2, Sparrow, Mk 84</span></button>
       <button data-v="a29"><b>A-29 Super Tucano</b><span>Turboélice da FAB, MAA-1, metralhadoras .50</span></button>
     </div>
+    <button class="btn alt" id="custOpen" type="button">＋ Avião por link (Sketchfab ou .glb)</button>
     <p class="sub soon" id="soonLine"></p>
     <div class="lbl">Campanha 1 · combate aéreo</div>
     <div class="opts mis" data-k="mission">
@@ -358,6 +359,24 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
 <div id="mpBoard" class="hide"><h3>Placar</h3><ol></ol><p class="note"></p></div>
 
 <div id="mlChip" class="hide" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:30;background:rgba(8,14,20,.78);color:#cfe;border:1px solid rgba(140,220,200,.35);border-radius:14px;padding:5px 12px;font:12px system-ui,sans-serif;pointer-events:none;white-space:nowrap"></div>
+<div id="cust" class="ov hide"><div class="card mpcard">
+  <div class="mph"><h2>Avião por link</h2><button class="x" id="custClose" aria-label="Fechar">✕</button></div>
+  <p class="sub">Cole o link de um modelo do <b>Sketchfab</b> (precisa ser baixável) ou de um arquivo <b>.glb</b>. Ele voa com a física, as armas e o assento do caça que você escolher como base.</p>
+  <div class="lbl">Link do modelo</div><input id="custUrl" class="pname" placeholder="https://sketchfab.com/3d-models/...  ou  https://.../aviao.glb" autocomplete="off">
+  <div class="lbl">ou um arquivo do seu aparelho</div><input id="custFile" type="file" accept=".glb,.zip,model/gltf-binary">
+  <div id="custTokBox"><div class="lbl">Token da API do Sketchfab (só para links do Sketchfab)</div><input id="custTok" class="pname" type="password" placeholder="Sketchfab → Settings → Password &amp; API → API token" autocomplete="off">
+  <p class="sub">O token fica só neste aparelho e só é enviado para o próprio Sketchfab.</p></div>
+  <div class="mprow"><label class="sub">Caça base <select id="custBase"></select></label><label class="sub">Comprimento real (m) <input id="custLen" type="number" min="4" max="80" step=".1" style="width:5.5em"></label></div>
+  <div class="mprow"><label class="sub">Nome <input id="custName" class="pname" maxlength="32" placeholder="Ex.: F-35C Lightning II"></label></div>
+  <div class="mprow"><label class="sub"><input type="checkbox" id="custGear"> o modelo veio sem trem de pouso (desenhar um)</label></div>
+  <div class="mprow"><button class="btn" id="custGo" type="button">Baixar e colocar no hangar</button></div>
+  <p class="sub" id="custMsg"></p>
+  <div id="custEdit" class="hide"><h3>Ajuste fino</h3>
+   <div class="mprow"><button class="btn alt" id="custRot" type="button">Girar 90°</button><button class="btn alt" id="custFlip" type="button">Inverter nariz</button></div>
+   <div class="mprow"><label class="sub">Olho: frente/trás (m) <input id="custEx" type="number" step=".05" style="width:5em"></label><label class="sub">altura (m) <input id="custEy" type="number" step=".05" style="width:5em"></label><button class="btn alt" id="custApply" type="button">Aplicar</button></div>
+  </div>
+  <h3>Seus aviões</h3><div id="custList" class="sub"></div>
+</div></div>
 <div id="pause" class="ov hide">
   <div class="card keys" id="keys2"></div>
   <div class="card main"><h1>PAUSA</h1><p class="sub">O RIO aproveitou para tomar um café kkk</p>
@@ -1811,7 +1830,7 @@ const AC_COST={f14:0,f16:1500,m2000:3000,mig29:5000};for(const id in NEWAC)AC_CO
 const PROG={pm:0,owned:['f14']};
 try{const v=JSON.parse(localStorage.getItem('fcs-prog')||'null');if(v)Object.assign(PROG,v);else if(localStorage.getItem('tomcat-cfg'))PROG.owned=Object.keys(AC_COST)}catch(e){}// quem já jogava antes mantém os caças
 const saveProg=()=>{try{localStorage.setItem('fcs-prog',JSON.stringify(PROG))}catch(e){}};
-const acOwned=id=>S.freeHangar||PROG.owned.includes(id);
+const acOwned=id=>S.freeHangar||PROG.owned.includes(id)||!!(ACFT[id]&&ACFT[id].custom);
 const cleanName=t=>(t||'').replace(/[^\p{L}\p{N} _.-]/gu,'').trim().slice(0,16);
 function flashBtn(b){b.animate([{transform:'translateX(0)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:260})}
 function hangarUI(){{const sl=document.getElementById('soonLine');if(sl){const s2=Object.keys(ACFT).filter(id=>ACFT[id].soon&&!ACFT[id].enemyOnly).map(id=>ACFT[id].name.split(' ')[0]);sl.textContent=s2.length?'Chegando ao hangar (falta só o modelo 3D): '+s2.join(', ')+'.':''}}$('#pmv').textContent=PROG.pm.toLocaleString('pt-BR')+' PM';
@@ -1916,7 +1935,96 @@ function makeHD(R,withCock=true){const ac=ACFT[R.id],g=new THREE.Group(),m=new T
  return {g,m,sweep(a){const d=(a-20)*D2R;pr.rotation.y=-d;pl.rotation.y=d},gear(v){gOn.visible=v;gOff.visible=!v}}}
 const PAINT={mig29:{'#8a9790':['#7f8d84','#2c3038'],'#576b5b':['#55685a','#a3271c']},su27:{'#90a9b8':['#93abba','#2c3038'],'#567a9c':['#5a7ea0','#a3271c']}};
 function prepEnemy(sc,type){const o={};for(const [vi,vn] of[[0,'std'],[1,'ace']]){const c=sc.clone(true);c.traverse(n=>{if(n.name==='gear')n.visible=false;if(n.isMesh){n.material=n.material.clone();const k=(n.material.name||'').toLowerCase(),pp=PAINT[type][k];if(pp)n.material.color.copy(lc(pp[vi]));n.material.roughness=.6;n.material.metalness=.05;n.material.envMapIntensity=.6}});const g=new THREE.Group();g.add(c);o[vn]=g}return o}
-function loadAircraft(id){if(ACM[id]!==undefined)return Promise.resolve(ACM[id]);return loadQ(ACFT[id].file).then(sc=>{let R=null;try{if(sc)R=prepHD(sc,id)}catch(e){console.error('HD',id,e)}ACM[id]=R;return R})}
+// ===== Avião por link =====
+// Como o "importar modelo" de jogos com mods: o jogador cola um link do Sketchfab (API de download oficial, com o token dele)
+// ou de um .glb; o jogo baixa, guarda no IndexedDB (não precisa baixar de novo), descobre eixo/nariz/escala/olho
+// e o avião herda física, armas e assento de um caça base. No multiplayer os outros veem o caça base.
+const CUST={recs:{},db:null,cur:null};
+const escH=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const netAc=()=>ACFT[S.ac]&&ACFT[S.ac].custom?ACFT[S.ac].base:S.ac;
+function custDB(){return CUST.db||(CUST.db=new Promise((res,rej)=>{if(!window.indexedDB)return rej(new Error('sem IndexedDB'));const r=indexedDB.open('fcs-custom',1);r.onupgradeneeded=()=>r.result.createObjectStore('ac',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))}
+function custTx(mode,fn){return custDB().then(db=>new Promise((res,rej)=>{const t=db.transaction('ac',mode),st=t.objectStore('ac'),q=fn(st);t.oncomplete=()=>res(q&&q.result);t.onerror=()=>rej(t.error)}))}
+const skfbUid=u=>{const m=String(u).match(/sketchfab\.com\/.*?([0-9a-f]{32})/i);return m&&m[1]};
+async function custFetch(link,file,tok,msg){
+ if(file){msg('Lendo o arquivo…');const buf=await file.arrayBuffer();return {buf,title:file.name.replace(/\.(glb|zip)$/i,''),credit:'arquivo local',src:file.name}}
+ const uid=skfbUid(link);
+ if(uid){if(!tok)throw new Error('Para links do Sketchfab, cole seu token da API (Sketchfab → Settings → Password & API).');
+  msg('Pedindo o download ao Sketchfab…');let info=null;try{info=await fetch('https://api.sketchfab.com/v3/models/'+uid).then(r=>r.ok?r.json():null)}catch(e){}
+  if(info&&info.isDownloadable===false)throw new Error('Esse modelo não está liberado para download pelo autor.');
+  let r;try{r=await fetch('https://api.sketchfab.com/v3/models/'+uid+'/download',{headers:{Authorization:'Token '+tok}})}catch(e){throw new Error('Não deu pra falar com o Sketchfab (rede ou bloqueio do navegador). Baixe o .glb no site e use "arquivo do seu aparelho".')}
+  if(r.status===401||r.status===403)throw new Error('O Sketchfab recusou o token. Confira se copiou o token inteiro.');
+  if(!r.ok)throw new Error('O Sketchfab respondeu '+r.status+(r.status===404?' (modelo não existe ou não é baixável).':'.'));
+  const d=await r.json(),pk=d.glb||d.gltf;if(!pk)throw new Error('Esse modelo não tem versão glTF para baixar.');
+  msg('Baixando '+(pk.size?(pk.size/1048576).toFixed(1)+' MB':'o modelo')+'…');
+  let buf;try{buf=await fetch(pk.url).then(x=>{if(!x.ok)throw new Error(x.status);return x.arrayBuffer()})}catch(e){throw new Error('O download foi bloqueado pelo navegador. Baixe o .glb no Sketchfab e use "arquivo do seu aparelho".')}
+  const lic=info&&info.license?(info.license.label||info.license.slug):'';const au=info&&info.user?(info.user.displayName||info.user.username):'';
+  return {buf,title:info?info.name:'Modelo do Sketchfab',credit:(au?au:'autor no Sketchfab')+(lic?' ('+lic+')':''),src:link}}
+ if(!/^https?:\/\//i.test(link))throw new Error('Cole um link https:// (Sketchfab ou .glb) ou escolha um arquivo.');
+ msg('Baixando o modelo…');let buf;try{buf=await fetch(link).then(x=>{if(!x.ok)throw new Error(x.status);return x.arrayBuffer()})}catch(e){throw new Error('Esse site não deixa outros sites baixarem o arquivo (CORS). Baixe o .glb e use "arquivo do seu aparelho".')}
+ return {buf,title:decodeURIComponent(link.split('/').pop().split('?')[0]).replace(/\.glb$/i,''),credit:new URL(link).hostname,src:link}}
+// abre GLB ou ZIP de glTF (scene.gltf + scene.bin + texturas) sem servidor: as texturas viram blob URLs
+async function custScene(buf){const u8=new Uint8Array(buf),dec=await MESHOPT.catch(()=>null);
+ const mk=M=>{const l=new THREE.GLTFLoader(M);if(dec)l.setMeshoptDecoder(dec);return l};
+ if(u8[0]===0x67&&u8[1]===0x6c&&u8[2]===0x54&&u8[3]===0x46)return new Promise((res,rej)=>mk().parse(buf,'',g=>res(g.scene),rej));
+ if(u8[0]!==0x50||u8[1]!==0x4b)throw new Error('Arquivo não é .glb nem .zip de glTF.');
+ const {unzipSync}=await import('https://cdn.jsdelivr.net/npm/fflate@0.8.2/esm/browser.js');const F=unzipSync(u8),urls={};for(const k in F)urls[k]=URL.createObjectURL(new Blob([F[k]]));
+ const keys=Object.keys(F),main=keys.find(k=>/\.glb$/i.test(k))||keys.find(k=>/\.gltf$/i.test(k));if(!main)throw new Error('O zip não tem .gltf nem .glb.');
+ if(/\.glb$/i.test(main))return custScene(F[main].buffer.slice(F[main].byteOffset,F[main].byteOffset+F[main].byteLength));
+ const base=main.includes('/')?main.slice(0,main.lastIndexOf('/')+1):'',M=new THREE.LoadingManager();
+ M.setURLModifier(u=>{if(/^(blob|data):/.test(u))return u;const k=decodeURIComponent(u.replace(/^\.\//,''));return urls[base+k]||urls[k]||u});
+ return new Promise((res,rej)=>mk(M).parse(new TextDecoder().decode(F[main]),'',g=>res(g.scene),rej))}
+// normaliza: nariz em +X, Y pra cima, centro lateral em 0, chão em y=0; separa trem/vidro pelos nomes
+function custNormalize(sc,o){const wrap=new THREE.Group();wrap.add(sc);wrap.updateMatrixWorld(true);let bb=new THREE.Box3().setFromObject(wrap);
+ const sz=bb.getSize(new V3()),c0=bb.getCenter(new V3());
+ // o ponto mais alto é a deriva: fica no meio da envergadura e na ponta de trás do comprimento (vale até p/ asa reta, onde envergadura > comprimento)
+ let top=-1e9;const T=new V3();wrap.traverse(n=>{if(!n.isMesh)return;const p=n.geometry.attributes.position,v=new V3();for(let i=0;i<p.count;i+=3){v.fromBufferAttribute(p,i).applyMatrix4(n.matrixWorld);if(v.y>top){top=v.y;T.copy(v)}}});T.sub(c0);
+ let ax=o.ax||(Math.abs(T.x)/(sz.x/2+1e-6)<Math.abs(T.z)/(sz.z/2+1e-6)?'z':'x'),nose=o.nose;if(!nose)nose=(ax==='x'?T.x:T.z)>0?-1:1;
+ wrap.rotation.y=ax==='x'?(nose>0?0:Math.PI):(nose>0?Math.PI/2:-Math.PI/2);wrap.updateMatrixWorld(true);bb=new THREE.Box3().setFromObject(wrap);const c=bb.getCenter(new V3());
+ wrap.position.set(-c.x,-bb.min.y,-c.z);const root=new THREE.Group();root.add(wrap);root.updateMatrixWorld(true);
+ const G={};const grp=k=>G[k]||(G[k]=Object.assign(new THREE.Group(),{name:'cx-'+k}));const meshes=[];wrap.traverse(n=>{if(n.isMesh)meshes.push(n)});
+ for(const n of meshes){let nm='';for(let q=n;q&&q!==wrap;q=q.parent)nm+=' '+(q.name||'');const mt=[].concat(n.material).map(m=>m&&m.name||'').join(' ');
+  const k=/gear|wheel|tire|tyre|roda|landing/i.test(nm+' '+mt)?'landingOn':/glass|canopy|window|vidro|windscreen/i.test(nm+' '+mt)&&[].concat(n.material).every(m=>m&&m.transparent)?'canopy':'airframe';
+  const g=grp(k);if(!g.parent)root.add(g);g.attach(n)}
+ root.updateMatrixWorld(true);const len=bb.max.x-bb.min.x;return {root,len,box:new THREE.Box3().setFromObject(root)}}
+// palpite do olho: ~30% do comprimento a partir do nariz, logo abaixo do topo do canopy naquela fatia
+function custGuess(root,scale,len){const bb=new THREE.Box3().setFromObject(root),nx=bb.max.x*scale,L=len*scale,ex=nx-.3*L;let top=-1e9;
+ root.traverse(n=>{if(!n.isMesh)return;const p=n.geometry.attributes.position,v=new V3();for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i).applyMatrix4(n.matrixWorld).multiplyScalar(scale);if(Math.abs(v.x-ex)<.6&&Math.abs(v.z)<.35&&v.y>top)top=v.y}});
+ if(top<-1e8)top=bb.max.y*scale*.45;return {eye:[+ex.toFixed(2),+(top-.4).toFixed(2)],tail:bb.min.x*scale,h:bb.max.y*scale}}
+function custRegister(r){const b=ACFT[r.base]||ACFT.f16,id=r.id;
+ ACFT[id]=Object.assign({},b,{name:r.name,custom:true,base:r.base,file:null,scale:r.scale,eye:r.eye,gearH:r.gearH,fl:r.fl,pgear:r.pgear||null,gcut:null,sweep:false,soon:false,enemyOnly:false,rio:false,credit:r.credit,wpn:Object.fromEntries(Object.entries(b.wpn||{}).map(([k,w])=>[k,w&&Object.assign({},w)]))});
+ if(SEATS[r.base])SEATS[id]=SEATS[r.base];ALLY_CS[id]=ALLY_CS[r.base]||'Convidado';
+ let btn=document.querySelector('[data-k=ac] button[data-v="'+id+'"]');if(!btn){btn=document.createElement('button');btn.dataset.v=id;document.querySelector('[data-k=ac]').appendChild(btn)}
+ btn.innerHTML='<b>'+escH(r.name)+'</b><span>Por link · base '+escH(b.name.split(' ').slice(0,2).join(' '))+'</span>'}
+function custLoad(id){const r=CUST.recs[id];if(!r)return Promise.resolve(null);loading++;
+ return (r.buf?Promise.resolve(r):custTx('readonly',st=>st.get(id)).then(x=>{if(!x)throw new Error('modelo sumiu do armazenamento');r.buf=x.buf;return r})).then(r=>custScene(r.buf)).then(sc=>{const N=custNormalize(sc,r.orient||{});return prepHD(N.root,id)}).catch(e=>{console.error('avião por link',e);return null}).finally(()=>loading--)}
+async function custBuild(r){// mede e preenche escala, olho, trem e chama
+ const sc=await custScene(r.buf),N=custNormalize(sc,r.orient||{}),scale=r.len/Math.max(.01,N.len),gs=custGuess(N.root,scale,N.len),b=ACFT[r.base];
+ r.scale=+scale.toPrecision(5);if(!r.eyeSet)r.eye=gs.eye;const lift=r.drawGear?1.35:0;r.pgear=r.drawGear?{gy:-lift,w:[[r.eye[0]-.05*r.len,0,.1,.3,.18],[r.eye[0]-.32*r.len,-1.3,.15,.4,.24],[r.eye[0]-.32*r.len,1.3,.15,.4,.24]]}:null;
+ r.gearH=+(r.eye[1]+lift).toFixed(2);r.fl=b&&b.prop?[]:[[0,+(gs.h*.35-r.eye[1]).toFixed(2),+(r.eye[0]-gs.tail+.3).toFixed(2)]];return r}
+const custMeta=()=>{try{return JSON.parse(localStorage.getItem('fcs-cust')||'[]')}catch(e){return[]}};
+const custMetaSave=()=>{try{localStorage.setItem('fcs-cust',JSON.stringify(Object.values(CUST.recs).map(r=>{const o=Object.assign({},r);delete o.buf;return o})))}catch(e){}};
+// registra na hora (síncrono) a partir do localStorage; o arquivo 3D vem do IndexedDB só quando o avião é carregado
+function custBoot(){for(const r of custMeta()){CUST.recs[r.id]=r;custRegister(r)}if(!ACFT[S.ac])S.ac='f14';custListUI()}
+function custListUI(){const L=document.getElementById('custList');if(!L)return;const ids=Object.keys(CUST.recs);L.textContent=ids.length?'':'Nenhum ainda.';
+ for(const id of ids){const r=CUST.recs[id],d=document.createElement('div');d.textContent=r.name+' · '+r.credit;const e=document.createElement('button');e.className='btn alt';e.textContent='Ajustar';e.onclick=()=>custEditOpen(id);
+  const x=document.createElement('button');x.className='btn alt';x.textContent='Apagar';x.onclick=async()=>{await custTx('readwrite',st=>st.delete(id)).catch(()=>{});delete CUST.recs[id];custMetaSave();delete ACFT[id];delete ACM[id];const b=document.querySelector('[data-k=ac] button[data-v="'+id+'"]');if(b)b.remove();if(S.ac===id){S.ac='f14';saveCfg()}custListUI();syncMenu()};d.append(e,x);L.appendChild(d)}}
+function custEditOpen(id){CUST.cur=id;const r=CUST.recs[id];document.getElementById('custEdit').classList.remove('hide');document.getElementById('custEx').value=r.eye[0];document.getElementById('custEy').value=r.eye[1];
+ const b=document.querySelector('[data-k=ac] button[data-v="'+id+'"]');if(b)b.click();if(typeof hgShow==='function')hgShow(id)}
+async function custSave(r){delete ACM[r.id];if(HG.models)delete HG.models[r.id];if(HG.prom)delete HG.prom[r.id];CUST.recs[r.id]=r;custRegister(r);await custTx('readwrite',st=>st.put(r));custMetaSave();custListUI();if(typeof hangarUI==='function')hangarUI()}
+(function custUI(){const $c=i=>document.getElementById(i),msg=t=>{$c('custMsg').textContent=t};if(!$c('cust'))return;
+ const sel=$c('custBase');for(const id of playable().filter(i=>!ACFT[i].custom)){const o=document.createElement('option');o.value=id;o.textContent=ACFT[id].name;sel.appendChild(o)}sel.value='f16';$c('custLen').value=15;
+ try{$c('custTok').value=localStorage.getItem('fcs-skfb')||''}catch(e){}
+ $c('custOpen').onclick=()=>{$c('cust').classList.remove('hide');custListUI()};$c('custClose').onclick=()=>$c('cust').classList.add('hide');
+ $c('custGo').onclick=async()=>{const go=$c('custGo');go.disabled=true;try{const tok=$c('custTok').value.trim();try{if(tok)localStorage.setItem('fcs-skfb',tok)}catch(e){}
+   const f=await custFetch($c('custUrl').value.trim(),$c('custFile').files[0],tok,msg);if(f.buf.byteLength>80*1048576)throw new Error('Modelo grande demais ('+(f.buf.byteLength/1048576|0)+' MB). Procure uma versão mais leve (até ~80 MB).');
+   msg('Ajustando o modelo…');const id='cx'+Date.now().toString(36);const r=await custBuild({id,name:($c('custName').value.trim()||f.title||'Avião').slice(0,32),credit:f.credit,src:f.src,base:sel.value,len:Math.max(4,+$c('custLen').value||15),drawGear:$c('custGear').checked,orient:{},buf:f.buf});
+   await custSave(r);msg('Pronto! "'+r.name+'" está no hangar. Se a cabine ficou torta, use o ajuste fino.');custEditOpen(id)}catch(e){console.warn(e);msg('⚠️ '+(e.message||e))}finally{go.disabled=false}};
+ const rebuild=async(fn)=>{const r=CUST.recs[CUST.cur];if(!r)return;if(!r.buf){const x=await custTx('readonly',st=>st.get(r.id)).catch(()=>null);if(!x)return msg('⚠️ O arquivo do modelo não está mais salvo neste aparelho.');r.buf=x.buf}fn(r);msg('Refazendo…');try{await custBuild(r);await custSave(r);msg('Ajuste aplicado.');custEditOpen(r.id)}catch(e){msg('⚠️ '+e.message)}};
+ $c('custRot').onclick=()=>rebuild(r=>{r.orient=Object.assign({},r.orient,{ax:(r.orient.ax||'x')==='x'?'z':'x',nose:r.orient.nose||1});r.eyeSet=false});
+ $c('custFlip').onclick=()=>rebuild(r=>{r.orient=Object.assign({},r.orient,{nose:-(r.orient.nose||1)});r.eyeSet=false});
+ $c('custApply').onclick=()=>rebuild(r=>{r.eye=[+$c('custEx').value,+$c('custEy').value];r.eyeSet=true});
+ custBoot()})();
+function loadAircraft(id){if(ACM[id]!==undefined)return Promise.resolve(ACM[id]);if(ACFT[id]&&ACFT[id].custom)return custLoad(id).then(R=>(ACM[id]=R));return loadQ(ACFT[id].file).then(sc=>{let R=null;try{if(sc)R=prepHD(sc,id)}catch(e){console.error('HD',id,e)}ACM[id]=R;return R})}
 const cockExtra=[];
 function setupPlayer(id){A=ACFT[id];GEAR_H=A.gearH;const R=ACM[id];
  if(me.hd){me.g.remove(me.hd.g);me.hd=null}if(COCK.hd){cock.remove(COCK.hd.g);COCK.hd=null}for(const o of cockExtra)cock.remove(o);cockExtra.length=0;
@@ -1973,7 +2081,7 @@ function hgStats(){const el=document.getElementById('hgStats');if(!el)return;con
  const bar=(lbl,k)=>{const lo=Math.min(...all.map(o=>o[k])),hi=Math.max(...all.map(o=>o[k])),v=hi>lo?.25+.75*(n[k]-lo)/(hi-lo):.7;return'<div class="hgb"><span>'+lbl+'</span><i style="--v:'+v.toFixed(2)+'"></i></div>'};
  const W=Object.values(a.wpn).filter(Boolean).map(w=>w.n+'× '+w.name);
  el.innerHTML='<div class="hgt"><b>'+a.name+'</b>'+(acOwned(id)?'':'<em>🔒 '+AC_COST[id].toLocaleString('pt-BR')+' PM</em>')+'</div>'+bar('VELOCIDADE','vel')+bar('MANOBRA','mob')+bar('ESTABILIDADE','est')+bar('AR-AR','aa')+bar('AR-SOLO','ag')+bar('ALCANCE','alc')+
-  '<p>'+[a.gun.n?a.gun.name+' ('+a.gun.n+' tiros)':'sem canhão',...W].join(' · ')+'</p><p class="hgs">'+(SEATS[id]?'Assento '+SEATS[id]+' · ':'')+'limite '+a.gLim+' G'+(a.naval?' · pousa em porta-aviões':'')+(a.sweep?' · asa de geometria variável':'')+(a.fbw?' · fly-by-wire':'')+'</p>'}
+  '<p>'+[a.gun.n?a.gun.name+' ('+a.gun.n+' tiros)':'sem canhão',...W].join(' · ')+'</p><p class="hgs">'+(SEATS[id]?'Assento '+SEATS[id]+' · ':'')+'limite '+a.gLim+' G'+(a.naval?' · pousa em porta-aviões':'')+(a.sweep?' · asa de geometria variável':'')+(a.fbw?' · fly-by-wire':'')+(a.custom?'<br>Modelo: '+escH(a.credit||'importado por link')+' · base '+(ACFT[a.base]?ACFT[a.base].name:a.base):'')+'</p>'}
 function hgCamera(dt){if(!HG.id)hgShow(S.ac);if(HG.auto&&!HG.drag)HG.yaw+=dt*.12;HG.dist=lerp(HG.dist,HG.distT||28,1-Math.exp(-dt*3));
  const c=tA.copy(HG.pos).add(tB.set(0,2.6,0));camera.fov=45;camera.position.set(Math.sin(HG.yaw)*Math.cos(HG.pitch),-Math.sin(HG.pitch),Math.cos(HG.yaw)*Math.cos(HG.pitch)).multiplyScalar(HG.dist).add(c);camera.lookAt(c);
  // empurra o avião para a parte livre da tela (o menu ocupa a esquerda no PC)
@@ -2179,10 +2287,10 @@ async function mpJoin(code,asHost){code=(code||'').toUpperCase().replace(/[^A-Z0
 async function mpLeave(silent){if(!NET.on)return;mpSend('bye');clearInterval(NET.helloI);try{await NET.tr.leave()}catch(e){}NET.tr=null;NET.on=false;NET.match=false;
  for(const r of NET.R.values())mpRemoveRemote(r);NET.R.clear();NET.peers.clear();for(const a of NET.audio.values())a.remove();NET.audio.clear();if(NET.voice){for(const t of NET.voice.getTracks())t.stop();NET.voice=null}
  try{history.replaceState(null,'',location.pathname)}catch(e){}if(!silent)mpStatus('Você saiu da sala.');mpLobbyUI()}
-function mpHello(to){if(!NET.on)return;mpSend('hello',{pid:myPid(),name:mpName(),ac:S.ac,host:NET.host,mode:NET.mode,match:NET.match,cfg:NET.host?NET.cfg:undefined,teams:NET.host?Object.fromEntries(NET.teams):undefined},to)}
+function mpHello(to){if(!NET.on)return;mpSend('hello',{pid:myPid(),name:mpName(),ac:netAc(),host:NET.host,mode:NET.mode,match:NET.match,cfg:NET.host?NET.cfg:undefined,teams:NET.host?Object.fromEntries(NET.teams):undefined},to)}
 function mpStatus(t){const e=mpq('mpst');if(e)e.textContent=t}
 function mpLobbyUI(){const inRoom=NET.on;mpq('mpJoinBox').classList.toggle('hide',inRoom);mpq('mpRoom').classList.toggle('hide',!inRoom);if(!inRoom)return;
- mpq('mpCode').textContent=NET.code;const L=mpq('mpList');L.textContent='';const list=[{id:NET.me,name:mpName(),ac:S.ac,host:NET.host,me:true},...[...NET.peers.entries()].map(([id,p])=>Object.assign({id},p))];
+ mpq('mpCode').textContent=NET.code;const L=mpq('mpList');L.textContent='';const list=[{id:NET.me,name:mpName(),ac:netAc(),host:NET.host,me:true},...[...NET.peers.entries()].map(([id,p])=>Object.assign({id},p))];
  const pv=NET.mode==='pvp';if(pv)list.sort((a,b)=>teamOf(a.id).localeCompare(teamOf(b.id)));
  for(const p of list.slice(0,MP_MAX)){const li=document.createElement('li'),b=document.createElement('b'),s2=document.createElement('span');if(pv){const ti=document.createElement('i');ti.className=teamOf(p.id);ti.textContent=TEAMS[teamOf(p.id)].n.toUpperCase();b.appendChild(ti)}b.append(p.name+(p.me?' (você)':''));s2.textContent=(ACFT[p.ac]?ACFT[p.ac].name.split(' ')[0]:'?')+(p.host?' · anfitrião':'');li.append(b,s2);L.appendChild(li)}
  mpq('mpCount').textContent=list.length+'/'+MP_MAX;document.querySelectorAll('#mpMode button').forEach(b=>{b.classList.toggle('on',b.dataset.v===NET.mode);b.disabled=!NET.host});
@@ -2558,7 +2666,7 @@ function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.
 resetP();placeCat();applyTOD();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
 // PWA: instala como app e funciona offline (só em HTTPS ou localhost)
 if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
-window.__tomcat={ML,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={ML,netAc,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>
