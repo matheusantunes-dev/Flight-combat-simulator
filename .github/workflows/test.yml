@@ -55,3 +55,5 @@ jobs:
         run: node tests/sons.mjs
       - name: Atmosfera (Sol/Lua, clima ao vivo, vento, nuvens, chuva)
         run: node tests/atmosfera.mjs
+      - name: Combate (energia dos mísseis, flare e chaff)
+        run: node tests/combate.mjs

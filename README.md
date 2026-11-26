@@ -8,6 +8,15 @@ No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inici
 
 Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
 
+## Mísseis e contramedidas realistas
+
+- **Três fases de voo:** boost (aceleração forte e fumaça densa), sustentação e planeio. A sustentação existe nos motores de dois estágios: AIM-7, AIM-54, AIM-120, R-27, R-77 e o Meteor, que é ramjet e sustenta quase o voo todo. Nela, o empuxo baixo só compensa o arrasto e a fumaça fica fina. No planeio o motor apaga, não sai fumaça e o míssil só perde velocidade.
+- **Energia:** o G máximo depende da pressão dinâmica. Lento ou em ar rarefeito, o míssil curva pouco, e cada curva fechada gasta energia (arrasto induzido). Um alvo que puxa G no momento certo faz o míssil "morrer" sem energia.
+- **Flares:** com pós-combustor ligado o avião fica mais quente que o flare, então ele quase não engana. Com a manete reduzida, engana mais. Pela cauda, o buscador vê o bocal e o flare engana menos. Buscadores modernos (AIM-9X, IRIS-T, ASRAAM, R-74, Python 5) quase não caem.
+- **Chaff:** só funciona no feixe (notch), a cerca de 90° da linha de visada do míssil. É aí que o radar doppler perde a velocidade relativa. De frente ou de cauda, quase não engana. O RIO avisa quando a contramedida não tem chance.
+- **Visual:** a chama do motor-foguete agora é curta, com núcleo pequeno e claro, e de longe vira um ponto brilhante. Antes era uma "bola de luz" de 7 m. Quem aparece mesmo é a trilha de fumaça.
+- **Mira do canhão:** o pipper preditivo (que já existia) agora usa a velocidade de saída real de cada canhão.
+
 ## Céu, Sol, Lua e clima
 
 - **Céu físico:** modelo de Preetham, o mesmo do `THREE.Sky`, com espalhamento Rayleigh e Mie. Fica azul de dia e vai para laranja e roxo quando o Sol baixa, sem cores pintadas à mão. Luz, névoa, mar e nuvens seguem a altura do Sol.
