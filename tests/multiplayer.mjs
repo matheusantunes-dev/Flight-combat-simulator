@@ -28,15 +28,37 @@ await B.evaluate(() => { __tomcat.S.name = 'Bravo'; }); await B.waitForTimeout(8
 await B.click('#mpEnter'); await B.waitForTimeout(3000);
 ok.lobby = (await A.evaluate(() => __tomcat.NET.peers.size)) === 1 && (await B.evaluate(() => __tomcat.NET.hostId === [...__tomcat.NET.peers.keys()][0]));
 
-await A.click('#mpMode [data-v=pvp]'); await A.waitForTimeout(2500); await A.click('#mpStart'); await A.waitForTimeout(3000);
+// PvP é time contra time: A (anfitrião) e C no Azul, B no Vermelho
+const C = await open('C', '?sala=' + code + '&rede=local');
+await C.evaluate(() => { __tomcat.S.name = 'Charlie'; }); await C.waitForTimeout(800);
+await C.click('#mpEnter'); await C.waitForTimeout(3000);
+await A.click('#mpMode [data-v=pvp]'); await A.waitForTimeout(2500);
+const tms = await A.evaluate(() => Object.fromEntries(__tomcat.NET.teams));
+const idB = await B.evaluate(() => __tomcat.NET.me), idC = await C.evaluate(() => __tomcat.NET.me);
+// distribuição automática: o 2º vai pro Vermelho, o 3º pro Azul; se não, o C troca de time pelo botão
+ok.timesAuto = tms[idB] && tms[idC] && tms[idB] !== tms[idC];
+if ((await A.evaluate(() => Object.fromEntries(__tomcat.NET.teams)))[idC] !== 'az') { await C.click('#mpTeam'); await A.waitForTimeout(2500); }
+if ((await A.evaluate(() => Object.fromEntries(__tomcat.NET.teams)))[idB] !== 'vm') { await B.click('#mpTeam'); await A.waitForTimeout(2500); }
+ok.times = await A.evaluate(([b, c]) => { const t = __tomcat.NET.teams; return t.get(__tomcat.NET.me) === 'az' && t.get(c) === 'az' && t.get(b) === 'vm'; }, [idB, idC]);
+ok.trocaPeloBotao = await C.evaluate(() => /Vermelho|Azul/.test(document.getElementById('mpTeam').textContent));
+await A.click('#mpStart'); await A.waitForTimeout(3500);
 ok.pvpStart = (await B.evaluate(() => __tomcat.NET.match && __tomcat.G.mission === 'pvp'));
-await A.evaluate(() => { const r = __tomcat.T.find((t) => t.kind === 'remote'); for (let i = 0; i < 3; i++) __tomcat.damage(r, 1, 'aim9'); });
+await A.waitForFunction(() => __tomcat.T.some((t) => t.kind === 'remote'), null, { timeout: 15000 }).catch(() => {}); // o 1º estado do adversário pode demorar no Chrome sem GPU
+ok.colegaNaoEhAlvo = await A.evaluate((c) => !__tomcat.T.some((t) => t.kind === 'remote' && t.id === c) && __tomcat.T.some((t) => t.kind === 'remote'), idC);
+ok.ladosOpostos = (await A.evaluate(() => __tomcat.P.pos.z)) > (await B.evaluate(() => __tomcat.P.pos.z));
+// fogo amigo não vale: C manda acerto em A
+await C.evaluate((a) => { __tomcat.NET.tr.send({ t: 'hit', k: 'msl', to: a }); }, await A.evaluate(() => __tomcat.NET.me));
+await A.waitForTimeout(800);
+ok.semFogoAmigo = await A.evaluate(() => __tomcat.P.hp === 100);
+await A.evaluate((b) => { const r = __tomcat.T.find((t) => t.kind === 'remote' && t.id === b); for (let i = 0; i < 3; i++) __tomcat.damage(r, 1, 'aim9'); }, idB);
 await A.waitForTimeout(1500);
 ok.pvpKill = (await B.evaluate(() => __tomcat.P.state === 'dead')) && (await A.evaluate(() => __tomcat.G.kills === 1));
+ok.placarTime = await C.evaluate(() => /AZUL 1/.test(document.getElementById('top').textContent));
 await B.waitForTimeout(6000);
 ok.respawn = await B.evaluate(() => __tomcat.P.state === 'fly' && __tomcat.P.hp === 100);
-await A.evaluate(() => { __tomcat.NET.board.get(__tomcat.NET.me).k = 10; }); await A.waitForTimeout(5000);
-ok.pvpEnd = (await B.evaluate(() => document.getElementById('ovr').textContent)).includes('venceu');
+await A.evaluate(() => { __tomcat.NET.board.get(__tomcat.NET.me).k = 12; }); await A.waitForTimeout(5000);
+ok.pvpEnd = (await B.evaluate(() => document.getElementById('ovr').textContent)).includes('Time Azul venceu');
+await C.close();
 
 await A.click('#again'); await B.click('#again'); await A.waitForTimeout(800);
 await A.click('#mpMode [data-v=coop]'); await A.waitForTimeout(2500); await A.click('#mpStart'); await A.waitForTimeout(2500);
