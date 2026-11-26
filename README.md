@@ -8,6 +8,18 @@ No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inici
 
 Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
 
+## Sons dos motores
+
+O som de cada motor é feito em camadas que seguem a rotação e a potência, do mesmo jeito que os simuladores (MSFS e X-Plane com FMOD, DCS). Sem gravações, as camadas são calculadas a partir da física do motor:
+
+- **Jato/turbofan:** ronco grave, tom do fan (número de pás × N1, que sobe de ~600 Hz em marcha lenta para ~3 kHz no máximo) e "buzzsaw" em alta potência. Tem também o assobio do núcleo e, no pós-combustor, rugido com estalos.
+- **Turboélice (A-29, PT6A-68):** zumbido da hélice na frequência de passagem das pás (5 pás × 2000 rpm ÷ 60 ≈ 167 Hz, com harmônicos e um leve batimento). Por cima vêm o assobio agudo do compressor, que domina em marcha lenta, e o ronco do escape. A hélice tem governador, então a rotação quase não muda; o que muda é a carga.
+- **Hélice a pistão:** pulsos de ignição (rpm ÷ 60 × cilindros ÷ 2, com irregularidade), mais a rotação do eixo e a hélice.
+
+No cockpit o som fica abafado. O canhão acompanha a cadência real de cada arma: GAU-8 do A-10, M61, as duas .50 do A-29.
+
+**Trocar sons:** no hangar, toque em **🔊 Sons do avião selecionado**. Lá dá para mudar o tipo de motor e carregar gravações em loop do motor e do pós-combustor, de um arquivo do aparelho ou de um link. Também dá para ajustar o tom na marcha lenta e no máximo, o volume e a mistura com o som sintetizado, e ouvir antes com uma manete de teste. Tudo fica salvo para cada avião, no IndexedDB. A janela tem links para gravações CC0 no Freesound e no BigSoundBank.
+
 ## Câmera do cockpit ajustável (qualquer avião)
 
 Se a cabeça do piloto não ficou boa em algum avião, dá para ajustar a posição sem sair do voo. No PC, use **Ctrl+Shift+↑/↓** para frente e trás, **Ctrl+Shift+PgUp/PgDn** para subir e descer e **Ctrl+Shift+←/→** para o lado. **Ctrl+Shift+Backspace** volta ao padrão. No celular, use os botões da **pausa**. Cada toque move 2,5 cm e o ajuste fica salvo para cada avião. Só a câmera muda: o modelo visto de fora, a física e o trem continuam iguais.

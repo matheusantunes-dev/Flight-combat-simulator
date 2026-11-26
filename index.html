@@ -78,7 +78,7 @@ body.touch #radio{bottom:auto;top:40px;width:min(470px,60vw)}body.touch #rlog{ma
 .goBar{position:sticky;bottom:0;margin:12px -24px -22px;padding:12px 24px 14px;background:linear-gradient(180deg,rgba(14,20,22,0),rgba(14,20,22,.96) 30%);border-radius:0 0 14px 14px;z-index:2}.goBar .go{width:100%;margin:0}
 #pause{align-items:center}#pause .main{order:-1}#pause .keys{max-height:calc(100dvh - 40px);overflow:auto}
 #thrMil::after{right:auto;left:5px;top:-15px}
-#mp{background:rgba(5,8,10,.7);justify-content:center}#cust{background:rgba(5,8,10,.72);justify-content:center}.camed{margin-top:12px}.camgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.camgrid .btn{margin:0;padding:8px 4px;font-size:13px}#camReset{font-size:13px;padding:8px 10px;flex:0 0 auto}.camed .mprow{flex-wrap:wrap}.camed p.sub{font-size:12px}#cust select,#cust input[type=number]{background:#0c1418;color:#cfe;border:1px solid #2a3a40;border-radius:8px;padding:4px 6px}#custOpen{margin-top:8px;width:100%}#custList button{margin-left:8px}.mpcard{width:min(480px,100%)}.mph{display:flex;align-items:center;justify-content:space-between}.mph h2{margin:0;font-size:28px}.mph .x{all:unset;cursor:pointer;font-size:20px;padding:4px 8px}
+#mp{background:rgba(5,8,10,.7);justify-content:center}#cust{background:rgba(5,8,10,.72);justify-content:center}#snd{background:rgba(5,8,10,.72);justify-content:center}#sndOpen{margin-top:6px;width:100%}#snd select{background:#0c1418;color:#cfe;border:1px solid #2a3a40;border-radius:8px;padding:4px 6px}#snd a{color:#8fe0c8}#snd input[type=range]{width:9em}.camed{margin-top:12px}.camgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.camgrid .btn{margin:0;padding:8px 4px;font-size:13px}#camReset{font-size:13px;padding:8px 10px;flex:0 0 auto}.camed .mprow{flex-wrap:wrap}.camed p.sub{font-size:12px}#cust select,#cust input[type=number]{background:#0c1418;color:#cfe;border:1px solid #2a3a40;border-radius:8px;padding:4px 6px}#custOpen{margin-top:8px;width:100%}#custList button{margin-left:8px}.mpcard{width:min(480px,100%)}.mph{display:flex;align-items:center;justify-content:space-between}.mph h2{margin:0;font-size:28px}.mph .x{all:unset;cursor:pointer;font-size:20px;padding:4px 8px}
 .mprow{display:flex;gap:8px;align-items:center}.mprow .btn{flex:1;margin-top:10px}.mpcode{text-transform:uppercase;letter-spacing:.2em;font-family:'Share Tech Mono',monospace;margin-top:10px}.mpcodebox{margin-top:12px;font-size:15px;color:var(--muted)}.mpcodebox b{font:700 30px 'Share Tech Mono',monospace;color:var(--hud);letter-spacing:.15em;flex:1}
 .mplist{margin:4px 0 0;padding:0;list-style:none}.mplist li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)}.mplist li span{color:var(--muted);font-size:13px}
 .mpgo{background:rgba(140,255,170,.12);color:var(--hud);border:1px solid rgba(140,255,170,.5);font-size:16px;margin-top:8px!important;padding:10px!important}#mpVoice.on{background:#c0392b;color:#fff}
@@ -252,6 +252,7 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
       <button data-v="a29"><b>A-29 Super Tucano</b><span>Turboélice da FAB, MAA-1, metralhadoras .50</span></button>
     </div>
     <button class="btn alt" id="custOpen" type="button">＋ Avião por link (Sketchfab ou .glb)</button>
+    <button class="btn alt" id="sndOpen" type="button">🔊 Sons do avião selecionado</button>
     <p class="sub soon" id="soonLine"></p>
     <div class="lbl">Campanha 1 · combate aéreo</div>
     <div class="opts mis" data-k="mission">
@@ -376,6 +377,22 @@ body.touch #pause .main{order:-1;width:min(300px,100%)}body.touch #pause .keys{w
    <div class="mprow"><label class="sub">Olho: frente/trás (m) <input id="custEx" type="number" step=".05" style="width:5em"></label><label class="sub">altura (m) <input id="custEy" type="number" step=".05" style="width:5em"></label><button class="btn alt" id="custApply" type="button">Aplicar</button></div>
   </div>
   <h3>Seus aviões</h3><div id="custList" class="sub"></div>
+</div></div>
+<div id="snd" class="ov hide"><div class="card mpcard">
+  <div class="mph"><h2>Sons: <span id="sndAc"></span></h2><button class="x" id="sndClose" aria-label="Fechar">✕</button></div>
+  <div class="mprow"><label class="sub">Tipo de motor <select id="sndType"><option value="">Padrão deste avião</option><option value="jet">Jato (turbofan)</option><option value="turboprop">Turboélice</option><option value="piston">Hélice a pistão</option></select></label></div>
+  <h3>Gravação do motor (loop)</h3>
+  <p class="sub">Use um som em loop de motor (.mp3, .wav, .ogg) do seu aparelho ou de um link. O tom e o volume acompanham a manete.</p>
+  <div class="mprow"><input type="file" id="sndFileM" accept="audio/*"><input id="sndUrlM" class="pname" placeholder="ou link https://...mp3"></div>
+  <h3>Gravação do pós-combustor (opcional)</h3>
+  <div class="mprow"><input type="file" id="sndFileA" accept="audio/*"><input id="sndUrlA" class="pname" placeholder="ou link https://...mp3"></div>
+  <div class="mprow"><label class="sub">Tom em marcha lenta <input type="range" id="sndR0" min=".3" max="1.5" step=".05"></label><label class="sub">Tom na potência máxima <input type="range" id="sndR1" min=".6" max="2.5" step=".05"></label></div>
+  <div class="mprow"><label class="sub">Volume da gravação <input type="range" id="sndVol" min=".2" max="2" step=".05"></label><label class="sub">Misturar com o som sintetizado <input type="range" id="sndMix" min="0" max="1" step=".05"></label></div>
+  <div class="mprow"><button class="btn" id="sndSaveB" type="button">Salvar</button><button class="btn alt" id="sndClear" type="button">Voltar ao som original</button></div>
+  <h3>Ouvir</h3>
+  <div class="mprow"><label class="sub">Manete <input type="range" id="sndThr" min="0" max="1" step=".01" value=".6"></label><label class="sub"><input type="checkbox" id="sndAb"> pós-combustor</label><button class="btn alt" id="sndPlay" type="button">▶ Ouvir</button></div>
+  <p class="sub" id="sndMsg"></p>
+  <p class="sub">Gravações grátis (CC0, domínio público) para baixar: <a href="https://freesound.org/search/?q=jet+engine+loop&f=license%3A%22Creative+Commons+0%22" target="_blank" rel="noopener">jato</a> · <a href="https://freesound.org/search/?q=turboprop&f=license%3A%22Creative+Commons+0%22" target="_blank" rel="noopener">turboélice</a> · <a href="https://freesound.org/search/?q=propeller+plane+engine&f=license%3A%22Creative+Commons+0%22" target="_blank" rel="noopener">hélice a pistão</a> · <a href="https://bigsoundbank.com/search?q=plane" target="_blank" rel="noopener">BigSoundBank</a>. Se o som for CC BY, dê crédito ao autor.</p>
 </div></div>
 <div id="pause" class="ov hide">
   <div class="card keys" id="keys2"></div>
@@ -1601,20 +1618,106 @@ function initAudio(){if(AC)return;try{AC=new(window.AudioContext||window.webkitA
  const M=AC.createGain();M.gain.value=S.sound?.8:0;M.connect(AC.destination);SND.master=M;
  const loop=b=>{const s=AC.createBufferSource();s.buffer=b;s.loop=true;s.start();return s};
  const chain=(src,type,f,q)=>{const fl=AC.createBiquadFilter();fl.type=type;fl.frequency.value=f;if(q)fl.Q.value=q;const g=AC.createGain();g.gain.value=0;src.connect(fl).connect(g).connect(M);return[fl,g]};
- [SND.engF,SND.engG]=chain(loop(SND.brown),'lowpass',300);[SND.abF,SND.abG]=chain(loop(SND.brown),'lowpass',500);[SND.wiF,SND.wiG]=chain(loop(SND.white),'bandpass',900,.7);
- const wh=AC.createOscillator();wh.type='sawtooth';wh.start();SND.wh=wh;[SND.whF,SND.whG]=chain(wh,'bandpass',2000,9);
- const gn=loop(SND.white),ga=AC.createGain();ga.gain.value=.5;const mod=AC.createOscillator();mod.type='square';mod.frequency.value=100;const mg=AC.createGain();mg.gain.value=.5;mod.connect(mg).connect(ga.gain);mod.start();
+ [SND.wiF,SND.wiG]=chain(loop(SND.white),'bandpass',900,.7);
+ // motor: barramento próprio (abafado no cockpit) onde entra a voz do motor (sintetizada por tipo ou gravação do jogador)
+ SND.engLP=AC.createBiquadFilter();SND.engLP.type='lowpass';SND.engLP.frequency.value=18000;SND.engBus=AC.createGain();SND.engBus.connect(SND.engLP).connect(M);SND.loop=loop;SND.chain=chain;
+ const gn=loop(SND.white),ga=AC.createGain();ga.gain.value=.5;const mod=AC.createOscillator();mod.type='square';mod.frequency.value=100;SND.gunMod=mod;const mg=AC.createGain();mg.gain.value=.5;mod.connect(mg).connect(ga.gain);mod.start();
  const gf=AC.createBiquadFilter();gf.type='lowpass';gf.frequency.value=1800;SND.gunG=AC.createGain();SND.gunG.gain.value=0;gn.connect(ga).connect(gf).connect(SND.gunG).connect(M);
  const to=AC.createOscillator();to.type='triangle';to.start();SND.tone=to;SND.toneG=AC.createGain();SND.toneG.gain.value=0;to.connect(SND.toneG).connect(M);
  const rw=AC.createOscillator();rw.type='square';rw.frequency.value=1200;rw.start();SND.rwrG=AC.createGain();SND.rwrG.gain.value=0;rw.connect(SND.rwrG).connect(M);
  const wa=AC.createOscillator();wa.type='square';wa.start();SND.warn=wa;SND.warnG=AC.createGain();SND.warnG.gain.value=0;wa.connect(SND.warnG).connect(M)}
+/* ---- motores com som de verdade ----
+ Como os simuladores fazem (MSFS/X-Plane com FMOD, DCS): o som do motor é feito de camadas que seguem a rotação e a potência.
+ Sem gravações, cada camada vem da física do motor:
+ · jato/turbofan: ronco (ruído grave), tom do fan (nº de pás × N1), "buzzsaw" (harmônicos da rotação do eixo, só em alta), assobio do núcleo (N2) e, no pós-combustor, rugido com estalos.
+ · turboélice (PT6 do A-29): zumbido da hélice na frequência de passagem das pás (5 pás × 2000 rpm/60 ≈ 167 Hz, cheio de harmônicos e com batimento na rotação),
+   assobio agudo do compressor (o "chiado" típico de turboélice) e ronco do escape. A hélice tem governador: a rotação quase não muda, o que muda é a carga.
+ · pistão: pulsos de ignição (rpm/60 × cilindros/2, com irregularidade) + rotação do eixo + hélice.
+ O jogador pode trocar o tipo de motor e carregar gravações próprias (arquivo do aparelho ou link) para o motor e o pós-combustor de cada avião. */
+const ENG_DEF={jet:{n1:7400,fan:24},turboprop:{blades:5,rpm:2000,rpmIdle:1700},piston:{blades:3,rpm:2600,rpmIdle:900,cyl:9}};
+const SPV={on:false,thr:.6,ab:0};// prévia de som no hangar
+const SNDC=(()=>{try{return JSON.parse(localStorage.getItem('fcs-snd')||'{}')}catch(e){return{}}})();
+const sndSave=()=>{try{localStorage.setItem('fcs-snd',JSON.stringify(SNDC))}catch(e){}};
+function engProfile(id){const a=ACFT[id]||{},c=SNDC[id]||{},type=c.type||a.eng||(a.prop?'turboprop':'jet');return Object.assign({type},ENG_DEF[type],type===(a.eng||(a.prop?'turboprop':'jet'))?a.engP||{}:{})}
+function harm(n,decay,odd=1){const re=new Float32Array(n+1),im=new Float32Array(n+1);for(let k=1;k<=n;k++)im[k]=Math.pow(k,-decay)*(k%2?1:odd);return AC.createPeriodicWave(re,im)}
+function crackleBuf(){const b=AC.createBuffer(1,AC.sampleRate*2,AC.sampleRate),d=b.getChannelData(0);let e=0;for(let i=0;i<d.length;i++){if(Math.random()<.0009)e=.6+Math.random()*.8;e*=.992;d[i]=(Math.random()*2-1)*e+(Math.random()*2-1)*.12}return b}
+function engSynth(pf){const out=AC.createGain(),L=[],nodes=[];const g=v=>{const x=AC.createGain();x.gain.value=v;return x};
+ const osc=(w,f)=>{const o=AC.createOscillator();if(typeof w==='string')o.type=w;else o.setPeriodicWave(w);o.frequency.value=f;o.start();nodes.push(o);return o};
+ const src=b=>{const x=SND.loop(b);nodes.push(x);return x};
+ const filt=(type,f,q)=>{const x=AC.createBiquadFilter();x.type=type;x.frequency.value=f;if(q)x.Q.value=q;return x};
+ const lay=(node,...chain)=>{let n=node;for(const c of chain)n=n.connect(c);n.connect(out);return chain[chain.length-1]};
+ const V={out,nodes};
+ if(pf.type==='jet'){const roarF=filt('lowpass',300),roarG=g(0);lay(src(SND.brown),roarF,roarG);
+  const shaft=osc(harm(40,.75,.9),60),bzF=filt('bandpass',1400,.6),bzG=g(0);lay(shaft,bzF,bzG);
+  const fan=osc('sine',600),fan2=osc('sine',1200),fanG=g(0);fan.connect(fanG);fan2.connect(g(.4)).connect(fanG);fanG.connect(out);
+  const core=osc('sine',7000),coreG=g(0);lay(core,coreG);
+  const abF=filt('lowpass',700),abG=g(0);lay(src(SND.brown),abF,abG);const ckG=g(0);lay(src(crackleBuf()),filt('bandpass',900,.5),ckG);
+  V.up=(t,pw,ab,inC,set)=>{const n1=.2+.8*pw,f=pf.n1/60*n1;set(roarG.gain,.05+.2*pw+.1*ab);set(roarF.frequency,(inC?150:240)+(inC?380:1000)*pw);
+   set(shaft.frequency,f);set(bzG.gain,.09*Math.max(0,pw-.62)/.38*(inC?.5:1));set(bzF.frequency,800+1600*pw);
+   set(fan.frequency,f*pf.fan);set(fan2.frequency,2*f*pf.fan);set(fanG.gain,(.012+.02*pw)*(inC?.5:1));set(core.frequency,5200+3600*pw);set(coreG.gain,(.006+.008*pw)*(inC?.4:1));
+   set(abG.gain,.42*ab*(inC?.7:1));set(abF.frequency,inC?260:600);set(ckG.gain,.1*ab*(inC?.4:1))}}
+ else if(pf.type==='turboprop'){const bpf=pf.blades*pf.rpm/60;
+  const prop=osc(harm(36,.62,.75),bpf),pF=filt('lowpass',2200),trem=g(1),pG=g(0);prop.connect(pF).connect(trem).connect(pG).connect(out);
+  const lfo=osc('sine',pf.rpm/60),lg=g(.18);lfo.connect(lg).connect(trem.gain);// batimento: pás não são idênticas
+  const wsh=g(0);lay(src(SND.white),filt('bandpass',bpf*6,1.2),wsh);
+  const comp=osc('sine',4200),comp2=osc('sine',6300),cG=g(0);comp.connect(cG);comp2.connect(g(.5)).connect(cG);cG.connect(out);
+  const exF=filt('lowpass',260),exG=g(0);lay(src(SND.brown),exF,exG);
+  V.up=(t,pw,ab,inC,set)=>{const rpm=pf.rpmIdle+(pf.rpm-pf.rpmIdle)*Math.min(1,pw*1.6),b=pf.blades*rpm/60;set(prop.frequency,b);set(lfo.frequency,rpm/60);
+   set(pG.gain,(.05+.26*pw)*(inC?.75:1));set(pF.frequency,(inC?700:1200)+(inC?600:2200)*pw);set(wsh.gain,(.015+.05*pw)*(inC?.5:1));
+   set(comp.frequency,3600+2600*pw);set(comp2.frequency,5400+3900*pw);set(cG.gain,(.016+.014*pw)*(inC?.45:1));set(exG.gain,.04+.1*pw);set(exF.frequency,180+260*pw)}}
+ else{const fire=osc(harm(28,.48,.95),100),fG=g(0),fF=filt('lowpass',1400);fire.connect(fF).connect(fG).connect(out);
+  const jit=src(SND.brown),jg=g(2.5);jit.connect(jg).connect(fire.frequency);// irregularidade da combustão
+  const shaft=osc('square',40),sG=g(0);lay(shaft,filt('lowpass',160),sG);
+  const prop=osc(harm(20,.7,.8),120),pG=g(0);lay(prop,filt('lowpass',900),pG);
+  V.up=(t,pw,ab,inC,set)=>{const rpm=pf.rpmIdle+(pf.rpm-pf.rpmIdle)*pw,fr=rpm/60*pf.cyl/2;set(fire.frequency,fr);set(fG.gain,(.08+.2*pw)*(inC?.8:1));set(fF.frequency,600+1400*pw);
+   set(shaft.frequency,rpm/60);set(sG.gain,.02+.035*pw);set(prop.frequency,pf.blades*rpm/60);set(pG.gain,(.03+.14*pw)*(inC?.6:1))}}
+ return V}
+// gravação do jogador: loop com tom (playbackRate) e volume seguindo a potência
+function engSample(buf,c,abBuf){const out=AC.createGain(),nodes=[];const s=AC.createBufferSource();s.buffer=buf;s.loop=true;s.start();nodes.push(s);const sg=AC.createGain();sg.gain.value=0;s.connect(sg).connect(out);
+ let ab=null,abg=null;if(abBuf){ab=AC.createBufferSource();ab.buffer=abBuf;ab.loop=true;ab.start();nodes.push(ab);abg=AC.createGain();abg.gain.value=0;ab.connect(abg).connect(out)}
+ const r0=c.r0??.7,r1=c.r1??1.3,vol=c.vol??1;
+ return {out,nodes,up:(t,pw,abv,inC,set)=>{set(s.playbackRate,r0+(r1-r0)*pw);set(sg.gain,(.18+.5*pw)*vol*(inC?.7:1));if(abg)set(abg.gain,.6*abv*vol*(inC?.7:1))}}}
+let AID=null;const ENGV={key:null,v:null,syn:null,bufs:{}};
+function sndDB(){return custDB().then(db=>db)}
+function sndGet(k){return custTx('readonly',st=>st.get('snd:'+k)).then(r=>r&&r.buf).catch(()=>null)}
+function sndPut(k,buf){return custTx('readwrite',st=>st.put({id:'snd:'+k,buf}))}
+function sndDel(k){return custTx('readwrite',st=>st.delete('snd:'+k)).catch(()=>{})}
+async function sndBuf(k){if(ENGV.bufs[k]!==undefined)return ENGV.bufs[k];ENGV.bufs[k]=null;const raw=await sndGet(k);if(!raw)return null;try{ENGV.bufs[k]=await AC.decodeAudioData(raw.slice(0))}catch(e){ENGV.bufs[k]=null}return ENGV.bufs[k]}
+function engKill(v){if(!v)return;try{v.out.disconnect()}catch(e){}for(const n of v.nodes)try{n.stop()}catch(e){}}
+function engBuild(id){if(!AC)return;const c=SNDC[id]||{},key=id+'|'+JSON.stringify(c);if(ENGV.key===key)return;ENGV.key=key;engKill(ENGV.v);engKill(ENGV.syn);ENGV.v=ENGV.syn=null;
+ const syn=engSynth(engProfile(id));syn.out.connect(SND.engBus);ENGV.syn=syn;
+ if(c.motor){Promise.all([sndBuf(id+':motor'),c.pos?sndBuf(id+':pos'):null]).then(([b,ab])=>{if(ENGV.key!==key||!b)return;const v=engSample(b,c,ab);v.out.connect(SND.engBus);ENGV.v=v;syn.out.gain.value=c.mix??0})}
+ const gr=(ACFT[id]&&ACFT[id].gun&&ACFT[id].gun.rate)||100;if(SND.gunMod)SND.gunMod.frequency.value=Math.min(gr,110)}
+// renderiza offline o som de um motor (testes e exportar amostra): marcha lenta → máximo (+pós-combustor nos jatos) → reduz
+let SNDR=0;async function sndRender(id,type,dur=9){initAudio();if(!AC)return null;const real=AC,sr=44100;SNDR=1;AC=new OfflineAudioContext(1,sr*dur,sr);try{const pf=engProfile(id);if(type)pf.type=type;Object.assign(pf,ENG_DEF[pf.type],pf.type===((ACFT[id]||{}).eng||((ACFT[id]||{}).prop?'turboprop':'jet'))?(ACFT[id]||{}).engP||{}:{});
+ const V=engSynth(pf),bus=AC.createGain();bus.gain.value=1.6;V.out.connect(bus).connect(AC.destination);
+ for(let i=0;i<=180;i++){const tt=i/180*dur,pw=tt<2?0:tt<5?(tt-2)/3:tt<7?1:1-(tt-7)/2*.8,ab=pf.type==='jet'&&tt>5.5&&tt<7?1:0;V.up(tt,pw,ab,false,(par,v)=>par.setTargetAtTime(v,tt,.05))}
+ const b=await AC.startRendering();return {type:pf.type,data:b.getChannelData(0),sr}}finally{AC=real;SNDR=0}}
+function engAudio(t,on,inC){if(SNDR)return;const id=SPV.on?SPV.id:(G.mode==='play'&&AID)||S.ac;engBuild(id);const set=(p,v)=>p.setTargetAtTime(v,t,.08);
+ const pw=SPV.on?SPV.thr:P.spool||0,ab=SPV.on?SPV.ab:P.ab||0,dead=!SPV.on&&G.mode==='play'&&P.fuel<=0;
+ set(SND.engBus.gain,dead?0:on);set(SND.engLP.frequency,inC?2600:18000);for(const v of[ENGV.syn,ENGV.v])if(v)v.up(t,pw,ab,inC,set)}
+(function sndUI(){const $s=i=>document.getElementById(i);if(!$s('snd'))return;const msg=t=>{$s('sndMsg').textContent=t};let id=null;
+ const fill=()=>{id=S.ac;const c=SNDC[id]||{};$s('sndAc').textContent=ACFT[id]?ACFT[id].name:id;$s('sndType').value=c.type||'';$s('sndR0').value=c.r0??.7;$s('sndR1').value=c.r1??1.3;$s('sndVol').value=c.vol??1;$s('sndMix').value=c.mix??0;
+  $s('sndUrlM').value=c.urlM||'';$s('sndUrlA').value=c.urlA||'';msg(c.motor?'Usando gravação própria do motor'+(c.pos?' e do pós-combustor':'')+'.':'Usando o som sintetizado do motor ('+({jet:'jato',turboprop:'turboélice',piston:'hélice a pistão'})[engProfile(id).type]+').')};
+ const stopPrev=()=>{SPV.on=false;$s('sndPlay').textContent='▶ Ouvir'};
+ $s('sndOpen').onclick=()=>{initAudio();fill();$s('snd').classList.remove('hide')};$s('sndClose').onclick=()=>{stopPrev();$s('snd').classList.add('hide')};
+ const grab=async(f,u)=>{if(f){if(f.size>15*1048576)throw new Error('Arquivo grande demais (máx. 15 MB).');return f.arrayBuffer()}if(u){if(!/^https?:\/\//i.test(u))throw new Error('O link precisa começar com https://');try{const r=await fetch(u);if(!r.ok)throw 0;return r.arrayBuffer()}catch(e){throw new Error('Esse site não deixa baixar o áudio daqui (CORS). Baixe o arquivo e use "escolher arquivo".')}}return null};
+ const check=async raw=>{try{await AC.decodeAudioData(raw.slice(0));return true}catch(e){throw new Error('Não consegui ler esse áudio. Use .mp3, .wav ou .ogg.')}};
+ const live=()=>{const c=SNDC[id]||(SNDC[id]={});c.type=$s('sndType').value||undefined;c.r0=+$s('sndR0').value;c.r1=+$s('sndR1').value;c.vol=+$s('sndVol').value;c.mix=+$s('sndMix').value;sndSave()};
+ for(const k of['sndType','sndR0','sndR1','sndVol','sndMix'])$s(k).addEventListener('input',()=>{live();ENGV.key=null});
+ $s('sndSaveB').onclick=async()=>{const b=$s('sndSaveB');b.disabled=true;try{initAudio();live();const c=SNDC[id];
+   for(const [slot,fi,ui,uk] of[['motor','sndFileM','sndUrlM','urlM'],['pos','sndFileA','sndUrlA','urlA']]){const f=$s(fi).files[0],u=$s(ui).value.trim();if(!f&&(!u||u===c[uk]))continue;msg('Carregando '+(slot==='motor'?'o som do motor':'o som do pós-combustor')+'…');
+    const raw=await grab(f,u);await check(raw);await sndPut(id+':'+slot,raw);delete ENGV.bufs[id+':'+slot];c[slot]=true;c[uk]=f?'':u;$s(fi).value=''}
+   sndSave();ENGV.key=null;fill();msg('Salvo! '+$s('sndMsg').textContent)}catch(e){msg('⚠️ '+e.message)}finally{b.disabled=false}};
+ $s('sndClear').onclick=async()=>{await sndDel(id+':motor');await sndDel(id+':pos');delete ENGV.bufs[id+':motor'];delete ENGV.bufs[id+':pos'];delete SNDC[id];sndSave();ENGV.key=null;fill()};
+ $s('sndPlay').onclick=()=>{initAudio();if(AC&&AC.state==='suspended')AC.resume();if(SPV.on)return stopPrev();SPV.on=true;SPV.id=id;$s('sndPlay').textContent='■ Parar'};
+ $s('sndThr').oninput=e=>SPV.thr=+e.target.value;$s('sndAb').onchange=e=>SPV.ab=e.target.checked?1:0})();
 function oneShot(buf,type,f0,f1,vol,dur,off=0){if(!AC)return;const t=AC.currentTime,s=AC.createBufferSource();s.buffer=buf;const fl=AC.createBiquadFilter();fl.type=type;fl.frequency.setValueAtTime(f0,t);fl.frequency.exponentialRampToValueAtTime(f1,t+dur);const g=AC.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(fl).connect(g).connect(SND.master);s.start(t,off);s.stop(t+dur)}
 const boom=(v,d)=>oneShot(SND.brown,'lowpass',900,120,v,d,Math.random()),whoosh=v=>oneShot(SND.white,'bandpass',2600,350,v,1.4);
 function blip(f,d,v){if(!AC)return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(SND.master);o.start(t);o.stop(t+d)}
 const click=()=>blip(900,.03,.08);
-function updAudio(warn){if(!AC)return;const t=AC.currentTime,inC=view==='cock',on=G.mode==='play'&&!G.paused&&P.state!=='dead'?1:G.mode==='menu'?.3:0,set=(p,v)=>p.setTargetAtTime(v,t,.08);
- set(SND.engG.gain,(.06+.22*P.spool+.12*P.ab)*on);set(SND.engF.frequency,inC?160+P.spool*420:280+P.spool*1100);
- set(SND.abG.gain,P.ab*.45*on*(inC?.7:1));set(SND.abF.frequency,inC?260:520);set(SND.wh.frequency,700+P.spool*2400);set(SND.whF.frequency,700+P.spool*2400);set(SND.whG.gain,.014*on*(.25+P.spool)*(inC?.6:1));
+function updAudio(warn){if(!AC)return;const t=AC.currentTime,inC=view==='cock'&&!SPV.on,on=SPV.on?1:G.mode==='play'&&!G.paused&&P.state!=='dead'?1:G.mode==='menu'?.3:0,set=(p,v)=>p.setTargetAtTime(v,t,.08);
+ engAudio(t,on,inC);
  set(SND.wiG.gain,clamp(P.qd/55000,0,1)*.22*on);set(SND.wiF.frequency,400+P.spd*1.4);set(SND.gunG.gain,firing&&on?.38:0);
  const tone=on&&P.wpn===2&&P.state==='fly'&&P.stores.aim9.some(s=>s.loaded);set(SND.toneG.gain,tone?(P.seekLock?.05:.025):0);set(SND.tone.frequency,P.seekLock?1150:380+40*Math.sin(t*22));
  const rw=P.rwr===2?(t*9%1<.5):P.rwr===1?(t%1.2<.12):0;SND.rwrG.gain.setTargetAtTime(rw&&on?.045:0,t,.005);
@@ -2048,7 +2151,7 @@ function camOffReset(){if(!CAMO.id)return;delete CAMO.v[CAMO.id];camOffSave();ca
 document.addEventListener('click',e=>{const b=e.target.closest('[data-cam]');if(b){camOffMove(b.dataset.cam.split(',').map(Number));return}if(e.target.id==='camReset')camOffReset()});
 function loadAircraft(id){if(ACM[id]!==undefined)return Promise.resolve(ACM[id]);if(ACFT[id]&&ACFT[id].custom)return custLoad(id).then(R=>(ACM[id]=R));return loadQ(ACFT[id].file).then(sc=>{let R=null;try{if(sc)R=prepHD(sc,id)}catch(e){console.error('HD',id,e)}ACM[id]=R;return R})}
 const cockExtra=[];
-function setupPlayer(id){A=ACFT[id];GEAR_H=A.gearH;const R=ACM[id];
+function setupPlayer(id){A=ACFT[id];AID=id;GEAR_H=A.gearH;const R=ACM[id];
  if(me.hd){me.g.remove(me.hd.g);me.hd=null}if(COCK.hd){cock.remove(COCK.hd.g);COCK.hd=null}for(const o of cockExtra)cock.remove(o);cockExtra.length=0;
  HD.ok=!!R;me.b.visible=!R;for(const c of cock.children)c.visible=!R;if(!R)return;
  me.hd=makeHD(R,true);me.g.add(me.hd.g);
@@ -2688,7 +2791,7 @@ function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.
 resetP();placeCat();applyTOD();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
 // PWA: instala como app e funciona offline (só em HTTPS ou localhost)
 if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
-window.__tomcat={ML,netAc,propOf:()=>me.hd&&me.hd.prop,CAMO,camOffMove,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={sndRender,engSynth,engProfile,SNDC,SPV,ENGV,ML,netAc,propOf:()=>me.hd&&me.hd.prop,CAMO,camOffMove,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>
