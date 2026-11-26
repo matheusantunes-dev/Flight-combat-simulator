@@ -49,3 +49,5 @@ jobs:
         run: node tests/link.mjs
       - name: Câmera do cockpit ajustável
         run: node tests/camera.mjs
+      - name: Hélice do A-29 (gira e vira disco)
+        run: node tests/helice.mjs
