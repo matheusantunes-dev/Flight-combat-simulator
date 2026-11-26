@@ -506,6 +506,46 @@ const seaNorm=(()=>{const N=256,c=document.createElement('canvas');c.width=c.hei
  for(let y=0;y<N;y++)for(let X=0;X<N;X++){const dx=h[y*N+(X+1)%N]-h[y*N+(X+N-1)%N],dy=h[((y+1)%N)*N+X]-h[((y+N-1)%N)*N+X];const n=new V3(-dx*1.4,-dy*1.4,1).normalize();const k=(y*N+X)*4;img.data[k]=(n.x*.5+.5)*255;img.data[k+1]=(n.y*.5+.5)*255;img.data[k+2]=(n.z*.5+.5)*255;img.data[k+3]=255}
  x.putImageData(img,0,0);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(1600,1600);t.anisotropy=8;return t})();
 const sea=new THREE.Mesh(new THREE.PlaneGeometry(200000,200000),new THREE.MeshStandardMaterial({color:lc(0x123a56),roughness:.22,metalness:0,normalMap:seaNorm,normalScale:new THREE.Vector2(.55,.55)}));
+/* ================= água realista =================
+ Como os simuladores fazem (DCS, MSFS, Sea of Thieves): a superfície NÃO usa uma textura de ondas repetida
+ — é ela que vira aquele xadrez de moiré no horizonte. O certo é somar várias ondas senoidais em direções,
+ tamanhos e velocidades diferentes, calculadas no shader a partir da posição no mundo, e ainda:
+ · Fresnel: de raspão a água vira espelho do céu (por isso o mar longe tem a cor do horizonte)
+ · sun glitter: o caminho de brilho do sol na água, que some à noite
+ · LOD: cada oitava de onda desaparece com a distância, senão vira chuvisco piscando. */
+const WATER={sun:new THREE.Vector3(0,1,0),horiz:new THREE.Color(0x9fc4dd),u:null};
+sea.material.normalMap=null;sea.material.roughness=.2;sea.material.needsUpdate=true;
+sea.material.onBeforeCompile=sh=>{
+ sh.uniforms.uTime={value:0};sh.uniforms.uSun={value:WATER.sun};sh.uniforms.uHorizon={value:WATER.horiz};sh.uniforms.uGlit={value:1};WATER.u=sh.uniforms;
+ sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vWPos;')
+  .replace('#include <worldpos_vertex>','#include <worldpos_vertex>\n vWPos=(modelMatrix*vec4(transformed,1.0)).xyz;');
+ sh.fragmentShader=sh.fragmentShader.replace('#include <common>',`#include <common>
+varying vec3 vWPos;uniform float uTime;uniform vec3 uSun;uniform vec3 uHorizon;uniform float uGlit;
+vec3 gWN=vec3(0.0,1.0,0.0);
+vec2 waveGrad(vec2 p,float t,float dC){vec2 g=vec2(0.0);
+ // "domain warp": dobra as cristas com um ruído lento. Sem isso as senoides viram listras de telha.
+ p+=7.0*vec2(sin(p.y*0.0032+t*0.21),cos(p.x*0.0036-t*0.19));
+ for(int i=0;i<7;i++){float fi=float(i);float sc=pow(2.35,fi);
+  float ang=fi*2.3999+0.6;vec2 d=vec2(cos(ang),sin(ang));
+  float k=0.0075*sc,a=0.95/pow(sc,1.22);
+  float lod=clamp(1.0-dC*k/900.0,0.0,1.0);lod*=lod;
+  // dispersão de águas profundas: onda grande anda rápido, ondinha anda devagar (c = sqrt(g/k))
+  g+=d*(a*k*cos(k*(dot(d,p)-sqrt(9.81/k)*t))*lod);}
+ return g;}`)
+  .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
+ {float dC=length(vWPos.xz-cameraPosition.xz);
+  vec2 g=waveGrad(vWPos.xz,uTime,dC)*8.0;
+  gWN=normalize(vec3(-g.x,1.0,-g.y));
+  normal=normalize((viewMatrix*vec4(gWN,0.0)).xyz);}`)
+  .replace('gl_FragColor = vec4( outgoingLight, diffuseColor.a );',`
+ {vec3 V=normalize(cameraPosition-vWPos);
+  float fres=pow(1.0-clamp(dot(gWN,V),0.0,1.0),5.0);
+  vec3 H=normalize(normalize(uSun)+V);
+  float spec=pow(max(dot(gWN,H),0.0),260.0)+0.13*pow(max(dot(gWN,H),0.0),70.0);
+  outgoingLight=mix(outgoingLight,uHorizon,clamp(fres*0.75,0.0,0.8));
+  outgoingLight+=vec3(1.0,0.95,0.84)*spec*1.35*uGlit;}
+ gl_FragColor = vec4( outgoingLight, diffuseColor.a );`)};
+
 sea.rotation.x=-Math.PI/2;scene.add(sea);
 
 /* ================= terreno (ilhas) ================= */
@@ -528,7 +568,20 @@ const ISL=[[-6000,-20000,7500,1750],[9000,-30000,5000,1150],[14000,5000,2600,420
 let REAL_WORLD=false,ISLAND_MESH=null;
 function terrainH(x,z){return REAL_WORLD?realH(x,z):islandH(x,z)}
 function islandH0(x,z){let h=-60;for(const I of ISL){const dx=x-I[0],dz=z-I[1],d=Math.sqrt(dx*dx+dz*dz)/I[2];if(d<1.3){const n=fbm(x*.00045,z*.00045);const t=clamp(1.12-d-(n-.5)*.55,0,1);const e=t*t*(3-2*t);const ridge=1-Math.abs(fbm(x*.0009+7,z*.0009-3)*2-1);h=Math.max(h,-60+e*(I[3]*(.5+.65*ridge*n)+80))}}return h}
-for(const b of BASES)b.elev=Math.max(18,Math.round(islandH0(b.x,b.z)));// a pista fica na cota natural do terreno
+/* Onde construir a pista: nenhum engenheiro põe pista numa encosta. O jogo procura sozinho,
+   em volta do ponto sugerido, o trecho mais PLANO e baixo que caiba na pista inteira (como um
+   estudo de sítio aeroportuário de verdade). Busca determinística (semente fixa) para que todos
+   os jogadores da mesma sala tenham as bases no mesmo lugar. */
+(function placeBases(){let seed=20261126;const rnd1=()=>(seed=(seed*1664525+1013904223)>>>0)/4294967296;
+ for(const b of BASES){const x0=b.x,z0=b.z;let best=null;
+  for(let i=0;i<900;i++){const r=400+rnd1()*8000,a=rnd1()*6.2832,x=x0+Math.cos(a)*r,z=z0+Math.sin(a)*r,hdg=Math.floor(rnd1()*8)*22.5;
+   const sa=hdg*Math.PI/180,sx=Math.sin(sa),cx=Math.cos(sa);let lo=1e9,hi=-1e9,sum=0,n=0,bad=false;
+   for(let u=-b.len/2-260;u<=b.len/2+260&&!bad;u+=160)for(let v=-b.w*2.4;v<=b.w*2.4;v+=b.w*1.2){
+    const h=islandH0(x+sx*u+cx*v,z-cx*u+sx*v);if(h<16){bad=true;break}lo=Math.min(lo,h);hi=Math.max(hi,h);sum+=h;n++}
+   if(bad)continue;const med=sum/n,score=(hi-lo)+Math.max(0,med-260)*.12+Math.max(0,60-med)*.3;
+   if(!best||score<best.score)best={x,z,hdg,elev:Math.round(med),score,rough:hi-lo}}
+  if(best){b.x=best.x;b.z=best.z;b.hdg=best.hdg;b.elev=Math.max(18,best.elev);b.rough=Math.round(best.rough)}
+  else b.elev=Math.max(18,Math.round(islandH0(b.x,b.z)))}})();
 function islandH(x,z){const h=islandH0(x,z),pd=rwyPad(x,z);return pd?h+(pd.b.elev-h)*pd.k:h}
 (function buildTerrain(){
  const g=new THREE.PlaneGeometry(52000,52000,260,260);g.rotateX(-Math.PI/2);g.translate(-2000,0,-15000);
@@ -536,11 +589,30 @@ function islandH(x,z){const h=islandH0(x,z),pd=rwyPad(x,z);return pd?h+(pd.b.ele
  g.computeVertexNormals();const n=g.attributes.normal,col=new Float32Array(p.count*3),c=new COL();
  const sand=lc(0xcdbb8c),grass=lc(0x5a7440),forest=lc(0x31502c),rock=lc(0x7b746a),snow=lc(0xeef2f5),deep=lc(0x23485a);
  for(let i=0;i<p.count;i++){const h=p.getY(i),ny=n.getY(i);
-  if(h<-4)c.copy(deep);else if(h<14)c.copy(sand);else if(h<420)c.copy(grass).lerp(forest,clamp((h-60)/360,0,1));else c.copy(forest).lerp(rock,clamp((h-420)/500,0,1));
+  if(h<-4)c.copy(deep);else c.copy(sand).lerp(grass,clamp((h-2)/22,0,1));
+  if(h>24)c.lerp(grass.clone().lerp(forest,clamp((h-60)/360,0,1)),clamp((h-24)/30,0,1));
+  if(h>420)c.lerp(rock,clamp((h-420)/500,0,1));
   if(ny<.84&&h>14)c.lerp(rock,clamp((.84-ny)*4,0,1));if(h>1200&&ny>.68)c.lerp(snow,clamp((h-1200)/220,0,1));
   const j=1+(hash(p.getX(i)*.01,p.getZ(i)*.01)-.5)*.16;col[i*3]=c.r*j;col[i*3+1]=c.g*j;col[i*3+2]=c.b*j}
  g.setAttribute('color',new THREE.BufferAttribute(col,3));
  ISLAND_MESH=new THREE.Mesh(g,new THREE.MeshLambertMaterial({vertexColors:true}));scene.add(ISLAND_MESH);
+ /* o terreno tem 1 vértice a cada 200 m: sem textura ele vira uma mancha de plástico. Em vez de
+    multiplicar a geometria (caro no celular), o detalhe vem de ruído no shader, em três escalas,
+    como fazem os terrenos procedurais de verdade. Some com a distância para não chuviscar. */
+ ISLAND_MESH.material.onBeforeCompile=sh=>{
+  sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vWPos;')
+   .replace('#include <worldpos_vertex>','#include <worldpos_vertex>\n vWPos=(modelMatrix*vec4(transformed,1.0)).xyz;');
+  sh.fragmentShader=sh.fragmentShader.replace('#include <common>',`#include <common>
+varying vec3 vWPos;
+float h21(vec2 p){p=fract(p*vec2(127.31,311.7));p+=dot(p,p+37.21);return fract(p.x*p.y);}
+float vnoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
+ return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y);}`)
+   .replace('#include <color_fragment>',`#include <color_fragment>
+ {float dC=length(vWPos.xz-cameraPosition.xz);
+  float k=clamp(1.0-dC/7000.0,0.0,1.0);
+  float n=vnoise(vWPos.xz*0.055)*0.5+vnoise(vWPos.xz*0.014)*0.32+vnoise(vWPos.xz*0.0035)*0.18;
+  diffuseColor.rgb*=1.0+(n-0.5)*0.55*k;
+  diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*vec3(0.88,1.03,0.86),(n-0.5)*0.6*k);}`)};
 })();
 /* ================= MUNDO REAL: Rio de Janeiro (relevo + satélite + prédios do OpenStreetMap) =================
    Teatro plano de ~200 km em volta do porta-aviões (aproximação equiretangular: erro < 0,1% nessa distância,
@@ -579,7 +651,10 @@ function wJob(n){if(n.hs===2&&(n.is===2||n.z>IMZ))return;if(!n.job)n.job={d:c=>M
 /* ---- altura do terreno (física, colisão, IA) ---- */
 function hSample(n,fx,fy){const px=clamp(fx*255,0,255),py=clamp(fy*255,0,255),ix=Math.min(Math.floor(px),254),iy=Math.min(Math.floor(py),254),ax=px-ix,ay=py-iy,h=n.h;
  const a=h[iy*256+ix],b=h[iy*256+ix+1],c=h[iy*256+ix+256],d=h[iy*256+ix+257];return a+(b-a)*ax+(c-a)*ay+(a-b-c+d)*ax*ay}
-function realH(x,z){const lat=z2lat(z),lon=x2lon(x);for(let zz=HZ;zz>=Z0;zz--){const tx=lon2tx(lon,zz),ty=lat2ty(lat,zz),k=zz+'/'+Math.floor(tx)+'/'+Math.floor(ty);const n=WORLD.HC.get(k);if(n&&n.h){n.used=performance.now();return hSample(n,tx-Math.floor(tx),ty-Math.floor(ty))}}return -30}
+/* realH.ok diz se havia bloco de altitude carregado: sem isso a altura é um chute (-30) e quem anda
+   no chão não pode confiar nela — era isso que afundava o piloto no modo Mundo Real. */
+function realH(x,z){const lat=z2lat(z),lon=x2lon(x);for(let zz=HZ;zz>=Z0;zz--){const tx=lon2tx(lon,zz),ty=lat2ty(lat,zz),k=zz+'/'+Math.floor(tx)+'/'+Math.floor(ty);const n=WORLD.HC.get(k);if(n&&n.h){n.used=performance.now();realH.ok=true;return hSample(n,tx-Math.floor(tx),ty-Math.floor(ty))}}realH.ok=false;return -30}
+realH.ok=false;
 /* ---- malha de um bloco ---- */
 const wFallMat=new THREE.MeshLambertMaterial({vertexColors:true});
 function wBuild(n){const N=wq().N,G=N+3,pos=new Float32Array(G*G*3),uv=new Float32Array(G*G*2),col=new Float32Array(G*G*3),idx=[];
@@ -643,9 +718,9 @@ function hitBuilding(p){for(const t of WORLD.B.tiles.values()){if(!t.boxes||Math
 /* ---- liga/desliga e laço ---- */
 const RWY={grp:null};
 (function buildBases(){const grp=new THREE.Group();scene.add(grp);RWY.grp=grp;
- const asf=new THREE.MeshLambertMaterial({color:0x34393d}),paint=new THREE.MeshBasicMaterial({color:0xe9ede9}),apron=new THREE.MeshLambertMaterial({color:0x44563a});
+ const asf=new THREE.MeshLambertMaterial({color:0x34393d}),paint=new THREE.MeshBasicMaterial({color:0xe9ede9}),apron=new THREE.MeshLambertMaterial({color:0x50693c});
  for(const b of BASES){const g=new THREE.Group();g.position.set(b.x,b.elev,b.z);g.rotation.y=-b.hdg*Math.PI/180;grp.add(g);b.grp=g;
-  const pad=new THREE.Mesh(new THREE.PlaneGeometry(b.w*3.6,b.len+620),apron);pad.rotation.x=-Math.PI/2;pad.position.y=.25;g.add(pad);
+  const pad=new THREE.Mesh(new THREE.PlaneGeometry(b.w*2.4,b.len+420),apron);pad.rotation.x=-Math.PI/2;pad.position.y=.25;g.add(pad);
   const rw=new THREE.Mesh(new THREE.PlaneGeometry(b.w,b.len),asf);rw.rotation.x=-Math.PI/2;rw.position.y=.45;g.add(rw);
   for(let z=-b.len/2+50;z<b.len/2-50;z+=60){const d=new THREE.Mesh(new THREE.PlaneGeometry(1.3,30),paint);d.rotation.x=-Math.PI/2;d.position.set(0,.6,z);g.add(d)}
   for(const sg of[-1,1])for(let i=0;i<6;i++){const t=new THREE.Mesh(new THREE.PlaneGeometry(1.9,26),paint);t.rotation.x=-Math.PI/2;t.position.set((i-2.5)*3.8,.6,sg*(b.len/2-26));g.add(t)}
@@ -1506,7 +1581,10 @@ function makeDrogue(){const g=new THREE.Group();const c=new THREE.Mesh(new THREE
 function makeRaft(){const g=new THREE.Group();const t=new THREE.Mesh(new THREE.TorusGeometry(.75,.22,8,16),pbMat.raft);t.rotation.x=Math.PI/2;g.add(t);gBox(g,1.4,.06,1.4,pbMat.raft,0,-.15,0);return g}
 // chão sob um ponto: convés (se houver porta-aviões), terreno ou mar
 const carrierOn=()=>!(WORLD.real&&WORLD.noCarrier);
-function pbGround(x,z){if(carrierOn()&&Math.abs(x)<DECK_HW&&z>BOW_Z&&z<STERN_Z){if(x>27&&z>-5&&z<35)return{y:DECK+24,wall:1};return{y:DECK,deck:1}}const th=terrainH(x,z);return th>0?{y:th}:{y:0,water:1}}
+function pbGround(x,z){if(carrierOn()&&Math.abs(x)<DECK_HW&&z>BOW_Z&&z<STERN_Z){if(x>27&&z>-5&&z<35)return{y:DECK+24,wall:1};return{y:DECK,deck:1}}
+ const th=terrainH(x,z);
+ if(REAL_WORLD&&!realH.ok)return{y:-1e9,pending:1};// bloco de altitude ainda baixando: não existe chão (nem mar) aqui ainda
+ return th>0?{y:th}:{y:0,water:1}}
 function newBody(pos,vel,up,npc,seatName){const pl=makePilot(),seat=makeSeat(),chute=makeChute(),drog=makeDrogue(),g=new THREE.Group();g.add(seat,pl.g,chute,drog);chute.visible=drog.visible=false;scene.add(g);
  const keas=vel.length()*KT*Math.sqrt(Math.exp(-pos.y/8500)),alt=pos.y*FT;const mode=alt>15000?3:keas>250?2:1;
  const b={pos:pos.clone(),vel:vel.clone(),up:up.clone(),t:0,mode,keas,phase:'seat',sepT:mode===1?.75:1.4,chuteK:0,g,pl,seat,chute,drog,npc,hdg:Math.atan2(-vel.x,-vel.z)||0,raft:null,raftT:-1,walkT:0,land:'',inj:keas>600?1:0,seatName,fourLine:false};
@@ -1526,7 +1604,8 @@ function stepBody(b,dt,ctl){b.t+=dt;const d=b.drog,ch=b.chute;const rho=rhoAt(b.
   if(k>=1&&tt>4&&!b.fourLine){b.fourLine=true;if(!b.npc)say('4 tirantes soltos: agora dá para dirigir o paraquedas (A/D ou manche para os lados).','a')}
   if(b.fourLine){if(ctl)b.hdg-=ctl.turn*.35*dt;const f=tA.set(-Math.sin(b.hdg),0,-Math.cos(b.hdg)),a=1-Math.exp(-dt/1.5);b.vel.x+=(f.x*2.6-b.vel.x)*a;b.vel.z+=(f.z*2.6-b.vel.z)*a}}
  if(b.phase==='seat'||b.phase==='drogue'||b.phase==='chute'){b.pos.addScaledVector(b.vel,dt);const gr=pbGround(b.pos.x,b.pos.z);
-  if(b.t>.35&&b.pos.y<=gr.y){const vs=-b.vel.y,sp=b.vel.length();b.pos.y=gr.y;
+  if(gr.pending){b.vel.y*=.2;b.pos.y=Math.max(b.pos.y,120);if(!b.npc&&!b.waitSaid){b.waitSaid=true;say('Baixando o relevo do terreno… segura aí.','a')}}
+  if(b.t>.35&&!gr.pending&&b.pos.y<=gr.y){const vs=-b.vel.y,sp=b.vel.length();b.pos.y=gr.y;
    if(b.phase!=='chute'||b.chuteK<.6&&sp>14||vs>16){b.phase='dead';b.land='fatal';explosion(b.pos,.3,!!gr.water,null,'missile');b.g.visible=false;return}
    if(vs>8.5)b.inj=Math.max(b.inj,2);b.land=gr.water?'water':gr.deck?'deck':'land';b.phase=gr.water?'water':'walk';b.vel.set(0,0,0);b.landPos=b.pos.clone();
    ch.userData.canopy.scale.set(1,.12,1);ch.userData.canopy.position.y=.3;ch.userData.lines.visible=false;ch.position.set(1.5,0,3);b.chuteDrop=b.t;
@@ -1589,7 +1668,8 @@ function pbStep(dt){if(P.abandoned)jetStep(dt);if(!PB.on)return;
   if(blocked){b.vel.x=b.vel.z=0}else{b.pos.x=nx;b.pos.z=nz}
   const gr=pbGround(b.pos.x,b.pos.z);
   if(b.phase==='walk'){if(K.Space&&!PB.jumpH&&b.pos.y-gr.y<.05)b.vel.y=4.2;PB.jumpH=!!K.Space;b.vel.y-=G0*dt;b.pos.y+=b.vel.y*dt;
-   if(b.pos.y<=gr.y){const vs=-b.vel.y;b.pos.y=gr.y;if(gr.water){b.phase='water';b.vel.set(0,0,0);say(vs>15?'Você caiu de '+Math.round(vs*vs/2/G0)+' m no mar. Isso doeu kkk. Nade (W) ou chame o resgate (E).':'Você está na água. Nade (W) ou chame o resgate (E).','a');if(vs>22){b.phase='dead';b.land='fatal'}}else{if(vs>9)b.inj=Math.max(b.inj,2);b.vel.y=0}}}
+   if(gr.pending){b.vel.y=0}
+   else if(b.pos.y<=gr.y){const vs=-b.vel.y;b.pos.y=gr.y;if(gr.water){b.phase='water';b.vel.set(0,0,0);say(vs>15?'Você caiu de '+Math.round(vs*vs/2/G0)+' m no mar. Isso doeu kkk. Nade (W) ou chame o resgate (E).':'Você está na água. Nade (W) ou chame o resgate (E).','a');if(vs>22){b.phase='dead';b.land='fatal'}}else{if(vs>9)b.inj=Math.max(b.inj,2);b.vel.y=0}}}
   else{b.pos.y=0;if(!gr.water&&gr.y<.5){b.phase='walk';b.pos.y=gr.y}}
   const sw=Math.hypot(b.vel.x,b.vel.z);b.walkT+=dt*sw*2.2;const s=Math.sin(b.walkT)*Math.min(sw/2,1)*.7;b.pl.legL.rotation.x=s;b.pl.legR.rotation.x=-s;b.pl.armL.rotation.x=-s*.8;b.pl.armR.rotation.x=s*.8;b.pl.g.position.set(0,0,0);
   if(b.phase==='water'){b.pl.armL.rotation.z=-.8-Math.sin(b.t*3)*.4;b.pl.armR.rotation.z=.8+Math.sin(b.t*3)*.4}
@@ -2292,7 +2372,7 @@ function update(dt){
  if(run){G.t+=dt;readInput(dt);if(P.gph.loc>0&&P.state!=='dead'){IN.pitch=IN.roll=IN.yaw=0;fireHeld=false}const n=Math.ceil(dt/.008);for(let i=0;i<n&&P.state!=='dead'&&P.state!=='out';i++)stepPlayer(dt/n);axes();att();updGun(dt);radar();gPhys(dt);}
  else if(G.mode==='menu'){P.spool=.12}
  if(live&&G.mode!=='menu'){FR.length=0;if(P.state==='fly'||P.state==='deck')FR.push(P);for(const a of AL)if(a.alive&&!a.dying&&a.state!=='hold')FR.push(a);if(G.vip&&G.vip.alive&&!G.vip.dying)FR.push(G.vip);if(NET.match&&NET.mode==='coop')for(const r of NET.R.values())if(r.alive)FR.push(r);if(G.vip&&G.vip.alive)updVIP(G.vip,dt);for(const t of[...T]){if(!t.alive)continue;t.ghost?updGhost(t,dt):t.kind==='remote'?0:t.kind==='bandit'?updBandit(t,dt):t.kind==='ground'?updGround(t,dt):updVamp(t,dt)}updWrecks(dt);for(const a of[...AL])if(a.alive)updAlly(a,dt);updMissiles(dt);updBullets(dt);updFlares(dt);if(G.mode==='play')waves(dt)}
- if(live){updPS(SMK,dt);updPS(FIR,dt);updPS(SPK,dt);updFX(dt);flashL.intensity*=Math.exp(-dt*6);sea.material.normalMap.offset.x+=dt*.0012;sea.material.normalMap.offset.y+=dt*.0007;
+ if(live){updPS(SMK,dt);updPS(FIR,dt);updPS(SPK,dt);updFX(dt);flashL.intensity*=Math.exp(-dt*6);if(WATER.u){WATER.u.uTime.value+=dt;WATER.sun.copy(sunDirL);WATER.horiz.copy(scene.fog.color);WATER.u.uGlit.value=clamp((ATM.el+3)/10,0,1)}
   if(G.carrierHp<75&&Math.random()<.5)emit(SMK,tA.set(rnd(-8,8),DECK+2,rnd(-60,40)),rnd(-2,2),rnd(8,14),rnd(-2,2),rnd(5,9),8,45,.12,.11,.1,.6,.3,1);
   if(P.state==='cat'&&Math.random()<.15)emit(SMK,tA.set(rnd(-.5,.5),DECK+.3,rnd(-150,CAT_Z)),0,rnd(1,3),0,2.5,2,8,.85,.87,.9,.25,.6)}
  if(G.mode!=='menu'&&!G.paused)pbStep(dt);mpTick(dt);worldTick(dt);worldShift();if(JOY.cap)joyCapPoll();if(!document.getElementById('ctl').classList.contains('hide'))joyBars();if(run&&WORLD.real&&P.state==='fly'&&hitBuilding(P.pos))crash('Você bateu num prédio do Rio!');
@@ -3115,7 +3195,7 @@ async function teleport(name,lat,lon){if(G.mode!=='play')return false;say('Telep
 (function tpUI(){const box=document.getElementById('tpList');if(!box)return;
  for(const [n,la,lo] of TPLACES){const b=document.createElement('button');b.className='btn alt';b.textContent=n;
   b.onclick=()=>{setPause(false);teleport(n,la,lo)};box.appendChild(b)}})();
-window.__tomcat={get GEAR_H(){return GEAR_H},TOUCH,updTouch,BASES,rwyAt,rwyUV,nearBase,baseTick,papiTick,touchRwy,teleport,TPLACES,papi:()=>BASES.map(b=>(b.papi||[]).map(m=>m.material.color.getHex())),FBY,MCAM,RPL,VOX,fbySet,mcamSet,rplStart,rplStop,rplRec,dopUpd,vaporTick,voxTick,dop:()=>DOP,dvol:()=>DVOL,vapor:()=>vapor,boom:()=>boomT,simc(sec){for(let t=0;t<sec;t+=1/60){update(1/60);rplRec(1/60);updCamera(1/60);if(!RPL.on)syncModel(1/60);vaporTick(1/60);dopUpd();voxTick([],1/60)}},K,cockCam,VR,cmChance,updMissiles,ATM,AST,CLOUDS,cloudDepth,fog:()=>scene.fog.density,starOp:()=>starMat.opacity,smkN:()=>{let n=0;for(let i=0;i<SMK.max;i++)if(SMK.life[i]>0)n++;return n},hideCock:v=>{cockScene.visible=!v},skyG:(v,r)=>{SKYG=v;if(r)RAYL=r;applyTOD()},applyTOD2:()=>applyTOD(),wxApply2:()=>wxApply(),atm:()=>({el:+ATM.el.toFixed(1),cover:ATM.cover,rain:ATM.rain,wind:ATM.wind.toArray().map(v=>+v.toFixed(1)),spd:+P.spd.toFixed(1),gs:+(P.gs||0).toFixed(1),inCloud:+ATM.inCloud.toFixed(2)}),sndRender,engSynth,engProfile,SNDC,SPV,ENGV,ML,netAc,propOf:()=>me.hd&&me.hd.prop,CAMO,camOffMove,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={get GEAR_H(){return GEAR_H},TOUCH,updTouch,pbGround,worldSet,BASES,rwyAt,rwyUV,nearBase,baseTick,papiTick,touchRwy,teleport,TPLACES,papi:()=>BASES.map(b=>(b.papi||[]).map(m=>m.material.color.getHex())),FBY,MCAM,RPL,VOX,fbySet,mcamSet,rplStart,rplStop,rplRec,dopUpd,vaporTick,voxTick,dop:()=>DOP,dvol:()=>DVOL,vapor:()=>vapor,boom:()=>boomT,simc(sec){for(let t=0;t<sec;t+=1/60){update(1/60);rplRec(1/60);updCamera(1/60);if(!RPL.on)syncModel(1/60);vaporTick(1/60);dopUpd();voxTick([],1/60)}},K,cockCam,VR,cmChance,updMissiles,ATM,AST,CLOUDS,cloudDepth,fog:()=>scene.fog.density,starOp:()=>starMat.opacity,smkN:()=>{let n=0;for(let i=0;i<SMK.max;i++)if(SMK.life[i]>0)n++;return n},hideCock:v=>{cockScene.visible=!v},skyG:(v,r)=>{SKYG=v;if(r)RAYL=r;applyTOD()},applyTOD2:()=>applyTOD(),wxApply2:()=>wxApply(),atm:()=>({el:+ATM.el.toFixed(1),cover:ATM.cover,rain:ATM.rain,wind:ATM.wind.toArray().map(v=>+v.toFixed(1)),spd:+P.spd.toFixed(1),gs:+(P.gs||0).toFixed(1),inCloud:+ATM.inCloud.toFixed(2)}),sndRender,engSynth,engProfile,SNDC,SPV,ENGV,ML,netAc,propOf:()=>me.hd&&me.hd.prop,CAMO,camOffMove,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>

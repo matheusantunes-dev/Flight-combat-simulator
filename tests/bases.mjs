@@ -35,7 +35,7 @@ ok.pistaNaCotaDoTerreno = pad.elev > 18;
 // 2) pousa na pista: vira estado "land", corre na pista e não cai no terreno
 const ld = await p.evaluate(() => { const t = __tomcat, P = t.P, b = t.BASES[0], a = b.hdg * Math.PI / 180;
   const u = b.len / 2 - 500;                                   // rodas quase na zona de toque
-  P.pos.set(b.x + Math.sin(a) * u, b.elev + t.GEAR_H + 1.2, b.z + Math.cos(a) * u);
+  P.pos.set(b.x - Math.sin(a) * u, b.elev + t.GEAR_H + 1.2, b.z + Math.cos(a) * u);  // atrás da cabeceira, no rumo de pouso
   t.setQ(a, 0, 0); P.vel.set(Math.sin(a) * 68, -1.6, -Math.cos(a) * 68);
   P.gear = 1; P.gearPos = 1; P.flaps = 1; P.thr = .35; P.state = 'fly';
   let land = false, morreu = '', saiu = false, kiasToque = 0;
