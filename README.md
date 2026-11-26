@@ -8,6 +8,15 @@ No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inici
 
 Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
 
+## Bases em terra, pouso na pista e teleporte
+
+- **Duas bases aéreas** nas ilhas (SBIG e SBNO). A pista é um platô plano na **cota natural do morro** (a borda é misturada com o terreno, sem penhasco), com eixo tracejado, cabeceiras pintadas e luzes de borda.
+- **PAPI de verdade:** 4 caixas ao lado da zona de toque, com os ângulos oficiais (2°30′, 2°50′, 3°10′, 3°30′). Na rampa certa você vê **duas brancas perto da pista e duas vermelhas**; tudo branco = alto, tudo vermelho = baixo (*"red over red, you're dead"*).
+- **Pouso em terra:** trem baixado, menos de 9,5 m/s de razão de descida, asas niveladas e alinhado com a pista (até 35° de desalinhamento). Depois é corrida na pista: manete em idle e **B** para frear.
+- **Rearme e reabastecimento:** pare na pista (ou no convés) abaixo de **15 kt** e espere **5 s** — a equipe reabastece, rearma e conserta. Se você sair andando, o serviço é cancelado.
+- **Seta da base mais próxima:** no HUD, uma seta azul na borda aponta a pista ou o porta-aviões mais perto, com a distância em **NM**.
+- **Teleporte:** no menu de **Pausa**, lugares famosos (Anápolis, Estreito de Ormuz, Atlântico, Grand Canyon, Rio, Nellis). Liga o Mundo Real, muda o cenário e te põe no ar com tanque cheio.
+
 ## Câmeras de cinema, replay e som de fora
 
 Teclas: **F2** fly-by · **F** câmera do míssil · **F3** replay.
