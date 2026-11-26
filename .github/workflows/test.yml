@@ -43,3 +43,5 @@ jobs:
         run: node tests/ground.mjs
       - name: Todos os caças (modelos, trem, voo)
         run: node tests/cacas.mjs
+      - name: Olhar livre com o mouse (Alt+C, Pointer Lock)
+        run: node tests/olhar.mjs

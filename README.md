@@ -8,6 +8,10 @@ No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inici
 
 Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
 
+## Olhar livre com o mouse (só PC)
+
+Aperte **Alt+C** (o mesmo atalho do DCS) ou clique com o **botão do meio** (como no MSFS) para prender o cursor. A partir daí, é só mover o mouse para virar a cabeça do piloto, sem clicar. A cabeça fica onde você deixou, e o duplo clique centraliza. Para soltar, aperte **Alt+C** de novo, o botão do meio ou **Esc**; o Esc só solta o mouse e não pausa o jogo. Também funciona na câmera externa e no modo a pé. Usa a Pointer Lock API do navegador, e no celular fica desligado.
+
 ## Testes automáticos
 
 Todo Pull Request roda `.github/workflows/test.yml`: abre o jogo num Chrome headless e confere decolagem por catapulta, pouso com cabo e combate com os alas (`tests/smoke.mjs`), o multiplayer com 2 abas: lobby, PvP e coop (`tests/multiplayer.mjs`), o Mundo Real com mapa sintético (`tests/world.mjs`), e o joystick com um manche falso + o VR (`tests/controls.mjs`).
