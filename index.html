@@ -891,6 +891,8 @@ glc.addEventListener('wheel',e=>{e.preventDefault();if(view==='cock')fovT=clamp(
 
 function onKey(c){
  if(G.mode!=='play')return;
+ if(c==='F3'){RPL.on?rplStop():rplStart();return}
+ if(RPL.on){rplStop();return}
  if(c==='KeyP'||c==='Escape'){setPause(!G.paused);return}
  if(G.paused||P.state==='dead')return;
  const ground=P.state==='cat'||P.state==='launch'||P.state==='deck'||P.state==='trap';
@@ -907,6 +909,8 @@ function onKey(c){
  case 'KeyY':if(P.lock){P.lock=null;say('RIO: Trava solta.')}break;
   case 'KeyX':dropCM('flare');break;case 'KeyV':if(G.mode==='play')wingCmd();break;case 'KeyZ':dropCM('chaff');break;
   case 'KeyC':view=view==='cock'?'ext':'cock';break;
+  case 'F2':fbySet(!FBY.on);break;
+  case 'KeyF':mcamSet(!MCAM.on);break;
   case 'KeyU':if(!A.sweep){say(A.name+': asa fixa, sem enflechamento variável.','a');break}P.sweepAuto=true;say('Asas: modo AUTO (programa de Mach).');break;
   case 'KeyO':if(!A.sweep){say(A.name+': asa fixa, sem enflechamento variável.','a');break}P.sweepAuto=false;P.sweepMan=Math.min(68,Math.max(P.sweep,P.sweepMan)+8);say('Asas: MANUAL '+Math.round(P.sweepMan)+'°');break;
   case 'KeyI':if(!A.sweep){say(A.name+': asa fixa, sem enflechamento variável.','a');break}P.sweepAuto=false;P.sweepMan=Math.max(20,P.sweepMan-8);say('Asas: MANUAL '+Math.round(P.sweepMan)+'° (nunca à frente do AUTO)');break;
@@ -1680,7 +1684,16 @@ function initAudio(){if(AC)return;try{AC=new(window.AudioContext||window.webkitA
  const gf=AC.createBiquadFilter();gf.type='lowpass';gf.frequency.value=1800;SND.gunG=AC.createGain();SND.gunG.gain.value=0;gn.connect(ga).connect(gf).connect(SND.gunG).connect(M);
  const to=AC.createOscillator();to.type='triangle';to.start();SND.tone=to;SND.toneG=AC.createGain();SND.toneG.gain.value=0;to.connect(SND.toneG).connect(M);
  const rw=AC.createOscillator();rw.type='square';rw.frequency.value=1200;rw.start();SND.rwrG=AC.createGain();SND.rwrG.gain.value=0;rw.connect(SND.rwrG).connect(M);
- const wa=AC.createOscillator();wa.type='square';wa.start();SND.warn=wa;SND.warnG=AC.createGain();SND.warnG.gain.value=0;wa.connect(SND.warnG).connect(M)}
+ const wa=AC.createOscillator();wa.type='square';wa.start();SND.warn=wa;SND.warnG=AC.createGain();SND.warnG.gain.value=0;wa.connect(SND.warnG).connect(M);
+ /* camadas de cinema (como DCS/MSFS fazem no FMOD):
+    · vento por ângulo de ataque: o buffet e o ar batendo na cabine sobem junto com o alfa e a pressão dinâmica
+    · respiração anti-G: acima de ~5 G o piloto faz a manobra anti-G (M-1/L-1) e você ouve o esforço
+    · estouro sônico: um "clap" grave curto (o piloto NÃO ouve o próprio boom, ele fica atrás do avião) */
+ {const [af,ag]=chain(loop(SND.white),'bandpass',1400,.9);SND.aoaF=af;SND.aoaG=ag;
+  const [bf,bg]=chain(loop(SND.brown),'bandpass',330,1.1);SND.brF=bf;SND.brG=bg;
+  SND.boom=(vol=1)=>{try{const s=AC.createBufferSource();s.buffer=SND.brown;const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=190;const g=AC.createGain(),t0=AC.currentTime;
+   g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(clamp(vol,0,1)*.85,t0+.01);g.gain.exponentialRampToValueAtTime(.0008,t0+.55);
+   s.connect(lp).connect(g).connect(M);s.start(t0);s.stop(t0+.6)}catch(e){}}}}
 /* ---- motores com som de verdade ----
  Como os simuladores fazem (MSFS/X-Plane com FMOD, DCS): o som do motor é feito de camadas que seguem a rotação e a potência.
  Sem gravações, cada camada vem da física do motor:
@@ -1770,7 +1783,10 @@ let SNDR=0;async function sndRender(id,type,dur=9,synthOnly=false){initAudio();i
  if(bs.some(Boolean)){const B={};ks.forEach((k,i)=>B[k]=bs[i]);R=engReal(pf,B);R.out.connect(bus);V.out.gain.value=pf.type==='jet'?.35:0}
  for(let i=0;i<=180;i++){const tt=i/180*dur,pw=tt<2?0:tt<5?(tt-2)/3:tt<7?1:1-(tt-7)/2*.8,ab=pf.type==='jet'&&tt>5.5&&tt<7?1:0,st=(par,v)=>par.setTargetAtTime(v,tt,.05);V.up(tt,pw,ab,false,st);if(R)R.up(tt,pw,ab,false,st)}
  const b=await AC.startRendering();return {type:pf.type,real:!!R,data:b.getChannelData(0),sr}}finally{AC=real;SNDR=0}}
-function engAudio(t,on,inC){if(SNDR)return;const id=SPV.on?SPV.id:(G.mode==='play'&&AID)||S.ac;engBuild(id);const set=(p,v)=>p.setTargetAtTime(v,t,.08);
+function engAudio(t,on,inC){if(SNDR)return;const id=SPV.on?SPV.id:(G.mode==='play'&&AID)||S.ac;engBuild(id);
+ /* Doppler de verdade nas câmeras externas: só os parâmetros de frequência (maxValue = Nyquist) levam o fator;
+    ganhos e playbackRate têm maxValue = FLT_MAX e passam intactos. */
+ const set=(p,v)=>p.setTargetAtTime(p.maxValue<1e6?v*DOP:v,t,.08);
  const pw=SPV.on?SPV.thr:P.spool||0,ab=SPV.on?SPV.ab:P.ab||0,dead=!SPV.on&&G.mode==='play'&&P.fuel<=0;
  set(SND.engBus.gain,dead?0:on);set(SND.engLP.frequency,inC?2600:18000);for(const v of[ENGV.syn,ENGV.v])if(v)v.up(t,pw,ab,inC,set)}
 (function sndUI(){const $s=i=>document.getElementById(i);if(!$s('snd'))return;const msg=t=>{$s('sndMsg').textContent=t};let id=null;
@@ -1793,12 +1809,16 @@ function oneShot(buf,type,f0,f1,vol,dur,off=0){if(!AC)return;const t=AC.currentT
 const boom=(v,d)=>oneShot(SND.brown,'lowpass',900,120,v,d,Math.random()),whoosh=v=>oneShot(SND.white,'bandpass',2600,350,v,1.4);
 function blip(f,d,v){if(!AC)return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(SND.master);o.start(t);o.stop(t+d)}
 const click=()=>blip(900,.03,.08);
-function updAudio(warn){if(!AC)return;const t=AC.currentTime,inC=view==='cock'&&!SPV.on,on=SPV.on?1:G.mode==='play'&&!G.paused&&P.state!=='dead'?1:G.mode==='menu'?.3:0,set=(p,v)=>p.setTargetAtTime(v,t,.08);
- engAudio(t,on,inC);
+function updAudio(warn){if(!AC)return;const t=AC.currentTime,inC=view==='cock'&&!SPV.on&&!FBY.on&&!MCAM.on&&!RPL.on,on=SPV.on?1:G.mode==='play'&&!G.paused&&P.state!=='dead'?1:G.mode==='menu'?.3:0,set=(p,v)=>p.setTargetAtTime(v,t,.08);
+ engAudio(t,on*DVOL,inC);
  set(SND.wiG.gain,clamp(P.qd/55000,0,1)*(SND.airR?.08:.22)*on);if(SND.airR){set(SND.airR.gain,clamp(P.qd/45000,0,1.2)*.5*on*(inC?.55:1));set(SND.airS.playbackRate,.8+clamp(P.spd/400,0,.6));set(SND.airLP.frequency,inC?2500:9000)}set(SND.wiF.frequency,400+P.spd*1.4);if(SND.gunR){set(SND.gunG.gain,0);SND.gunR.gain.setTargetAtTime(firing&&on?.6:0,t,.02);SND.gunS.playbackRate.value=clamp(((A&&A.gun&&A.gun.rate)||100)/65,.55,1.6);SND.gunLP.frequency.value=inC?3000:9000}else set(SND.gunG.gain,firing&&on?.38:0);
  const tone=on&&P.wpn===2&&P.state==='fly'&&P.stores.aim9.some(s=>s.loaded);set(SND.toneG.gain,tone?(P.seekLock?.05:.025):0);set(SND.tone.frequency,P.seekLock?1150:380+40*Math.sin(t*22));
  const rw=P.rwr===2?(t*9%1<.5):P.rwr===1?(t%1.2<.12):0;SND.rwrG.gain.setTargetAtTime(rw&&on?.045:0,t,.005);
- set(SND.warnG.gain,warn&&on?.035:0);SND.warn.frequency.setValueAtTime(t*3%1<.5?700:880,t)}
+ set(SND.warnG.gain,warn&&on?.035:0);SND.warn.frequency.setValueAtTime(t*3%1<.5?700:880,t);
+ if(SND.aoaG){const buf=P.state==='fly'?clamp((P.aoa/(P.aSt||.42)-.5)/.6,0,1):0;
+  set(SND.aoaG.gain,on*DVOL*buf*clamp(P.qd/30000,0,1)*(inC?.11:.05));set(SND.aoaF.frequency,(850+buf*1500)*DOP);
+  const gg=clamp(((P.g||1)-4.6)/4,0,1),bre=gg*(.45+.55*Math.sin(t*(2+gg*1.8)));
+  set(SND.brG.gain,inC&&on&&P.state==='fly'?bre*.1:0);set(SND.brF.frequency,290+gg*170)}}
 function speak(txt){if(!S.voice||!txt||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(txt);u.lang='en-US';u.rate=1.15;u.pitch=.9;u.volume=.9;speechSynthesis.speak(u)}catch(e){}}
 
 /* ================= mensagens ================= */
@@ -2122,12 +2142,71 @@ document.getElementById('mrank').addEventListener('toggle',e=>{if(e.target.open)
 
 /* ================= câmera e loop ================= */
 const headQ=new Q4(),shQ=new Q4(),camQ=new Q4(),orbQ=new Q4(),eye=new V3();let menuA=0,panelT=0,last=performance.now();
+/* ================= câmeras de cinema, replay e Doppler =================
+ Pesquisa de como os grandes fazem: DCS World tem a tecla F4 (fly-by) com uma câmera parada no ar
+ e som com Doppler, e a F6 presa ao míssil; o MSFS tem "drone" e replay com fita circular;
+ o Ace Combat mostra a câmera do míssil até o impacto. Aqui:
+ · fly-by: a câmera fica parada ~320 m à frente, o avião passa perto e o som sobe/cai de verdade (f' = f·c/(c+vr))
+ · câmera do míssil: presa atrás do último míssil seu, olhando para o alvo
+ · replay: anel de 20 s com 30 amostras/s do seu avião (posição, atitude, trem, enflechamento) */
+const FBY={on:false,p:new V3(),t:0},MCAM={on:false,m:null},RPL={on:false,buf:[],w:0,n:0,acc:0,play:0,rate:30},RPL_MAX=600;
+let DOP=1,DVOL=1,vapor=null,prevMach=0,boomT=0;
+function dopUpd(){if(!(FBY.on||MCAM.on||RPL.on)||G.mode!=='play'){DOP=1;DVOL=1;return}
+ const d=tA.copy(P.pos).sub(camera.position),r=Math.max(d.length(),1);d.multiplyScalar(1/r);
+ const vr=P.vel?P.vel.dot(d):0;/* vr > 0 = afastando: som mais grave */
+ DOP=clamp(340/(340+vr),.5,2);DVOL=clamp(280/Math.max(r,70),.12,1.25)}
+function fbySet(on){if(on&&(G.mode!=='play'||P.state==='dead'))return;FBY.on=!!on;MCAM.on=false;
+ if(FBY.on){fbyPlace();say('Câmera FLY-BY · o avião passa pela sua direita (F2 volta)')}else{DOP=DVOL=1;say('Câmera normal.')}}
+function fbyPlace(){const g=Math.max(terrainH(P.pos.x,P.pos.z),0);FBY.p.copy(P.pos).addScaledVector(P.fwd,320).addScaledVector(P.right,42);FBY.p.y=Math.max(FBY.p.y-8,g+14);FBY.t=0}
+function fbyCamera(dt){FBY.t+=dt;camera.fov=lerp(camera.fov,40,1-Math.exp(-dt*6));camera.updateProjectionMatrix();
+ camera.position.copy(FBY.p);camera.lookAt(P.pos);if(FBY.t>4&&P.pos.distanceTo(FBY.p)>1100)fbyPlace()}
+function mcamSet(on){if(!on){MCAM.on=false;MCAM.m=null;DOP=DVOL=1;return}
+ const mine=MS.filter(x=>x.alive&&(x.owner==='player'||x.owner===P));if(!mine.length){say('Nenhum míssil seu no ar.','a');return}
+ MCAM.m=mine[mine.length-1];MCAM.on=true;FBY.on=false;say('CÂMERA DO MÍSSIL (F volta)')}
+function mcamCamera(dt){const m=MCAM.m;if(!m||!m.alive){mcamSet(false);return}
+ const v=tB.copy(m.vel);if(v.lengthSq()<1)v.set(0,0,-1);v.normalize();
+ camera.fov=lerp(camera.fov,52,1-Math.exp(-dt*5));camera.updateProjectionMatrix();
+ camera.position.copy(m.pos).addScaledVector(v,-19).add(tC.set(0,3.4,0));
+ tD.copy(m.pos).addScaledVector(v,80);if(m.target&&m.target.pos)tD.lerp(m.target.pos,.45);camera.lookAt(tD)}
+function rplRec(dt){if(G.mode!=='play'||P.state==='dead'||RPL.on)return;RPL.acc+=dt;if(RPL.acc<1/RPL.rate)return;RPL.acc=0;
+ const s=RPL.buf[RPL.w]||(RPL.buf[RPL.w]={p:new V3(),q:new THREE.Quaternion()});
+ s.p.copy(P.pos);s.q.copy(P.q);s.sw=P.sweep;s.gear=P.gearPos;s.ab=P.ab;
+ RPL.w=(RPL.w+1)%RPL_MAX;RPL.n=Math.min(RPL.n+1,RPL_MAX)}
+function rplStart(){if(RPL.n<30){say('Replay: a fita ainda tem menos de 1 s kkk','a');return false}
+ RPL.on=true;RPL.play=0;G.paused=true;FBY.on=MCAM.on=false;say('REPLAY dos últimos '+(RPL.n/RPL.rate).toFixed(0)+' s · F3 para sair');return true}
+function rplStop(){if(!RPL.on)return;RPL.on=false;G.paused=false;DOP=DVOL=1;say('Fim do replay.')}
+function rplFrame(dt){const k=Math.floor(RPL.play*RPL.rate);if(k>=RPL.n){rplStop();return}
+ const s=RPL.buf[(RPL.w-RPL.n+k+RPL_MAX*2)%RPL_MAX];RPL.play+=dt;if(!s){rplStop();return}
+ me.g.visible=true;me.g.position.copy(s.p);me.g.quaternion.copy(s.q);me.sweep(s.sw);
+ for(const g of me.gear){g.visible=s.gear>.05;g.scale.y=s.gear}
+ if(HD.ok&&me.hd){me.hd.sweep(s.sw);me.hd.gear(s.gear>.5)}
+ const a=G.t*.22;camera.fov=46;camera.updateProjectionMatrix();
+ camera.position.copy(s.p).add(tA.set(Math.sin(a)*95,30,Math.cos(a)*95));camera.lookAt(s.p)}
+/* cone de vapor (condensação de Prandtl-Glauert) e estouro sônico */
+function vaporTick(dt){
+ if(!vapor){const g=new THREE.ConeGeometry(6.5,15,22,1,true);g.rotateX(-Math.PI/2);g.translate(0,0,-3);
+  vapor=new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:0xe2ecf5,transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));vapor.renderOrder=3;scene.add(vapor)}
+ const m=P.mach||0,hum=clamp(1-P.pos.y/13000,.2,1),k=P.state==='fly'?clamp(1-Math.abs(m-.99)/.13,0,1)*hum:0;
+ vapor.visible=k>.03&&(view!=='cock'||FBY.on||MCAM.on||RPL.on);
+ if(vapor.visible){vapor.position.copy(P.pos).addScaledVector(P.fwd,-7);vapor.quaternion.copy(P.q);vapor.material.opacity=k*.34;const sc=.85+k*.45;vapor.scale.set(sc,sc,1)}
+ if(prevMach<1&&m>=1&&P.state==='fly'){boomT=.8;if(SND.boom&&(view==='ext'||FBY.on||MCAM.on))SND.boom(1)}
+ if(boomT>0)boomT=Math.max(0,boomT-dt);prevMach=m}
+/* avisos falados do tipo "Bitching Betty": Over-G e Pull Up, com intervalo mínimo */
+const VOX={og:0,pu:0};
+function voxTick(warn,dt){if(G.mode!=='play'||P.state!=='fly'){VOX.og=VOX.pu=0;return}
+ VOX.og=Math.max(0,VOX.og-dt);VOX.pu=Math.max(0,VOX.pu-dt);
+ if(P.g>7.8&&!VOX.og){VOX.og=4;say('OVER G! Alivia o manche.','w','Over G, over G')}
+ const agl=P.pos.y-Math.max(terrainH(P.pos.x,P.pos.z),0),sink=-(P.vel?P.vel.y:0);
+ if(agl<1500&&sink>45&&agl/sink<10&&P.gearPos<.5&&!VOX.pu){VOX.pu=3.5;say('PULL UP! PULL UP!','w','Pull up, pull up')}}
 function updCamera(dt){
  {const hw=G.mode==='menu'&&!$('#menu').classList.contains('hide')&&(HG.insp||!!document.querySelector('section.tab.on[data-tab=play]'));hgSet(hw);if(hw){hgCamera(dt);return}}
  if(G.mode==='menu'){menuA+=dt*.06;camera.fov=50;camera.updateProjectionMatrix();camera.position.set(Math.sin(menuA)*150-20,DECK+34+Math.sin(menuA*.7)*10,CAT_Z+Math.cos(menuA)*150);camera.lookAt(0,DECK+3,CAT_Z+4);return}
  camera.fov=lerp(camera.fov,view==='cock'?fovT:60,1-Math.exp(-dt*8));camera.updateProjectionMatrix();cockCam.fov=camera.fov;cockCam.updateProjectionMatrix();
  if(P.state==='dead'||G.mode==='over'){menuA+=dt*.15;const cx=P.pos.x+Math.sin(menuA)*180,cz=P.pos.z+Math.cos(menuA)*180;camera.position.set(cx,Math.max(P.pos.y+60,terrainH(cx,cz)+40,40),cz);camera.lookAt(P.pos.x,Math.max(P.pos.y,0),P.pos.z);return}
+ if(RPL.on&&G.mode==='play'){rplFrame(dt);return}
  if(PB.on&&G.mode==='play'){pbCamera(dt);return}
+ if(MCAM.on&&G.mode==='play'){mcamCamera(dt);return}
+ if(FBY.on&&G.mode==='play'){fbyCamera(dt);return}
  if(G.kcam){const t=G.kcam.tg,v=XV.copy(t.vel);if(v.lengthSq()<1)v.set(0,0,-1);v.normalize();const side=tB.crossVectors(v,tC.set(0,1,0)).normalize().multiplyScalar(G.kcam.side);const k=G.kcam.t/2.2;camera.position.copy(t.pos).addScaledVector(side,70-k*25).addScaledVector(v,-40+k*60).add(tC.set(0,18,0));camera.lookAt(t.pos);return}
  if(ML.on&&(G.mode!=='play'||G.paused))mlToggle(false);if(view==='cock'){const back=!dragging&&!ML.on;headYaw=lerp(headYaw,back?lookYaw*.0:lookYaw,1-Math.exp(-dt*(back?3:14)));headPitch=lerp(headPitch,back?-.06:lookPitch,1-Math.exp(-dt*(back?3:14)));if(back){lookYaw=headYaw;lookPitch=headPitch}
   const buf=P.state==='fly'&&P.aoa>P.aSt*.78?(P.aoa/P.aSt-.78)*1.2:0,sh=(P.shake+buf+(P.state==='launch'?.6:0)+P.ab*clamp(1-P.pos.y/3000,0,1)*.15)*.006;P.shake=Math.max(0,P.shake-dt*1.6);
@@ -2157,7 +2236,7 @@ function update(dt){
  if(G.mode!=='menu'&&!G.paused)pbStep(dt);mpTick(dt);worldTick(dt);worldShift();if(JOY.cap)joyCapPoll();if(!document.getElementById('ctl').classList.contains('hide'))joyBars();if(run&&WORLD.real&&P.state==='fly'&&hitBuilding(P.pos))crash('Você bateu num prédio do Rio!');
  return run}
 function frame(now){if(RS.role==='view')return;if(!XR.s)requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.05);last=now;const run=update(dt);
- updCamera(dt);syncModel(dt);touchFrame();
+ rplRec(dt);updCamera(dt);if(!RPL.on)syncModel(dt);vaporTick(dt);dopUpd();touchFrame();
  sky.position.copy(camera.position);sea.position.set(Math.round(camera.position.x/125)*125,0,Math.round(camera.position.z/125)*125);
  sun.position.copy(camera.position).addScaledVector(sunDirL,5000);sun.target.position.copy(camera.position);stars.position.copy(camera.position);moonSpr.position.copy(camera.position).addScaledVector(ATM.moon,880);atmoTick(dt);
  tA.copy(sunDirL).applyQuaternion(tQ.copy(P.q).invert());cSun.position.copy(tA).multiplyScalar(5);cSun.target.position.set(0,0,0);
@@ -2167,7 +2246,7 @@ function frame(now){if(RS.role==='view')return;if(!XR.s)requestAnimationFrame(fr
  if(XR.s){xrPre();xrHUD(warn);XR.hud.visible=G.mode==='play'&&P.state!=='dead';renderer.clear();renderer.render(scene,camera);renderer.clearDepth();if(showC)renderer.render(cockScene,cockCam);xrPost();if(showC&&now-panelT>66){panelT=now;drawPanel()}}
  else{if(!vrOn){renderer.clear();renderer.render(scene,camera)}
  if(showC){if(!vrOn){renderer.clearDepth();renderer.render(cockScene,cockCam)}if(now-panelT>66){panelT=now;drawPanel()}}
- if(vrOn)vrRender(showC,warn);else drawHUD(warn);rsHostFrame()}updAudio(warn.length&&warn.some(w=>w!=='MISSILE'));
+ if(vrOn)vrRender(showC,warn);else drawHUD(warn);rsHostFrame()}updAudio(warn.length&&warn.some(w=>w!=='MISSILE'));voxTick(warn,dt);
  if(now-uiT>200){uiT=now;updUI()}}
 
 /* ================= modelos 3D reais (GLB) ================= */
@@ -2958,7 +3037,7 @@ function goFull(){if(!TOUCH.ui)return;try{const d=document.documentElement,rq=d.
 resetP();placeCat();wxApply();drawPanel();syncMenu();hangarUI();$('#go').disabled=true;
 // PWA: instala como app e funciona offline (só em HTTPS ou localhost)
 if('serviceWorker' in navigator&&/^https:|localhost|127\.0\.0\.1/.test(location.href))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('sw',e)));
-window.__tomcat={K,cockCam,VR,cmChance,updMissiles,ATM,AST,CLOUDS,cloudDepth,fog:()=>scene.fog.density,starOp:()=>starMat.opacity,smkN:()=>{let n=0;for(let i=0;i<SMK.max;i++)if(SMK.life[i]>0)n++;return n},hideCock:v=>{cockScene.visible=!v},skyG:(v,r)=>{SKYG=v;if(r)RAYL=r;applyTOD()},applyTOD2:()=>applyTOD(),wxApply2:()=>wxApply(),atm:()=>({el:+ATM.el.toFixed(1),cover:ATM.cover,rain:ATM.rain,wind:ATM.wind.toArray().map(v=>+v.toFixed(1)),spd:+P.spd.toFixed(1),gs:+(P.gs||0).toFixed(1),inCloud:+ATM.inCloud.toFixed(2)}),sndRender,engSynth,engProfile,SNDC,SPV,ENGV,ML,netAc,propOf:()=>me.hd&&me.hd.prop,CAMO,camOffMove,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
+window.__tomcat={FBY,MCAM,RPL,VOX,fbySet,mcamSet,rplStart,rplStop,rplRec,dopUpd,vaporTick,voxTick,dop:()=>DOP,dvol:()=>DVOL,vapor:()=>vapor,boom:()=>boomT,simc(sec){for(let t=0;t<sec;t+=1/60){update(1/60);rplRec(1/60);updCamera(1/60);if(!RPL.on)syncModel(1/60);vaporTick(1/60);dopUpd();voxTick([],1/60)}},K,cockCam,VR,cmChance,updMissiles,ATM,AST,CLOUDS,cloudDepth,fog:()=>scene.fog.density,starOp:()=>starMat.opacity,smkN:()=>{let n=0;for(let i=0;i<SMK.max;i++)if(SMK.life[i]>0)n++;return n},hideCock:v=>{cockScene.visible=!v},skyG:(v,r)=>{SKYG=v;if(r)RAYL=r;applyTOD()},applyTOD2:()=>applyTOD(),wxApply2:()=>wxApply(),atm:()=>({el:+ATM.el.toFixed(1),cover:ATM.cover,rain:ATM.rain,wind:ATM.wind.toArray().map(v=>+v.toFixed(1)),spd:+P.spd.toFixed(1),gs:+(P.gs||0).toFixed(1),inCloud:+ATM.inCloud.toFixed(2)}),sndRender,engSynth,engProfile,SNDC,SPV,ENGV,ML,netAc,propOf:()=>me.hd&&me.hd.prop,CAMO,camOffMove,custScene,custNormalize,cam:()=>({yaw:lookYaw,pitch:lookPitch,view}),ccip,MDEF,ACFT,NEWAC,updBandit,HG,PB,EJ,eject,pbAction,placeCat,placeAir,gPhys,gTol,lockCycle,fireMissile,groundLeft,WR,CAMPAIGN,radar,RS,XR,RADIO,endGame,NET,WORLD,realH,JOY,VR,vrSet,worldGo,joyUI,mpJoin,mpHostStart,damage,AL,MS,DEB,SMK,FIR,ENEMY,explosion,wingCmd,spawnMissile,camera,P,G,S,T,MS,K,IN,startGame,setQ,spawnBandit,selectAircraft,get A(){return A},look(y,p){lookYaw=headYaw=y;lookPitch=headPitch=p;dragging=true},sim(sec,fn){for(let t=0;t<sec;t+=1/60){if(fn)fn(t);update(1/60)}}};
 requestAnimationFrame(frame);
 }
 </script>

@@ -8,6 +8,19 @@ No Chrome do Android: menu ⋮ → **Instalar app** (ou "Adicionar à tela inici
 
 Ao mudar modelos ou bibliotecas, suba a versão em `sw.js` (`const VERSION = 'fcs-v2'`) para os jogadores receberem os arquivos novos.
 
+## Câmeras de cinema, replay e som de fora
+
+Teclas: **F2** fly-by · **F** câmera do míssil · **F3** replay.
+
+- **Fly-by (F2):** a câmera para no ar ~320 m à frente e o avião passa raspando por ela, como o F4 do DCS. Quando você se afasta muito ela se reposiciona sozinha pra te dar outra passagem.
+- **Doppler de verdade:** nas câmeras externas o som usa `f' = f·c/(c+vr)` — agudo quando o avião vem, grave quando passa — e o volume cai com a distância. Vale para o motor sintetizado e para as camadas de vento.
+- **Câmera do míssil (F):** cola atrás do seu último míssil no ar, olhando para o alvo. Sem míssil no ar ela avisa e não liga.
+- **Replay (F3):** fita circular com os últimos **20 s** do seu avião (30 amostras/s: posição, atitude, trem, enflechamento). O jogo pausa enquanto você assiste, numa órbita em volta da fita. F3 de novo volta ao voo. Hoje a fita guarda só o **seu** avião — inimigos e mísseis ficam congelados no replay.
+- **Cone de vapor + estouro sônico:** perto de Mach 1 aparece o cone de condensação (Prandtl–Glauert), mais forte em altitude baixa (ar úmido). O boom só é ouvido nas câmeras de fora: na vida real o piloto nunca ouve o próprio estouro, ele fica atrás do avião.
+- **Vento por ângulo de ataque:** o ar na cabine fica mais alto e mais agudo conforme você puxa alfa e pressão dinâmica (buffet).
+- **Respiração anti-G:** acima de ~5 G você ouve o piloto fazendo a manobra anti-G.
+- **Vozes:** "OVER G" acima de 7,8 G e "PULL UP" quando a razão de descida come o terreno, com intervalo mínimo entre avisos (como a *Bitching Betty* dos caças).
+
 ## Aerodinâmica de verdade
 
 - **Estol com quebra de nariz:** passou do ângulo de ataque crítico, a sustentação cai e o nariz despenca. O aviso de estol toca antes.

@@ -59,3 +59,5 @@ jobs:
         run: node tests/combate.mjs
       - name: Aerodinâmica (estol, parafuso, efeito solo, inércia da cabeça)
         run: node tests/aerodinamica.mjs
+      - name: Câmeras de cinema e áudio (fly-by com Doppler, câmera do míssil, replay, vapor)
+        run: node tests/cinema.mjs
