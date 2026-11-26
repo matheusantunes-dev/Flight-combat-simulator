@@ -16,7 +16,7 @@ if (process.env.LIBS) {
 }
 const errs = [];
 const ready = (p) => p.waitForFunction(() => window.__tomcat && !document.querySelector('#go').disabled, null, { timeout: 120000 });
-const open = async (n, q) => { const p = await ctx.newPage(); p.on('pageerror', (e) => errs.push(n + ': ' + e)); await p.goto(BASE + q); await ready(p); return p; };
+const open = async (n, q) => { const p = await ctx.newPage(); p.on('pageerror', (e) => errs.push(n + ': ' + e)); await p.goto(BASE + q, { timeout: 120000 }); await ready(p); return p; };
 const ok = {};
 
 const A = await open('A', '?rede=local');
