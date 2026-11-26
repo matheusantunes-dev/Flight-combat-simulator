@@ -151,8 +151,8 @@ Observações honestas:
 - MiG-29 e Su-27 simples: Zuujis, CC0.
 - F-15E, Rafale M, Su-57, Gripen, Su-35 e Su-34: bohmerang, **CC BY-NC-SA 4.0**.
 - F-117A e F-22A: andertan, **CC BY 4.0**. F-16F Block 60: MirzaArrafiERV_45, **CC BY 4.0**.
-- A-10C e Su-30MKK: Jeyhun1985, **CC BY 4.0**. Su-25: Alexios_Apokaukos, **CC BY 4.0**.
+- A-10C: blarg, **CC BY 4.0** (bombas do modelo removidas). Su-30MKK: Jeyhun1985, **CC BY 4.0**. Su-25: Alexios_Apokaukos, **CC BY 4.0**.
 - J-11B (usado como Flanker inimigo): Rhine_Lab_Muelsyse, **CC BY 4.0**.
-- Alterações nos modelos CC BY: reorientados (nariz em +X), simplificados, texturas recomprimidas; F-117, F-22, A-10 e Su-30 ganham trem de pouso procedural no jogo (os modelos vieram com o trem recolhido); no F-16F o trem, que veio fundido na fuselagem, é recortado para recolher em voo.
+- Alterações nos modelos CC BY: reorientados (nariz em +X), simplificados, texturas recomprimidas; F-117, F-22 e Su-30 ganham trem de pouso procedural no jogo (os modelos vieram com o trem recolhido); no F-16F e no A-10 o trem, que veio fundido na fuselagem, é recortado para recolher em voo.
 
 Por causa da licença NC dos caças, este projeto **não pode ser vendido nem monetizado** sem trocar esses modelos.
